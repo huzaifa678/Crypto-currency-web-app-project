@@ -38,7 +38,7 @@ jobs:
     
     - name: Install migrations
       run: | 
-        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.18.1/migrate.linux-arm64.tar.gz | tar xvz
+        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.18.1/migrate.linux-amd64.tar.gz | tar xvz
         sudo mv migrate /usr/local/bin/
         chmod +x /usr/local/bin/migrate
         migrate --version
