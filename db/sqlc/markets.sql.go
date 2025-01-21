@@ -57,6 +57,31 @@ func (q *Queries) DeleteMarket(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
+const getMarketByCurrencies = `-- name: GetMarketByCurrencies :one
+SELECT id, base_currency, quote_currency, min_order_amount, price_precision, created_at
+FROM markets
+WHERE base_currency = $1 AND quote_currency = $2
+`
+
+type GetMarketByCurrenciesParams struct {
+	BaseCurrency  string `json:"base_currency"`
+	QuoteCurrency string `json:"quote_currency"`
+}
+
+func (q *Queries) GetMarketByCurrencies(ctx context.Context, arg GetMarketByCurrenciesParams) (Market, error) {
+	row := q.db.QueryRowContext(ctx, getMarketByCurrencies, arg.BaseCurrency, arg.QuoteCurrency)
+	var i Market
+	err := row.Scan(
+		&i.ID,
+		&i.BaseCurrency,
+		&i.QuoteCurrency,
+		&i.MinOrderAmount,
+		&i.PricePrecision,
+		&i.CreatedAt,
+	)
+	return i, err
+}
+
 const getMarketByID = `-- name: GetMarketByID :one
 SELECT id, base_currency, quote_currency, min_order_amount, price_precision, created_at
 FROM markets
