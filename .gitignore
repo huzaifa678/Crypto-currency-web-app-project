@@ -1,1 +1,12 @@
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
 
+*.test
+*.out
+*.cover
+
+vendor/
+Godeps/
