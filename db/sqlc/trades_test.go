@@ -75,6 +75,202 @@ func TestCreateTrade(t *testing.T) {
 	require.Equal(t, "10.00000000", trade.Amount, "Amount should match the trade amount")
 }
 
+func TestDeleteTrade(t *testing.T) {
+	market := createRandomMarketForTrade(t)
+
+	buyerUsersArgs := CreateUserParams {
+		Email: "exam370@example.com",
+		PasswordHash: "kddeoovpds",
+		Role: "user",
+		IsVerified: sql.NullBool{Bool: false, Valid: true},
+	}
+
+	buyer, err := testQueries.CreateUser(context.Background(), buyerUsersArgs)
+	require.NoError(t, err, "Failed to create user")
+
+
+	buyOrderArgs := CreateOrderParams {
+		UserID: buyer.ID,
+		MarketID: market.ID,
+		Type: OrderType("buy"),
+		Status: OrderStatus("open"),
+		Price: sql.NullString{String: "100.50000000", Valid: true},
+		Amount: "1000.00000000",
+	}
+
+	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
+	require.NoError(t, err, "Failed to create order for the buyer")
+
+	sellerUsersArgs := CreateUserParams {
+		Email: "exam371@example.com",
+		PasswordHash: "fvfdvrrgtg",
+		Role: "user",
+		IsVerified: sql.NullBool{Bool: false, Valid: true},
+	}
+
+	seller, err := testQueries.CreateUser(context.Background(), sellerUsersArgs)
+	require.NoError(t, err, "Failed to create user")
+
+	sellOrderArgs := CreateOrderParams {
+		UserID: seller.ID,
+		MarketID: market.ID,
+		Type: OrderType("buy"),
+		Status: OrderStatus("open"),
+		Price: sql.NullString{String: "110.50000000", Valid: true},
+		Amount: "1000.00000000",
+	}
+
+	sellOrder, err := testQueries.CreateOrder(context.Background(), sellOrderArgs)
+	require.NoError(t, err, "Failed to create order for the seller")
+
+	tradeArgs := CreateTradeParams {
+		BuyOrderID: buyOrder.ID,
+		SellOrderID: sellOrder.ID,
+		MarketID: market.ID,
+		Price: "105.50000000",
+		Amount: "10.00000000",
+	}
+
+	trade, err := testQueries.CreateTrade(context.Background(), tradeArgs)
+	require.NoError(t, err, "Failed to create trade")
+	err = testQueries.DeleteTrade(context.Background(), trade.ID)
+	require.NoError(t, err, "Failed to delete trade")
+	_, err = testQueries.GetTradeByID(context.Background(), trade.ID)
+	require.Error(t, err, "Expected error when fetching deleted trade")
+	require.Equal(t, sql.ErrNoRows, err, "Error should be no rows found")
+}
+
+func TestGetTradeById(t *testing.T) {
+	market := createRandomMarketForTrade(t)
+
+	buyerUsersArgs := CreateUserParams {
+		Email: "exam302@example.com",
+		PasswordHash: "kddeoovpds",
+		Role: "user",
+		IsVerified: sql.NullBool{Bool: false, Valid: true},
+	}
+
+	buyer, err := testQueries.CreateUser(context.Background(), buyerUsersArgs)
+	require.NoError(t, err, "Failed to create user")
+
+
+	buyOrderArgs := CreateOrderParams {
+		UserID: buyer.ID,
+		MarketID: market.ID,
+		Type: OrderType("buy"),
+		Status: OrderStatus("open"),
+		Price: sql.NullString{String: "100.50000000", Valid: true},
+		Amount: "1000.00000000",
+	}
+
+	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
+	require.NoError(t, err, "Failed to create order for the buyer")
+
+	sellerUsersArgs := CreateUserParams {
+		Email: "exam303@example.com",
+		PasswordHash: "fvfdvrrgtg",
+		Role: "user",
+		IsVerified: sql.NullBool{Bool: false, Valid: true},
+	}
+
+	seller, err := testQueries.CreateUser(context.Background(), sellerUsersArgs)
+	require.NoError(t, err, "Failed to create user")
+
+	sellOrderArgs := CreateOrderParams {
+		UserID: seller.ID,
+		MarketID: market.ID,
+		Type: OrderType("buy"),
+		Status: OrderStatus("open"),
+		Price: sql.NullString{String: "110.50000000", Valid: true},
+		Amount: "1000.00000000",
+	}
+
+	sellOrder, err := testQueries.CreateOrder(context.Background(), sellOrderArgs)
+	require.NoError(t, err, "Failed to create order for the seller")
+
+	tradeArgs := CreateTradeParams {
+		BuyOrderID: buyOrder.ID,
+		SellOrderID: sellOrder.ID,
+		MarketID: market.ID,
+		Price: "105.50000000",
+		Amount: "10.00000000",
+	}
+
+	trade, err := testQueries.CreateTrade(context.Background(), tradeArgs)
+	require.NoError(t, err, "Failed to create trade")
+	fetchedTrade, err := testQueries.GetTradeByID(context.Background(), trade.ID)
+	require.NoError(t, err, "failed to get the trade by ID")
+	require.Equal(t, trade.ID, fetchedTrade.ID, "The Trade ID is matched")
+	require.Equal(t, trade.BuyOrderID, fetchedTrade.BuyOrderID, "The BuyOrderID is matched")
+	require.Equal(t, trade.SellOrderID, fetchedTrade.SellOrderID, "The SellOrderID is matched")
+	require.Equal(t, trade.MarketID, fetchedTrade.MarketID, "The MarketID is matched")
+	require.Equal(t, trade.Price, fetchedTrade.Price, "The Price is matched")
+	require.Equal(t, trade.Amount, fetchedTrade.Amount, "The Amount is matched")
+}
+
+
+func TestGetTradeByMarketID(t *testing.T) {
+	market := createRandomMarketForTrade(t)
+	
+	buyerUsersArgs := CreateUserParams {
+		Email: "exam3012@example.com",
+		PasswordHash: "kddeoovpds",
+		Role: "user",
+		IsVerified: sql.NullBool{Bool: false, Valid: true},
+	}
+
+	buyer, err := testQueries.CreateUser(context.Background(), buyerUsersArgs)
+	require.NoError(t, err, "Failed to create user")
+
+
+	buyOrderArgs := CreateOrderParams {
+		UserID: buyer.ID,
+		MarketID: market.ID,
+		Type: OrderType("buy"),
+		Status: OrderStatus("open"),
+		Price: sql.NullString{String: "100.50000000", Valid: true},
+		Amount: "1000.00000000",
+	}
+
+	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
+	require.NoError(t, err, "Failed to create order for the buyer")
+
+	sellerUsersArgs := CreateUserParams {
+		Email: "exam3013@example.com",
+		PasswordHash: "fvfdvrrgtg",
+		Role: "user",
+		IsVerified: sql.NullBool{Bool: false, Valid: true},
+	}
+
+	seller, err := testQueries.CreateUser(context.Background(), sellerUsersArgs)
+	require.NoError(t, err, "Failed to create user")
+
+	sellOrderArgs := CreateOrderParams {
+		UserID: seller.ID,
+		MarketID: market.ID,
+		Type: OrderType("buy"),
+		Status: OrderStatus("open"),
+		Price: sql.NullString{String: "110.50000000", Valid: true},
+		Amount: "1000.00000000",
+	}
+
+	sellOrder, err := testQueries.CreateOrder(context.Background(), sellOrderArgs)
+	require.NoError(t, err, "Failed to create order for the seller")
+
+	tradeArgs := CreateTradeParams {
+		BuyOrderID: buyOrder.ID,
+		SellOrderID: sellOrder.ID,
+		MarketID: market.ID,
+		Price: "105.50000000",
+		Amount: "10.00000000",
+	}
+
+	trade, err := testQueries.CreateTrade(context.Background(), tradeArgs)
+	require.NoError(t, err, "Failed to create trade")
+	_, err = testQueries.GetTradesByMarketID(context.Background(), trade.MarketID)
+	require.NoError(t, err, "failed to get the trade by Market ID")
+}
+
 func createRandomMarketForTrade(t *testing.T) CreateMarketRow {
 	ctx := context.Background()
 
@@ -118,7 +314,5 @@ func createRandomMarketForTrade(t *testing.T) CreateMarketRow {
 	require.NotEmpty(t, market.ID, "Market ID should not be empty")
 	require.Equal(t, baseCurrency, market.BaseCurrency, "BaseCurrency should match")
 	require.Equal(t, quoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
-
 	return market
 }
-
