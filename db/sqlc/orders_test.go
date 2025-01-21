@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/require"
+	"golang.org/x/exp/rand"
 )
 
 
@@ -21,14 +22,7 @@ func TestCreateOrder(t *testing.T) {
 	user, err := testQueries.CreateUser(context.Background(), userArgs)
 	require.NoError(t, err, "Failed to create user")
 
-	arg := CreateMarketParams {
-		BaseCurrency: "EUR",
-		QuoteCurrency: "USD",
-		MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
-		PricePrecision: sql.NullInt32{Int32: 8, Valid: true},
-	}
-
-	market, err := testQueries.CreateMarket(context.Background(), arg)
+	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
 		UserID: user.ID,
@@ -61,14 +55,8 @@ func TestGetOrderById(t *testing.T) {
 	user, err := testQueries.CreateUser(context.Background(), userArgs)
 	require.NoError(t, err, "Failed to create user")
 
-	arg := CreateMarketParams {
-		BaseCurrency: "PKR",
-		QuoteCurrency: "BTC",
-		MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
-		PricePrecision: sql.NullInt32{Int32: 8, Valid: true},
-	}
 
-	market, err := testQueries.CreateMarket(context.Background(), arg)
+	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
 		UserID: user.ID,
@@ -103,14 +91,8 @@ func TestDeleteOrder(t *testing.T) {
 	user, err := testQueries.CreateUser(context.Background(), userArgs)
 	require.NoError(t, err, "Failed to create user")
 
-	arg := CreateMarketParams {
-		BaseCurrency: "BTC",
-		QuoteCurrency: "USD",
-		MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
-		PricePrecision: sql.NullInt32{Int32: 8, Valid: true},
-	}
 
-	market, err := testQueries.CreateMarket(context.Background(), arg)
+	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
 		UserID: user.ID,
@@ -141,14 +123,8 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 	user, err := testQueries.CreateUser(context.Background(), userArgs)
 	require.NoError(t, err, "Failed to create user")
 
-	arg := CreateMarketParams {
-		BaseCurrency: "PKR",
-		QuoteCurrency: "EUR",
-		MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
-		PricePrecision: sql.NullInt32{Int32: 8, Valid: true},
-	}
 
-	market, err := testQueries.CreateMarket(context.Background(), arg)
+	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
 		UserID: user.ID,
@@ -175,5 +151,52 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 	require.Equal(t, updatedArg.Status, updatedOrder.Status)
 	require.Equal(t, updatedArg.FilledAmount, updatedOrder.FilledAmount)
 	require.WithinDuration(t, time.Now(), updatedOrder.UpdatedAt.Time, time.Second, "UpdatedAt should be recent")
+}
+
+func createRandomMarketForOrder(t *testing.T) CreateMarketRow {
+	ctx := context.Background()
+
+	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
+	baseCurrency := currencies[rand.Intn(len(currencies))]
+	quoteCurrency := currencies[rand.Intn(len(currencies))]
+
+	for baseCurrency == quoteCurrency {
+		quoteCurrency = currencies[rand.Intn(len(currencies))]
+	}
+
+	existingMarket, err := testQueries.GetMarketByCurrencies(ctx, GetMarketByCurrenciesParams{
+		BaseCurrency:  baseCurrency,
+		QuoteCurrency: quoteCurrency,
+	})
+
+	if err == nil {
+		return CreateMarketRow{
+			ID:            existingMarket.ID,
+			BaseCurrency:  existingMarket.BaseCurrency,
+			QuoteCurrency: existingMarket.QuoteCurrency,
+			CreatedAt:     existingMarket.CreatedAt,
+		}
+	}
+
+	arg := CreateMarketParams{
+		BaseCurrency:  baseCurrency,
+		QuoteCurrency: quoteCurrency,
+		MinOrderAmount: sql.NullString{
+			String: "0.1",
+			Valid:  true,
+		},
+		PricePrecision: sql.NullInt32{
+			Int32: 6,
+			Valid: true,
+		},
+	}
+
+	market, err := testQueries.CreateMarket(ctx, arg)
+	require.NoError(t, err, "Failed to create random market")
+	require.NotEmpty(t, market.ID, "Market ID should not be empty")
+	require.Equal(t, baseCurrency, market.BaseCurrency, "BaseCurrency should match")
+	require.Equal(t, quoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
+
+	return market
 }
 

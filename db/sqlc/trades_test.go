@@ -20,7 +20,7 @@ func TestCreateTrade(t *testing.T) {
 	buyer, err := testQueries.CreateUser(context.Background(), buyerUsersArgs)
 	require.NoError(t, err, "Failed to create user")
 
-	market := createRandomMarket(t)
+	market := createRandomMarketForTrade(t)
 
 	buyOrderArgs := CreateOrderParams {
 		UserID: buyer.ID,
@@ -75,7 +75,7 @@ func TestCreateTrade(t *testing.T) {
 	require.Equal(t, "10.00000000", trade.Amount, "Amount should match the trade amount")
 }
 
-func createRandomMarket(t *testing.T) CreateMarketRow {
+func createRandomMarketForTrade(t *testing.T) CreateMarketRow {
 	ctx := context.Background()
 
 	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
