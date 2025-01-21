@@ -12,8 +12,8 @@ import (
 
 func TestCreateMarket (t *testing.T) {
 	arg := CreateMarketParams {
-		BaseCurrency: "BTC",
-		QuoteCurrency: "USD",
+		BaseCurrency: "PKR",
+		QuoteCurrency: "INR",
 		MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
 		PricePrecision: sql.NullInt32{Int32: 8, Valid: true},
 	}
