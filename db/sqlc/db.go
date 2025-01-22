@@ -23,6 +23,10 @@ type Queries struct {
 	db DBTX
 }
 
+func (q *Queries) GetAuditLogByID(context context.Context, d uuid.UUID) (any, error) {
+	panic("unimplemented")
+}
+
 func (q *Queries) GetTradeByMarketID(context context.Context, d uuid.UUID) (any, error) {
 	panic("unimplemented")
 }
