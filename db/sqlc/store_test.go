@@ -5,6 +5,8 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/jackc/pgconn"
+
 	"github.com/stretchr/testify/require"
 )
 
@@ -65,4 +67,75 @@ func TestCreateTransactionTx(t *testing.T) {
     require.Equal(t, feeArgs.MarketID, fee.MarketID, "MarketID should match")
     require.Equal(t, feeArgs.MakerFee, fee.MakerFee, "MakerFee should match")
     require.Equal(t, feeArgs.TakerFee, fee.TakerFee, "TakerFee should match")
+}
+
+
+func TestDeadlockDetection(t *testing.T) {
+	store := NewStore(testDB)
+
+	createUserParams := CreateUserParams{
+		Email:        "exam1005@example.com",
+		PasswordHash: "8rrfrf4t45",
+		Role:         "user",
+		IsVerified:   sql.NullBool{Bool: true, Valid: true},
+	}
+	user, err := testQueries.CreateUser(context.Background(), createUserParams)
+	require.NoError(t, err, "Failed to create user")
+
+	errs := make(chan error, 2)
+
+	transactionParams1 := TransactionsParams{
+		UserID:   user.ID,
+		Type:     "deposit",
+		Currency: "USD",
+		Amount:   "50.00000000",
+		Status:   "pending",
+		Address:  sql.NullString{String: "0x1111", Valid: true},
+		TxHash:   sql.NullString{String: "0xhash1", Valid: true},
+	}
+
+	transactionParams2 := TransactionsParams{
+		UserID:   user.ID,
+		Type:     "withdrawal",
+		Currency: "usd",
+		Amount:   "30.00000000",
+		Status:   "pending",
+		Address:  sql.NullString{String: "0x2222", Valid: true},
+		TxHash:   sql.NullString{String: "0xhash2", Valid: true},
+	}
+
+	market := createRandomMarketForFee(t)
+
+	feeArgs := CreateFeeParams {
+		MarketID: market.ID,
+		MakerFee: sql.NullString{String: "0.0100", Valid: true},
+		TakerFee: sql.NullString{String: "0.0200", Valid: true},
+	}
+
+	feeParams := FeeParams{
+		MarketID: feeArgs.MarketID,
+		Amount: feeArgs.MakerFee,
+		TakerFee: feeArgs.TakerFee,
+	}
+
+	go func() {
+		err := store.CreateTransactionTx(context.Background(), transactionParams1, feeParams)
+		errs <- err
+	}()
+
+	go func() {
+		err := store.CreateTransactionTx(context.Background(), transactionParams2, feeParams)
+		errs <- err
+	}()
+
+	for i := 0; i < 2; i++ {
+		err := <-errs
+		if err != nil {
+			if pgErr, ok := err.(*pgconn.PgError); ok && pgErr.Code == "40P01" {
+				t.Errorf("Deadlock detected: %v", err)
+			} else {
+				require.NoError(t, err, "Unexpected error")
+			}
+		}
+	}
 }
