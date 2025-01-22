@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/jackc/pgconn"
 
 	"github.com/stretchr/testify/require"
@@ -70,11 +71,11 @@ func TestCreateTransactionTx(t *testing.T) {
 }
 
 
-func TestDeadlockDetection(t *testing.T) {
+func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	store := NewStore(testDB)
 
 	createUserParams := CreateUserParams{
-		Email:        "exam1005@example.com",
+		Email:        "exam1006@example.com",
 		PasswordHash: "8rrfrf4t45",
 		Role:         "user",
 		IsVerified:   sql.NullBool{Bool: true, Valid: true},
@@ -136,6 +137,92 @@ func TestDeadlockDetection(t *testing.T) {
 			} else {
 				require.NoError(t, err, "Unexpected error")
 			}
+		}
+	}
+}
+
+func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
+	store := NewStore(testDB)
+
+	createUser1Params := CreateUserParams{
+		Email:	"exam1015@example.com",
+		PasswordHash: "cdcewcds",
+		Role: "user",
+		IsVerified: sql.NullBool{Bool: true, Valid: true},
+	}
+
+	user1, err := testQueries.CreateUser(context.Background(), createUser1Params)
+	require.NoError(t, err, "Failed to create user")
+
+	createUser2Params := CreateUserParams{
+		Email: "exam1016@example.com",
+		PasswordHash: "cdcewcccfvs",
+		Role: "user",
+		IsVerified: sql.NullBool{Bool: true, Valid: true},
+	}
+
+	user2, err := testQueries.CreateUser(context.Background(), createUser2Params)
+	require.NoError(t, err, "Failed to create user")
+
+	market := createRandomMarketForOrder(t)
+
+	createOrder1Params := CreateOrderParams{
+		UserID: user1.ID,
+		MarketID: market.ID,
+		Type: "buy",
+		Status: "open",
+		Price: sql.NullString{String: "100.50000000", Valid: true},
+		Amount: "10.00000000",
+	}
+
+
+	order1, err := testQueries.CreateOrder(context.Background(), createOrder1Params)
+	require.NoError(t, err, "Failed to create order for user1")
+
+	createOrder2Params := CreateOrderParams{
+		UserID:   user2.ID,
+		MarketID: market.ID,
+		Type:     "sell",
+		Status:   "open",
+		Price:    sql.NullString{String: "100.50000000", Valid: true},
+		Amount:   "10.00000000",
+	}
+
+	order2, err := testQueries.CreateOrder(context.Background(), createOrder2Params)
+	require.NoError(t, err, "Failed to create order for user2")
+
+	errCh := make(chan error)
+
+	type UpdateOrderStatusAndFilledAmountParams struct {
+		Status       OrderStatus    `json:"status"`
+		FilledAmount sql.NullString `json:"filled_amount"`
+		ID           uuid.UUID      `json:"id"`
+	}
+
+	go func() {
+		_, err := store.UpdatedOrderTx(context.Background(), UpdatedOrderParams{
+			Status:	"filled",
+			FilledAmount:  sql.NullString{String: "15.00000000", Valid: true},
+			ID: order1.ID, 
+		})
+		errCh <- err
+	}()
+
+	go func() {
+		_, err := store.UpdatedOrderTx(context.Background(), UpdatedOrderParams{
+			Status:	"filled",
+			FilledAmount:  sql.NullString{String: "5.00000000", Valid: true}, 
+			ID: order2.ID,
+		})
+		errCh <- err
+	}()
+
+	for i := 0; i < 2; i++ {
+		err := <-errCh
+		if err != nil {
+			require.Contains(t, err.Error(), "deadlock detected", "Expected deadlock error")
+		} else {
+			t.Log("Transaction succeeded")
 		}
 	}
 }
