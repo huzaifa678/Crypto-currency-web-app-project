@@ -213,7 +213,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 	market := createRandomMarketForTrade(t)
 	
 	buyerUsersArgs := CreateUserParams {
-		Email: "exam3012@example.com",
+		Email: "exam3020@example.com",
 		PasswordHash: "kddeoovpds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -236,7 +236,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the buyer")
 
 	sellerUsersArgs := CreateUserParams {
-		Email: "exam3013@example.com",
+		Email: "exam3019@example.com",
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -267,8 +267,10 @@ func TestGetTradeByMarketID(t *testing.T) {
 
 	trade, err := testQueries.CreateTrade(context.Background(), tradeArgs)
 	require.NoError(t, err, "Failed to create trade")
-	_, err = testQueries.GetTradesByMarketID(context.Background(), trade.MarketID)
+	tradeByMarketID, err := testQueries.GetTradesByMarketID(context.Background(), trade.MarketID)
 	require.NoError(t, err, "failed to get the trade by Market ID")
+	require.NotEmpty(t, trade, "Trade should not be empty")
+	require.Equal(t, trade.MarketID, tradeByMarketID[0].MarketID, "The MarketID is matched")
 }
 
 func createRandomMarketForTrade(t *testing.T) CreateMarketRow {
