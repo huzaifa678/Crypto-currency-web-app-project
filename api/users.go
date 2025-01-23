@@ -3,10 +3,12 @@ package api
 import (
 	db "crypto-system/db/sqlc"
 	"database/sql"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/gin-contrib/sessions"
 )
 
 type UserRole string
@@ -47,19 +49,40 @@ func (server *server) createUser(ctx *gin.Context) {
 		return
 	}
 
+	session := sessions.Default(ctx)
+    session.Set("user_id", user.ID.String())
+    
+	if err := session.Save(); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
+		return
+	}
+
+	log.Println("User created with ID:", user.ID)
 	ctx.JSON(http.StatusOK, gin.H{"id": user.ID})
 }
 
 func (server *server) getUser(ctx *gin.Context) {
-	id := ctx.Param("id") 
 
-	userID, err := uuid.Parse(id)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	var err error
+
+	session := sessions.Default(ctx)
+    id := session.Get("user_id")
+
+	if id == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No session found"})
 		return
 	}
 
-	user, err := server.store.GetUserByID(ctx, userID)
+	if id == "" {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+        return
+    }
+
+	
+
+	parsedID, err := uuid.Parse(id.(string))
+
+	user, err := server.store.GetUserByID(ctx, parsedID)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -105,15 +128,24 @@ func (server *server) updateUser(ctx *gin.Context) {
 }
 
 func (server *server) deleteUser(ctx *gin.Context) {
-	id := ctx.Param("id")
 
-	userID, err := uuid.Parse(id)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	session := sessions.Default(ctx)
+    id := session.Get("user_id")
+
+	if id == nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No session found"})
 		return
 	}
 
-	err = server.store.DeleteUser(ctx, userID)
+	if id == "" {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+        return
+    }
+
+	parsedID, err := uuid.Parse(id.(string))
+
+	err = server.store.DeleteUser(ctx, parsedID)
+
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
