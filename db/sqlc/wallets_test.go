@@ -61,9 +61,9 @@ func TestDeleteWallet(t *testing.T) {
 
 }
 
-func TestGetWalletByUserIDAndCurrency(t *testing.T) {
+func TestGetWalletByUserEmailAndCurrency(t *testing.T) {
 	userArgs := CreateUserParams {
-		Email: "exam900@example.com",
+		Email: "exam6000@example.com",
 		PasswordHash: "vfvfe33433gtgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},

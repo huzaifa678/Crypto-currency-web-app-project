@@ -18,7 +18,7 @@ const (
 
 
 type transactionRequest struct {
-	UserID   uuid.UUID       `json:"user_id"`
+	UserEmail string         `json:"user_email"`
 	Type     TransactionType `json:"type"`
 	Currency string          `json:"currency"`
 	Amount   string          `json:"amount"`
@@ -35,7 +35,7 @@ func (server *server) createTransaction(ctx *gin.Context) {
 	}
 
 	arg := db.CreateTransactionParams {
-		UserID: req.UserID,
+		UserEmail: req.UserEmail,
 		Type: db.TransactionType(req.Type),
 		Currency: req.Currency,
 		Amount: req.Amount,
@@ -51,4 +51,58 @@ func (server *server) createTransaction(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{"id": transaction.ID})
+}
+
+func (server *server) getTransaction(ctx *gin.Context) {
+    id := ctx.Param("id")
+    transactionID, err := uuid.Parse(id)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, errorResponse(err))
+        return
+    }
+
+    transaction, err := server.store.GetTransactionByID(ctx, transactionID)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            ctx.JSON(http.StatusNotFound, errorResponse(err))
+            return
+        }
+        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+        return
+    }
+
+    ctx.JSON(http.StatusOK, transaction)
+}
+
+func (server *server) listUserTransactions(ctx *gin.Context) {
+    email := ctx.Param("user_email")
+
+    transactions, err := server.store.GetTransactionsByUserEmail(ctx, email)
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+        return
+    }
+
+    ctx.JSON(http.StatusOK, transactions)
+}
+
+func (server *server) deleteTransaction(ctx *gin.Context) {
+    id := ctx.Param("id")
+    transactionID, err := uuid.Parse(id)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, errorResponse(err))
+        return
+    }
+
+    err = server.store.DeleteTransaction(ctx, transactionID)
+    if err != nil {
+        if err == sql.ErrNoRows {
+            ctx.JSON(http.StatusNotFound, errorResponse(err))
+            return
+        }
+        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+        return
+    }
+
+    ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }
