@@ -21,7 +21,7 @@ func TestCreateTransaction(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	transactionsArgs := CreateTransactionParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		Type: TransactionType("deposit"),
 		Currency: "USD",
 		Amount: "100.00000000",
@@ -47,7 +47,7 @@ func TestDeleteTransaction(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	transactionsArgs := CreateTransactionParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		Type: TransactionType("deposit"),
 		Currency: "USD",
 		Amount: "100.00000000",
@@ -78,7 +78,7 @@ func TestGetTransactionById(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	transactionsArgs := CreateTransactionParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		Type: TransactionType("deposit"),
 		Currency: "USD",
 		Amount: "100.00000000",
@@ -93,7 +93,7 @@ func TestGetTransactionById(t *testing.T) {
 	require.NoError(t, err, "Failed to get transaction by ID")
 	require.NotEmpty(t, transactionByID, "Transaction should not be empty")
 	require.Equal(t, transaction.ID, transactionByID.ID, "Transaction ID should match")
-	require.Equal(t, transaction.UserID, transactionByID.UserID, "UserID should match")
+	require.Equal(t, transaction.UserEmail, transactionByID.UserEmail, "UserEmail should match")
 	require.Equal(t, transaction.Type, transactionByID.Type, "Type should match")
 	require.Equal(t, transaction.Currency, transactionByID.Currency, "Currency should match")
 	require.Equal(t, transaction.Amount, transactionByID.Amount, "Amount should match")
@@ -113,7 +113,7 @@ func TestGetTransactionsByUserID(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	transactionsArgs := CreateTransactionParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		Type: TransactionType("deposit"),
 		Currency: "USD",
 		Amount: "100.00000000",
@@ -124,7 +124,7 @@ func TestGetTransactionsByUserID(t *testing.T) {
 	transaction, err := testQueries.CreateTransaction(context.Background(), transactionsArgs)
 	require.NoError(t, err, "Failed to create transaction")
 
-	transactionsByUserID, err := testQueries.GetTransactionsByUserID(context.Background(), transaction.UserID)
+	transactionsByUserID, err := testQueries.GetTransactionsByUserEmail(context.Background(), transaction.UserEmail)
 	require.NoError(t, err, "Failed to get transaction by user ID")
 	require.NotEmpty(t, transactionsByUserID, "Transaction should not be empty")
 	require.Equal(t, transaction.ID, transactionsByUserID[0].ID, "Transaction ID should match")

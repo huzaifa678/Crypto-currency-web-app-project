@@ -12,7 +12,7 @@ import (
 func TestCreateAuditLog(t *testing.T) {
 
 	userArgs := CreateUserParams {
-		Email: "exam000@example.com",
+		Email: "exam200@example.com",
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -22,7 +22,7 @@ func TestCreateAuditLog(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	AuditLogArgs := CreateAuditLogParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		Action: "login",
 		IpAddress: sql.NullString{String: "0.0.0.0", Valid: true},
 	}
@@ -34,7 +34,7 @@ func TestCreateAuditLog(t *testing.T) {
 
 func TestDeleteAuditLog(t *testing.T) {
 	userArgs := CreateUserParams {
-		Email: "exam007@example.com",
+		Email: "exam201@example.com",
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -44,7 +44,7 @@ func TestDeleteAuditLog(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	AuditlogArgs := CreateAuditLogParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		Action: "login",
 		IpAddress: sql.NullString{String: "0.0.0.1", Valid: true},
 	}
@@ -58,7 +58,7 @@ func TestDeleteAuditLog(t *testing.T) {
 func TestGetAuditLogByUserId(t *testing.T) {
 
 	userArgs := CreateUserParams {
-		Email: "exam117@example.com",
+		Email: "exam202@example.com",
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -68,7 +68,7 @@ func TestGetAuditLogByUserId(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	AuditLogArgs := CreateAuditLogParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		Action: "login",
 		IpAddress: sql.NullString{String: "0.0.0.2", Valid: true},
 	}
@@ -76,8 +76,8 @@ func TestGetAuditLogByUserId(t *testing.T) {
 	auditLog, err := testQueries.CreateAuditLog(context.Background(), AuditLogArgs)
 	require.NoError(t, err, "Failed to create audit log")
 
-	auditLogByUserId, err := testQueries.GetAuditLogsByUserID(context.Background(), auditLog.UserID)
+	auditLogByUserId, err := testQueries.GetAuditLogsByUserEmail(context.Background(), auditLog.UserEmail)
 	require.NoError(t, err, "Failed to get audit log by user ID")
 	require.NotEmpty(t, auditLogByUserId, "Audit log should not be empty")
-	require.Equal(t, auditLog.UserID, auditLogByUserId[0].UserID, "UserID should match")
+	require.Equal(t, auditLog.UserEmail, auditLogByUserId[0].UserEmail, "UserID should match")
 }

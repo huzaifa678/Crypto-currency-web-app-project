@@ -109,7 +109,7 @@ func (e *UserRole) Scan(src interface{}) error {
 
 type AuditLog struct {
 	ID        uuid.UUID      `json:"id"`
-	UserID    uuid.UUID      `json:"user_id"`
+	UserEmail string         `json:"user_email"`
 	Action    string         `json:"action"`
 	IpAddress sql.NullString `json:"ip_address"`
 	CreatedAt sql.NullTime   `json:"created_at"`
@@ -134,7 +134,7 @@ type Market struct {
 
 type Order struct {
 	ID           uuid.UUID      `json:"id"`
-	UserID       uuid.UUID      `json:"user_id"`
+	UserEmail    string         `json:"user_email"`
 	MarketID     uuid.UUID      `json:"market_id"`
 	Type         OrderType      `json:"type"`
 	Status       OrderStatus    `json:"status"`
@@ -158,7 +158,7 @@ type Trade struct {
 
 type Transaction struct {
 	ID        uuid.UUID         `json:"id"`
-	UserID    uuid.UUID         `json:"user_id"`
+	UserEmail string            `json:"user_email"`
 	Type      TransactionType   `json:"type"`
 	Currency  string            `json:"currency"`
 	Amount    string            `json:"amount"`
@@ -180,7 +180,7 @@ type User struct {
 
 type Wallet struct {
 	ID            uuid.UUID      `json:"id"`
-	UserID        uuid.UUID      `json:"user_id"`
+	UserEmail     string         `json:"user_email"`
 	Currency      string         `json:"currency"`
 	Balance       sql.NullString `json:"balance"`
 	LockedBalance sql.NullString `json:"locked_balance"`

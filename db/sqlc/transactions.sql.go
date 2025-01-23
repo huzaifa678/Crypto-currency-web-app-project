@@ -11,23 +11,23 @@ import (
 )
 
 const createTransaction = `-- name: CreateTransaction :one
-INSERT INTO transactions (user_id, type, currency, amount, address, tx_hash)
+INSERT INTO transactions (user_email, type, currency, amount, address, tx_hash)
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, user_id, type, currency, amount, status, address, tx_hash, created_at
+RETURNING id, user_email, type, currency, amount, status, address, tx_hash, created_at
 `
 
 type CreateTransactionParams struct {
-	UserID   uuid.UUID       `json:"user_id"`
-	Type     TransactionType `json:"type"`
-	Currency string          `json:"currency"`
-	Amount   string          `json:"amount"`
-	Address  sql.NullString  `json:"address"`
-	TxHash   sql.NullString  `json:"tx_hash"`
+	UserEmail string          `json:"user_email"`
+	Type      TransactionType `json:"type"`
+	Currency  string          `json:"currency"`
+	Amount    string          `json:"amount"`
+	Address   sql.NullString  `json:"address"`
+	TxHash    sql.NullString  `json:"tx_hash"`
 }
 
 func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
 	row := q.db.QueryRowContext(ctx, createTransaction,
-		arg.UserID,
+		arg.UserEmail,
 		arg.Type,
 		arg.Currency,
 		arg.Amount,
@@ -37,7 +37,7 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 	var i Transaction
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
+		&i.UserEmail,
 		&i.Type,
 		&i.Currency,
 		&i.Amount,
@@ -60,7 +60,7 @@ func (q *Queries) DeleteTransaction(ctx context.Context, id uuid.UUID) error {
 }
 
 const getTransactionByID = `-- name: GetTransactionByID :one
-SELECT id, user_id, type, currency, amount, status, address, tx_hash, created_at
+SELECT id, user_email, type, currency, amount, status, address, tx_hash, created_at
 FROM transactions
 WHERE id = $1
 `
@@ -70,7 +70,7 @@ func (q *Queries) GetTransactionByID(ctx context.Context, id uuid.UUID) (Transac
 	var i Transaction
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
+		&i.UserEmail,
 		&i.Type,
 		&i.Currency,
 		&i.Amount,
@@ -82,15 +82,15 @@ func (q *Queries) GetTransactionByID(ctx context.Context, id uuid.UUID) (Transac
 	return i, err
 }
 
-const getTransactionsByUserID = `-- name: GetTransactionsByUserID :many
-SELECT id, user_id, type, currency, amount, status, address, tx_hash, created_at
+const getTransactionsByUserEmail = `-- name: GetTransactionsByUserEmail :many
+SELECT id, user_email, type, currency, amount, status, address, tx_hash, created_at
 FROM transactions
-WHERE user_id = $1
+WHERE user_email = $1
 ORDER BY created_at DESC
 `
 
-func (q *Queries) GetTransactionsByUserID(ctx context.Context, userID uuid.UUID) ([]Transaction, error) {
-	rows, err := q.db.QueryContext(ctx, getTransactionsByUserID, userID)
+func (q *Queries) GetTransactionsByUserEmail(ctx context.Context, userEmail string) ([]Transaction, error) {
+	rows, err := q.db.QueryContext(ctx, getTransactionsByUserEmail, userEmail)
 	if err != nil {
 		return nil, err
 	}
@@ -100,7 +100,7 @@ func (q *Queries) GetTransactionsByUserID(ctx context.Context, userID uuid.UUID)
 		var i Transaction
 		if err := rows.Scan(
 			&i.ID,
-			&i.UserID,
+			&i.UserEmail,
 			&i.Type,
 			&i.Currency,
 			&i.Amount,

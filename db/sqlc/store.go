@@ -43,7 +43,7 @@ func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
 }
 
 type TransactionsParams struct {
-	UserID   uuid.UUID       `json:"user_id"`
+	UserEmail string `json:"user_email"`  
 	Type     TransactionType `json:"type"`
 	Currency string          `json:"currency"`
 	Amount   string          `json:"amount"`
@@ -72,7 +72,7 @@ type returnAmountParams struct {
 func (store *Store) CreateTransactionTx(ctx context.Context, arg TransactionsParams, feeArgs FeeParams) error {
 	return store.execTx(ctx, func(q *Queries) error {
 		_, err := q.CreateTransaction(ctx, CreateTransactionParams{
-			UserID:   arg.UserID,
+			UserEmail:   arg.UserEmail,
 			Type:     arg.Type,
 			Currency: arg.Currency,
 			Amount:   arg.Amount,

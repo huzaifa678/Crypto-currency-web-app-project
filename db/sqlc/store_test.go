@@ -25,7 +25,7 @@ func TestCreateTransactionTx(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	transactionArgs := TransactionsParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		Type: "deposit",
 		Currency: "usd",
 		Amount: "100.00000000",
@@ -50,11 +50,11 @@ func TestCreateTransactionTx(t *testing.T) {
 		TakerFee: feeArgs.TakerFee,
 	}
 	err = store.CreateTransactionTx(context.Background(), transactionArgs, feeParams)
-
-	transaction, err := testQueries.GetTransactionsByUserID(context.Background(), transactionArgs.UserID)
+	require.NoError(t, err, "Failed to create transaction")
+	transaction, err := testQueries.GetTransactionsByUserEmail(context.Background(), transactionArgs.UserEmail)
     require.NoError(t, err, "Failed to get transaction")
     require.NotEmpty(t, transaction, "Transaction should not be empty")
-	require.Equal(t, transactionArgs.UserID, transaction[0].UserID, "UserID should match")
+	require.Equal(t, transactionArgs.UserEmail, transaction[0].UserEmail, "UserID should match")
 	require.Equal(t, transactionArgs.Type, transaction[0].Type, "Type should match")
 	require.Equal(t, transactionArgs.Currency, transaction[0].Currency, "Currency should match")
 	require.Equal(t, transactionArgs.Amount, transaction[0].Amount, "Amount should match")
@@ -75,7 +75,7 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	store := NewStore(testDB)
 
 	createUserParams := CreateUserParams{
-		Email:        "exam1006@example.com",
+		Email:        "exam5000@example.com",
 		PasswordHash: "8rrfrf4t45",
 		Role:         "user",
 		IsVerified:   sql.NullBool{Bool: true, Valid: true},
@@ -86,7 +86,7 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	errs := make(chan error, 2)
 
 	transactionParams1 := TransactionsParams{
-		UserID:   user.ID,
+		UserEmail:   user.Email,
 		Type:     "deposit",
 		Currency: "USD",
 		Amount:   "50.00000000",
@@ -96,7 +96,7 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	}
 
 	transactionParams2 := TransactionsParams{
-		UserID:   user.ID,
+		UserEmail:   user.Email,
 		Type:     "withdrawal",
 		Currency: "usd",
 		Amount:   "30.00000000",
@@ -145,7 +145,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	store := NewStore(testDB)
 
 	createUser1Params := CreateUserParams{
-		Email:	"exam1015@example.com",
+		Email:	"exam5001@example.com",
 		PasswordHash: "cdcewcds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: true, Valid: true},
@@ -155,7 +155,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	createUser2Params := CreateUserParams{
-		Email: "exam1016@example.com",
+		Email: "exam5002@example.com",
 		PasswordHash: "cdcewcccfvs",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: true, Valid: true},
@@ -167,7 +167,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	market := createRandomMarketForOrder(t)
 
 	createOrder1Params := CreateOrderParams{
-		UserID: user1.ID,
+		UserEmail: user1.Email,
 		MarketID: market.ID,
 		Type: "buy",
 		Status: "open",
@@ -180,7 +180,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for user1")
 
 	createOrder2Params := CreateOrderParams{
-		UserID:   user2.ID,
+		UserEmail:   user2.Email,
 		MarketID: market.ID,
 		Type:     "sell",
 		Status:   "open",

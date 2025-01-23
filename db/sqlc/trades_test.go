@@ -11,7 +11,7 @@ import (
 func TestCreateTrade(t *testing.T) {
 	
 	buyerUsersArgs := CreateUserParams {
-		Email: "exam369@example.com",
+		Email: "exam360@example.com",
 		PasswordHash: "kddeoovpds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -23,7 +23,7 @@ func TestCreateTrade(t *testing.T) {
 	market := createRandomMarketForTrade(t)
 
 	buyOrderArgs := CreateOrderParams {
-		UserID: buyer.ID,
+		UserEmail: buyer.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),
@@ -35,7 +35,7 @@ func TestCreateTrade(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the buyer")
 
 	sellerUsersArgs := CreateUserParams {
-		Email: "exam368@example.com",
+		Email: "exam361@example.com",
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -45,7 +45,7 @@ func TestCreateTrade(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	sellOrderArgs := CreateOrderParams {
-		UserID: seller.ID,
+		UserEmail: seller.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),
@@ -79,7 +79,7 @@ func TestDeleteTrade(t *testing.T) {
 	market := createRandomMarketForTrade(t)
 
 	buyerUsersArgs := CreateUserParams {
-		Email: "exam370@example.com",
+		Email: "exam362@example.com",
 		PasswordHash: "kddeoovpds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -90,7 +90,7 @@ func TestDeleteTrade(t *testing.T) {
 
 
 	buyOrderArgs := CreateOrderParams {
-		UserID: buyer.ID,
+		UserEmail: buyer.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),
@@ -102,7 +102,7 @@ func TestDeleteTrade(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the buyer")
 
 	sellerUsersArgs := CreateUserParams {
-		Email: "exam371@example.com",
+		Email: "exam363@example.com",
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -112,7 +112,7 @@ func TestDeleteTrade(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	sellOrderArgs := CreateOrderParams {
-		UserID: seller.ID,
+		UserEmail: seller.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),
@@ -144,7 +144,7 @@ func TestGetTradeById(t *testing.T) {
 	market := createRandomMarketForTrade(t)
 
 	buyerUsersArgs := CreateUserParams {
-		Email: "exam302@example.com",
+		Email: "exam309@example.com",
 		PasswordHash: "kddeoovpds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -155,7 +155,7 @@ func TestGetTradeById(t *testing.T) {
 
 
 	buyOrderArgs := CreateOrderParams {
-		UserID: buyer.ID,
+		UserEmail: buyer.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),
@@ -167,7 +167,7 @@ func TestGetTradeById(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the buyer")
 
 	sellerUsersArgs := CreateUserParams {
-		Email: "exam303@example.com",
+		Email: "exam389@example.com",
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -177,7 +177,7 @@ func TestGetTradeById(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	sellOrderArgs := CreateOrderParams {
-		UserID: seller.ID,
+		UserEmail: seller.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),
@@ -213,7 +213,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 	market := createRandomMarketForTrade(t)
 	
 	buyerUsersArgs := CreateUserParams {
-		Email: "exam3020@example.com",
+		Email: "exam4000@example.com",
 		PasswordHash: "kddeoovpds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -224,7 +224,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 
 
 	buyOrderArgs := CreateOrderParams {
-		UserID: buyer.ID,
+		UserEmail: buyer.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),
@@ -236,7 +236,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the buyer")
 
 	sellerUsersArgs := CreateUserParams {
-		Email: "exam3019@example.com",
+		Email: "exam4001@example.com",
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -246,7 +246,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	sellOrderArgs := CreateOrderParams {
-		UserID: seller.ID,
+		UserEmail: seller.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),

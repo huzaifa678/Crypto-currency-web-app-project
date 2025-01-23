@@ -5,7 +5,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"github.com/google/uuid"
 )
 
 type DBTX interface {
@@ -21,14 +20,6 @@ func New(db DBTX) *Queries {
 
 type Queries struct {
 	db DBTX
-}
-
-func (q *Queries) GetAuditLogByID(context context.Context, d uuid.UUID) (any, error) {
-	panic("unimplemented")
-}
-
-func (q *Queries) GetTradeByMarketID(context context.Context, d uuid.UUID) (any, error) {
-	panic("unimplemented")
 }
 
 func (q *Queries) WithTx(tx *sql.Tx) *Queries {
