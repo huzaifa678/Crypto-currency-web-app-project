@@ -11,23 +11,23 @@ import (
 )
 
 const createWallet = `-- name: CreateWallet :one
-INSERT INTO wallets (user_id, currency, balance)
+INSERT INTO wallets (user_email, currency, balance)
 VALUES ($1, $2, $3)
-RETURNING id, user_id, currency, balance, locked_balance, created_at
+RETURNING id, user_email, currency, balance, locked_balance, created_at
 `
 
 type CreateWalletParams struct {
-	UserID   uuid.UUID      `json:"user_id"`
-	Currency string         `json:"currency"`
-	Balance  sql.NullString `json:"balance"`
+	UserEmail string         `json:"user_email"`
+	Currency  string         `json:"currency"`
+	Balance   sql.NullString `json:"balance"`
 }
 
 func (q *Queries) CreateWallet(ctx context.Context, arg CreateWalletParams) (Wallet, error) {
-	row := q.db.QueryRowContext(ctx, createWallet, arg.UserID, arg.Currency, arg.Balance)
+	row := q.db.QueryRowContext(ctx, createWallet, arg.UserEmail, arg.Currency, arg.Balance)
 	var i Wallet
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
+		&i.UserEmail,
 		&i.Currency,
 		&i.Balance,
 		&i.LockedBalance,
@@ -46,30 +46,30 @@ func (q *Queries) DeleteWallet(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const getWalletByUserIDAndCurrency = `-- name: GetWalletByUserIDAndCurrency :one
-SELECT user_id, currency, balance, locked_balance, created_at
+const getWalletByUserEmailAndCurrency = `-- name: GetWalletByUserEmailAndCurrency :one
+SELECT user_email, currency, balance, locked_balance, created_at
 FROM wallets
-WHERE user_id = $1 AND currency = $2
+WHERE user_email = $1 AND currency = $2
 `
 
-type GetWalletByUserIDAndCurrencyParams struct {
-	UserID   uuid.UUID `json:"user_id"`
-	Currency string    `json:"currency"`
+type GetWalletByUserEmailAndCurrencyParams struct {
+	UserEmail string `json:"user_email"`
+	Currency  string `json:"currency"`
 }
 
-type GetWalletByUserIDAndCurrencyRow struct {
-	UserID        uuid.UUID      `json:"user_id"`
+type GetWalletByUserEmailAndCurrencyRow struct {
+	UserEmail     string         `json:"user_email"`
 	Currency      string         `json:"currency"`
 	Balance       sql.NullString `json:"balance"`
 	LockedBalance sql.NullString `json:"locked_balance"`
 	CreatedAt     sql.NullTime   `json:"created_at"`
 }
 
-func (q *Queries) GetWalletByUserIDAndCurrency(ctx context.Context, arg GetWalletByUserIDAndCurrencyParams) (GetWalletByUserIDAndCurrencyRow, error) {
-	row := q.db.QueryRowContext(ctx, getWalletByUserIDAndCurrency, arg.UserID, arg.Currency)
-	var i GetWalletByUserIDAndCurrencyRow
+func (q *Queries) GetWalletByUserEmailAndCurrency(ctx context.Context, arg GetWalletByUserEmailAndCurrencyParams) (GetWalletByUserEmailAndCurrencyRow, error) {
+	row := q.db.QueryRowContext(ctx, getWalletByUserEmailAndCurrency, arg.UserEmail, arg.Currency)
+	var i GetWalletByUserEmailAndCurrencyRow
 	err := row.Scan(
-		&i.UserID,
+		&i.UserEmail,
 		&i.Currency,
 		&i.Balance,
 		&i.LockedBalance,
@@ -81,13 +81,13 @@ func (q *Queries) GetWalletByUserIDAndCurrency(ctx context.Context, arg GetWalle
 const updateWalletBalance = `-- name: UpdateWalletBalance :exec
 UPDATE wallets
 SET balance = $1, locked_balance = $2
-WHERE user_id = $3 AND currency = $4
+WHERE user_email = $3 AND currency = $4
 `
 
 type UpdateWalletBalanceParams struct {
 	Balance       sql.NullString `json:"balance"`
 	LockedBalance sql.NullString `json:"locked_balance"`
-	UserID        uuid.UUID      `json:"user_id"`
+	UserEmail     string         `json:"user_email"`
 	Currency      string         `json:"currency"`
 }
 
@@ -95,7 +95,7 @@ func (q *Queries) UpdateWalletBalance(ctx context.Context, arg UpdateWalletBalan
 	_, err := q.db.ExecContext(ctx, updateWalletBalance,
 		arg.Balance,
 		arg.LockedBalance,
-		arg.UserID,
+		arg.UserEmail,
 		arg.Currency,
 	)
 	return err

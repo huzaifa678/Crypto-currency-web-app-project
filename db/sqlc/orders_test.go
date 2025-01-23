@@ -14,7 +14,7 @@ import (
 func TestCreateOrder(t *testing.T) {
 
     userArgs := CreateUserParams {
-		Email: "exam995@example.com",
+		Email: "exam910@example.com",
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -25,7 +25,7 @@ func TestCreateOrder(t *testing.T) {
 	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),
@@ -37,7 +37,7 @@ func TestCreateOrder(t *testing.T) {
 
 	require.NoError(t, err, "Failed to create order")
 	require.NotEmpty(t, order, "Order should not be empty")
-	require.Equal(t, args.UserID, order.UserID)
+	require.Equal(t, args.UserEmail, order.UserEmail)
 	require.Equal(t, args.MarketID, order.MarketID)
 	require.Equal(t, args.Type, order.Type)
 	require.Equal(t, args.Status, order.Status)
@@ -47,7 +47,7 @@ func TestCreateOrder(t *testing.T) {
 
 func TestGetOrderById(t *testing.T) {
 	userArgs := CreateUserParams {
-		Email: "exam888@example.com",
+		Email: "exam911@example.com",
 		PasswordHash: "9009909dddxxwd",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -59,7 +59,7 @@ func TestGetOrderById(t *testing.T) {
 	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),
@@ -73,7 +73,7 @@ func TestGetOrderById(t *testing.T) {
 	require.NoError(t, err, "Failed to fetch order by ID")
 	require.NotEmpty(t, fetchedOrder, "Fetched order should not be empty")
 	require.Equal(t, fetchedOrder.ID, fetchedOrder.ID)
-	require.Equal(t, fetchedOrder.UserID, fetchedOrder.UserID)
+	require.Equal(t, fetchedOrder.UserEmail, fetchedOrder.UserEmail)
 	require.Equal(t, fetchedOrder.MarketID, fetchedOrder.MarketID)
 	require.Equal(t, fetchedOrder.Type, fetchedOrder.Type)
 	require.Equal(t, fetchedOrder.Status, fetchedOrder.Status)
@@ -83,7 +83,7 @@ func TestGetOrderById(t *testing.T) {
 
 func TestDeleteOrder(t *testing.T) {
 	userArgs := CreateUserParams {
-		Email: "exam887@example.com",
+		Email: "exam912@example.com",
 		PasswordHash: "9009909dddxxwd",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -95,7 +95,7 @@ func TestDeleteOrder(t *testing.T) {
 	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),
@@ -115,7 +115,7 @@ func TestDeleteOrder(t *testing.T) {
 
 func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 	userArgs := CreateUserParams {
-		Email: "exam879@example.com",
+		Email: "exam913@example.com",
 		PasswordHash: "9009909dddxxwd",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -127,7 +127,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
-		UserID: user.ID,
+		UserEmail: user.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
 		Status: OrderStatus("open"),

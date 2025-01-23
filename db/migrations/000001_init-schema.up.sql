@@ -18,12 +18,12 @@ CREATE TABLE users (
 
 CREATE TABLE wallets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_email VARCHAR(255) NOT NULL REFERENCES users(email) ON DELETE CASCADE,
     currency VARCHAR(10) NOT NULL,
     balance DECIMAL(20, 8) DEFAULT 0.0,
     locked_balance DECIMAL(20, 8) DEFAULT 0.0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE (user_id, currency)
+    UNIQUE (user_email, currency)
 );
 
 CREATE TABLE markets (
@@ -38,7 +38,7 @@ CREATE TABLE markets (
 
 CREATE TABLE orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_email VARCHAR(255) NOT NULL REFERENCES users(email) ON DELETE CASCADE,
     market_id UUID NOT NULL REFERENCES markets(id) ON DELETE CASCADE,
     type order_type NOT NULL,
     status order_status DEFAULT 'open',
@@ -62,7 +62,7 @@ CREATE TABLE trades (
 
 CREATE TABLE transactions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_email VARCHAR(255) NOT NULL REFERENCES users(email) ON DELETE CASCADE,
     type transaction_type NOT NULL,
     currency VARCHAR(10) NOT NULL,
     amount DECIMAL(20, 8) NOT NULL,
@@ -82,7 +82,7 @@ CREATE TABLE fees (
 
 CREATE TABLE audit_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_email VARCHAR(255) NOT NULL REFERENCES users(email) ON DELETE CASCADE,
     action TEXT NOT NULL,
     ip_address VARCHAR(45),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

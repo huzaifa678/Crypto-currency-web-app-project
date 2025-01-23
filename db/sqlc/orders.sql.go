@@ -11,23 +11,23 @@ import (
 )
 
 const createOrder = `-- name: CreateOrder :one
-INSERT INTO orders (user_id, market_id, type, status, price, amount)
+INSERT INTO orders (user_email, market_id, type, status, price, amount)
 VALUES ($1, $2, $3, $4, $5, $6)
-RETURNING id, user_id, market_id, type, status, price, amount, filled_amount, created_at, updated_at
+RETURNING id, user_email, market_id, type, status, price, amount, filled_amount, created_at, updated_at
 `
 
 type CreateOrderParams struct {
-	UserID   uuid.UUID      `json:"user_id"`
-	MarketID uuid.UUID      `json:"market_id"`
-	Type     OrderType      `json:"type"`
-	Status   OrderStatus    `json:"status"`
-	Price    sql.NullString `json:"price"`
-	Amount   string         `json:"amount"`
+	UserEmail string         `json:"user_email"`
+	MarketID  uuid.UUID      `json:"market_id"`
+	Type      OrderType      `json:"type"`
+	Status    OrderStatus    `json:"status"`
+	Price     sql.NullString `json:"price"`
+	Amount    string         `json:"amount"`
 }
 
 func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
 	row := q.db.QueryRowContext(ctx, createOrder,
-		arg.UserID,
+		arg.UserEmail,
 		arg.MarketID,
 		arg.Type,
 		arg.Status,
@@ -37,7 +37,7 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 	var i Order
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
+		&i.UserEmail,
 		&i.MarketID,
 		&i.Type,
 		&i.Status,
@@ -61,7 +61,7 @@ func (q *Queries) DeleteOrder(ctx context.Context, id uuid.UUID) error {
 }
 
 const getOrderByID = `-- name: GetOrderByID :one
-SELECT id, user_id, market_id, type, status, price, amount, filled_amount, created_at, updated_at
+SELECT id, user_email, market_id, type, status, price, amount, filled_amount, created_at, updated_at
 FROM orders
 WHERE id = $1
 `
@@ -71,7 +71,7 @@ func (q *Queries) GetOrderByID(ctx context.Context, id uuid.UUID) (Order, error)
 	var i Order
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
+		&i.UserEmail,
 		&i.MarketID,
 		&i.Type,
 		&i.Status,

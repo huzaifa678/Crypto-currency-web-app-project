@@ -11,23 +11,23 @@ import (
 )
 
 const createAuditLog = `-- name: CreateAuditLog :one
-INSERT INTO audit_logs (user_id, action, ip_address)
+INSERT INTO audit_logs (user_email, action, ip_address)
 VALUES ($1, $2, $3)
-RETURNING id, user_id, action, ip_address, created_at
+RETURNING id, user_email, action, ip_address, created_at
 `
 
 type CreateAuditLogParams struct {
-	UserID    uuid.UUID      `json:"user_id"`
+	UserEmail string         `json:"user_email"`
 	Action    string         `json:"action"`
 	IpAddress sql.NullString `json:"ip_address"`
 }
 
 func (q *Queries) CreateAuditLog(ctx context.Context, arg CreateAuditLogParams) (AuditLog, error) {
-	row := q.db.QueryRowContext(ctx, createAuditLog, arg.UserID, arg.Action, arg.IpAddress)
+	row := q.db.QueryRowContext(ctx, createAuditLog, arg.UserEmail, arg.Action, arg.IpAddress)
 	var i AuditLog
 	err := row.Scan(
 		&i.ID,
-		&i.UserID,
+		&i.UserEmail,
 		&i.Action,
 		&i.IpAddress,
 		&i.CreatedAt,
@@ -45,15 +45,15 @@ func (q *Queries) DeleteAuditLog(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const getAuditLogsByUserID = `-- name: GetAuditLogsByUserID :many
-SELECT id, user_id, action, ip_address, created_at
+const getAuditLogsByUserEmail = `-- name: GetAuditLogsByUserEmail :many
+SELECT id, user_email, action, ip_address, created_at
 FROM audit_logs
-WHERE user_id = $1
+WHERE user_email = $1
 ORDER BY created_at DESC
 `
 
-func (q *Queries) GetAuditLogsByUserID(ctx context.Context, userID uuid.UUID) ([]AuditLog, error) {
-	rows, err := q.db.QueryContext(ctx, getAuditLogsByUserID, userID)
+func (q *Queries) GetAuditLogsByUserEmail(ctx context.Context, userEmail string) ([]AuditLog, error) {
+	rows, err := q.db.QueryContext(ctx, getAuditLogsByUserEmail, userEmail)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (q *Queries) GetAuditLogsByUserID(ctx context.Context, userID uuid.UUID) ([
 		var i AuditLog
 		if err := rows.Scan(
 			&i.ID,
-			&i.UserID,
+			&i.UserEmail,
 			&i.Action,
 			&i.IpAddress,
 			&i.CreatedAt,
