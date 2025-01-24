@@ -1,14 +1,13 @@
 package api
 
 import (
-	db "crypto-system/db/sqlc"
+	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"database/sql"
 	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"github.com/gin-contrib/sessions"
 )
 
 type UserRole string
@@ -49,13 +48,13 @@ func (server *server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	session := sessions.Default(ctx)
+	/*session := sessions.Default(ctx)
     session.Set("user_id", user.ID.String())
     
 	if err := session.Save(); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save session"})
 		return
-	}
+	}*/
 
 	log.Println("User created with ID:", user.ID)
 	ctx.JSON(http.StatusOK, gin.H{"id": user.ID})
@@ -65,22 +64,24 @@ func (server *server) getUser(ctx *gin.Context) {
 
 	var err error
 
-	session := sessions.Default(ctx)
-    id := session.Get("user_id")
+	id := ctx.Param("id")
 
-	if id == nil {
+	//session := sessions.Default(ctx)
+    //id := session.Get("user_id")
+
+	/*if id == nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No session found"})
 		return
-	}
+	}*/
 
-	if id == "" {
+	/*if id == "" {
         ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
         return
-    }
+    }*/
 
 	
 
-	parsedID, err := uuid.Parse(id.(string))
+	parsedID, err := uuid.Parse(id)
 
 	user, err := server.store.GetUserByID(ctx, parsedID)
 	if err != nil {
@@ -106,7 +107,14 @@ func (server *server) updateUser(ctx *gin.Context) {
 
 	id := ctx.Param("id")
 
-	userID, err := uuid.Parse(id)
+	if id == "" {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+        return
+    }
+
+	parsedID, err := uuid.Parse(id)
+
+	err = server.store.DeleteUser(ctx, parsedID)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
@@ -115,7 +123,7 @@ func (server *server) updateUser(ctx *gin.Context) {
 	arg := db.UpdateUserParams {
 		PasswordHash: req.PasswordHash,
 		IsVerified: sql.NullBool{Bool: true, Valid: true},
-		ID: userID,
+		ID: parsedID,
 	}
 
 	err = server.store.UpdateUser(ctx, arg)
@@ -129,29 +137,19 @@ func (server *server) updateUser(ctx *gin.Context) {
 
 func (server *server) deleteUser(ctx *gin.Context) {
 
-	session := sessions.Default(ctx)
-    id := session.Get("user_id")
+	id := ctx.Param("id")
 
-	if id == nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": "No session found"})
-		return
-	}
-
-	if id == "" {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+    userID, err := uuid.Parse(id)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, errorResponse(err))
         return
     }
 
-	parsedID, err := uuid.Parse(id.(string))
+    err = server.store.DeleteUser(ctx, userID)
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+        return
+    }
 
-	err = server.store.DeleteUser(ctx, parsedID)
-
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
-
-	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+    ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }
-
-

@@ -19,6 +19,9 @@ sqlc:
 server:
 	go run main.go
 
+mock:
+	mockgen -destination db/mock/store.go github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc Store_interface
+
 test:
 	go test -v -cover -short ./...
 .PHONY: createdb dropdb postgres migrateup migratedown sqlc

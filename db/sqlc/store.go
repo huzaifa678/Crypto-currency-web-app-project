@@ -6,9 +6,16 @@ import (
 	"github.com/google/uuid"
 )
 
+type Store_interface interface {
+	Querier
+	CreateTransactionTx(ctx context.Context, arg TransactionsParams, feeArgs FeeParams) error
+	UpdatedOrderTx(ctx context.Context, UpdatedOrderArgs UpdatedOrderParams) (ReturnAmountParams, error)
+	
+}
+
 type Store struct {
-	*Queries
-	db *sql.DB
+		*Queries
+		db *sql.DB
 }
 
 func (store *Store) UpdateOrderTx(context context.Context, param any) any {
@@ -64,7 +71,7 @@ type UpdatedOrderParams struct {
 	ID           uuid.UUID      `json:"id"`
 }
 
-type returnAmountParams struct {
+type ReturnAmountParams struct {
 	Amount sql.NullString `json:"amount"`
 }
 
@@ -97,8 +104,8 @@ func (store *Store) CreateTransactionTx(ctx context.Context, arg TransactionsPar
 	})
 }
 
-func (store *Store) UpdatedOrderTx(ctx context.Context, UpdatedOrderArgs UpdatedOrderParams) (returnAmountParams, error) {
-	var returnAmount returnAmountParams
+func (store *Store) UpdatedOrderTx(ctx context.Context, UpdatedOrderArgs UpdatedOrderParams) (ReturnAmountParams, error) {
+	var returnAmount ReturnAmountParams
 	var err error
 	err = store.execTx(ctx, func(q *Queries) error {
 		err = q.UpdateOrderStatusAndFilledAmount(ctx, UpdateOrderStatusAndFilledAmountParams{
@@ -107,7 +114,7 @@ func (store *Store) UpdatedOrderTx(ctx context.Context, UpdatedOrderArgs Updated
 			ID:           UpdatedOrderArgs.ID,
 		})
 
-		returnAmount = returnAmountParams{
+		returnAmount = ReturnAmountParams{
 			Amount: UpdatedOrderArgs.FilledAmount,
 		}
 
