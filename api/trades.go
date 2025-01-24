@@ -1,7 +1,7 @@
 package api
 
 import (
-	db "crypto-system/db/sqlc"
+	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"database/sql"
 	"net/http"
 
