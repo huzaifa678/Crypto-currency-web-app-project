@@ -10,12 +10,11 @@ type Store_interface interface {
 	Querier
 	CreateTransactionTx(ctx context.Context, arg TransactionsParams, feeArgs FeeParams) error
 	UpdatedOrderTx(ctx context.Context, UpdatedOrderArgs UpdatedOrderParams) (ReturnAmountParams, error)
-	
 }
 
 type Store struct {
-		*Queries
-		db *sql.DB
+	*Queries
+	db *sql.DB
 }
 
 func (store *Store) UpdateOrderTx(context context.Context, param any) any {
