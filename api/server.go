@@ -24,7 +24,7 @@ func NewServer(store db.Store_interface) *server {
 
     router.POST("/users", server.createUser)
     router.GET("/users/:id", server.getUser)
-    router.PUT("/users", server.updateUser)
+    router.PUT("/users/:id", server.updateUser)
     router.DELETE("/users/:id", server.deleteUser)
 
     router.POST("/transactions", server.createTransaction)
