@@ -46,29 +46,17 @@ func (q *Queries) DeleteWallet(ctx context.Context, id uuid.UUID) error {
 	return err
 }
 
-const getWalletByUserEmailAndCurrency = `-- name: GetWalletByUserEmailAndCurrency :one
-SELECT user_email, currency, balance, locked_balance, created_at
+const getWalletByID = `-- name: GetWalletByID :one
+SELECT id, user_email, currency, balance, locked_balance, created_at
 FROM wallets
-WHERE user_email = $1 AND currency = $2
+WHERE id = $1
 `
 
-type GetWalletByUserEmailAndCurrencyParams struct {
-	UserEmail string `json:"user_email"`
-	Currency  string `json:"currency"`
-}
-
-type GetWalletByUserEmailAndCurrencyRow struct {
-	UserEmail     string         `json:"user_email"`
-	Currency      string         `json:"currency"`
-	Balance       sql.NullString `json:"balance"`
-	LockedBalance sql.NullString `json:"locked_balance"`
-	CreatedAt     sql.NullTime   `json:"created_at"`
-}
-
-func (q *Queries) GetWalletByUserEmailAndCurrency(ctx context.Context, arg GetWalletByUserEmailAndCurrencyParams) (GetWalletByUserEmailAndCurrencyRow, error) {
-	row := q.db.QueryRowContext(ctx, getWalletByUserEmailAndCurrency, arg.UserEmail, arg.Currency)
-	var i GetWalletByUserEmailAndCurrencyRow
+func (q *Queries) GetWalletByID(ctx context.Context, id uuid.UUID) (Wallet, error) {
+	row := q.db.QueryRowContext(ctx, getWalletByID, id)
+	var i Wallet
 	err := row.Scan(
+		&i.ID,
 		&i.UserEmail,
 		&i.Currency,
 		&i.Balance,
@@ -81,22 +69,16 @@ func (q *Queries) GetWalletByUserEmailAndCurrency(ctx context.Context, arg GetWa
 const updateWalletBalance = `-- name: UpdateWalletBalance :exec
 UPDATE wallets
 SET balance = $1, locked_balance = $2
-WHERE user_email = $3 AND currency = $4
+WHERE id = $3
 `
 
 type UpdateWalletBalanceParams struct {
 	Balance       sql.NullString `json:"balance"`
 	LockedBalance sql.NullString `json:"locked_balance"`
-	UserEmail     string         `json:"user_email"`
-	Currency      string         `json:"currency"`
+	ID            uuid.UUID      `json:"id"`
 }
 
 func (q *Queries) UpdateWalletBalance(ctx context.Context, arg UpdateWalletBalanceParams) error {
-	_, err := q.db.ExecContext(ctx, updateWalletBalance,
-		arg.Balance,
-		arg.LockedBalance,
-		arg.UserEmail,
-		arg.Currency,
-	)
+	_, err := q.db.ExecContext(ctx, updateWalletBalance, arg.Balance, arg.LockedBalance, arg.ID)
 	return err
 }

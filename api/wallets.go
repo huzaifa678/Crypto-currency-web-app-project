@@ -24,6 +24,11 @@ type updateWalletRequest struct {
 func (server *server) createWallet(ctx *gin.Context) {
     var req walletRequest
 
+    if err := ctx.ShouldBindJSON(&req); err != nil {
+        ctx.JSON(http.StatusBadRequest, errorResponse(err))
+        return
+    }
+
     arg := db.CreateWalletParams{
         UserEmail: req.UserEmail,
         Currency:  req.Currency,
@@ -36,24 +41,26 @@ func (server *server) createWallet(ctx *gin.Context) {
         return
     }
 
-    ctx.JSON(http.StatusOK, gin.H{"email": wallet.UserEmail, "currency": wallet.Currency})
+    ctx.JSON(http.StatusOK, gin.H{"id": wallet.ID})
 }
 
 func (server *server) getWallet(ctx *gin.Context) {
-	userEmail := ctx.Query("user_email")
-    currency := ctx.Query("currency")
 
-    if userEmail == "" || currency == "" {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "user_email and currency are required"})
+    id := ctx.Param("id")
+
+
+    walletID, err := uuid.Parse(id)
+    if err != nil {
+        ctx.JSON(http.StatusBadRequest, errorResponse(err))
         return
     }
 
-    arg := db.GetWalletByUserEmailAndCurrencyParams{
-        UserEmail: userEmail,
-        Currency:  currency,
+    if walletID == uuid.Nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
+        return
     }
 
-    wallet, err := server.store.GetWalletByUserEmailAndCurrency(ctx, arg)
+    wallet, err := server.store.GetWalletByID(ctx, walletID)
     if err != nil {
         if err == sql.ErrNoRows {
             ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -68,6 +75,8 @@ func (server *server) getWallet(ctx *gin.Context) {
 
 func (server *server) updateWallet(ctx *gin.Context) {
 
+
+
 	var req updateWalletRequest
 
     if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -78,8 +87,6 @@ func (server *server) updateWallet(ctx *gin.Context) {
 	arg := db.UpdateWalletBalanceParams{
 		Balance:       req.Balance,
 		LockedBalance: req.LockedBalance,
-		UserEmail:     req.UserEmail,
-		Currency:      req.Currency,
 	}
 
     err := server.store.UpdateWalletBalance(ctx, arg)
@@ -96,6 +103,11 @@ func (server *server) deleteWallet(ctx *gin.Context) {
     walletID, err := uuid.Parse(id)
     if err != nil {
         ctx.JSON(http.StatusBadRequest, errorResponse(err))
+        return
+    }
+
+    if walletID == uuid.Nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
         return
     }
 

@@ -36,7 +36,7 @@ type Querier interface {
 	GetTransactionsByUserEmail(ctx context.Context, userEmail string) ([]Transaction, error)
 	GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error)
 	GetUserByID(ctx context.Context, id uuid.UUID) (GetUserByIDRow, error)
-	GetWalletByUserEmailAndCurrency(ctx context.Context, arg GetWalletByUserEmailAndCurrencyParams) (GetWalletByUserEmailAndCurrencyRow, error)
+	GetWalletByID(ctx context.Context, id uuid.UUID) (Wallet, error)
 	ListMarkets(ctx context.Context) ([]Market, error)
 	UpdateOrderStatusAndFilledAmount(ctx context.Context, arg UpdateOrderStatusAndFilledAmountParams) error
 	UpdateTransactionStatus(ctx context.Context, arg UpdateTransactionStatusParams) error
