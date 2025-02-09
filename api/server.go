@@ -33,6 +33,7 @@ func NewServer(store db.Store_interface) *server {
 
     router.POST("/markets", server.createMarket)
     router.GET("/markets/:id", server.getMarket)
+    router.DELETE("/markets/:id", server.deleteMarket)
     router.GET("/markets", server.listMarkets)
 
     router.POST("/fees", server.createFee)
