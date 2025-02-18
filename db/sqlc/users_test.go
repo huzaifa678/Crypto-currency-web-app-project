@@ -11,7 +11,7 @@ import (
 
 func TestCreateUser(t *testing.T) {
 	arg := CreateUserParams {
-		Email: "exam124@example.com",
+		Email: "exam10000@example.com",
 		PasswordHash: "rhfcjndwd3344ndd",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -29,7 +29,7 @@ func TestCreateUser(t *testing.T) {
 
 func TestDeleteUser(t *testing.T) {
 	arg := CreateUserParams{
-		Email:        "deleteuser@example.com",
+		Email:        "deleteuser10000@example.com",
 		PasswordHash: "hashedpassword",
 		Role:         "user",
 		IsVerified:   sql.NullBool{Bool: true, Valid: true},
@@ -48,7 +48,7 @@ func TestDeleteUser(t *testing.T) {
 func TestGetUserByEmail(t *testing.T) {
 
 	arg := CreateUserParams{
-		Email:        "exam125@example.com",
+		Email:        "exam10001@example.com",
 		PasswordHash: "3535554frff",
 		Role:         "admin",
 		IsVerified:   sql.NullBool{Bool: true, Valid: true},
@@ -67,7 +67,7 @@ func TestGetUserByEmail(t *testing.T) {
 func TestUpdateUser(t *testing.T) {
 
 	arg := CreateUserParams{
-		Email:        "exam126@example.com",
+		Email:        "exam10002@example.com",
 		PasswordHash: "54ffv895tnng",
 		Role:         "user",
 		IsVerified:   sql.NullBool{Bool: false, Valid: true},
