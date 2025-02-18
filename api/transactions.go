@@ -1,46 +1,50 @@
 package api
 
 import (
-	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"database/sql"
+	"fmt"
+	"log"
 	"net/http"
+
+	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
 
-type TransactionType string
-
-const (
-	Deposit  TransactionType = "deposit"
-	Withdraw TransactionType = "withdraw"
-)
-
 
 type transactionRequest struct {
 	UserEmail string         `json:"user_email"`
-	Type     TransactionType `json:"type"`
+	Type     db.TransactionType `json:"type"`
 	Currency string          `json:"currency"`
 	Amount   string          `json:"amount"`
-	Address  sql.NullString  `json:"address"`
-	TxHash   sql.NullString  `json:"tx_hash"`
+	Address  string  `json:"address"`
+	TxHash   string  `json:"tx_hash"`
 }
 
 func (server *server) createTransaction(ctx *gin.Context) {
 	var req transactionRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+        log.Printf("JSON Binding Error: %v", err)
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
 		return
 	}
 
-	arg := db.CreateTransactionParams {
+    currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
+
+    if !isValidCurrency(req.Currency, currencies) {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid currency"})
+        return
+    }
+
+	arg := db.CreateTransactionParams{
 		UserEmail: req.UserEmail,
 		Type: db.TransactionType(req.Type),
 		Currency: req.Currency,
 		Amount: req.Amount,
-		Address: req.Address,
-		TxHash: req.TxHash,
+		Address: sql.NullString{String: req.Address, Valid: req.Address != ""},
+		TxHash: sql.NullString{String: req.TxHash, Valid: req.TxHash != ""},
 	}
 
 	transaction, err := server.store.CreateTransaction(ctx, arg)
@@ -61,6 +65,11 @@ func (server *server) getTransaction(ctx *gin.Context) {
         return
     }
 
+    if transactionID == uuid.Nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error":  "invalid UUID"})
+        return
+    }
+
     transaction, err := server.store.GetTransactionByID(ctx, transactionID)
     if err != nil {
         if err == sql.ErrNoRows {
@@ -76,6 +85,7 @@ func (server *server) getTransaction(ctx *gin.Context) {
 
 func (server *server) listUserTransactions(ctx *gin.Context) {
     email := ctx.Param("user_email")
+    fmt.Printf("Extracted Email: '%s'\n", email)
 
     transactions, err := server.store.GetTransactionsByUserEmail(ctx, email)
     if err != nil {
@@ -89,8 +99,14 @@ func (server *server) listUserTransactions(ctx *gin.Context) {
 func (server *server) deleteTransaction(ctx *gin.Context) {
     id := ctx.Param("id")
     transactionID, err := uuid.Parse(id)
+
     if err != nil {
         ctx.JSON(http.StatusBadRequest, errorResponse(err))
+        return
+    }
+
+    if transactionID == uuid.Nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error":  "invalid UUID"})
         return
     }
 
