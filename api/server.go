@@ -29,7 +29,8 @@ func NewServer(store db.Store_interface) *server {
 
     router.POST("/transactions", server.createTransaction)
     router.GET("/transactions/:id", server.getTransaction)
-    router.GET("/transactions/user/:email", server.listUserTransactions)
+    router.GET("/transactions/user/:user_email", server.listUserTransactions)
+    router.DELETE("/transactions/:id", server.deleteTransaction)
 
     router.POST("/markets", server.createMarket)
     router.GET("/markets/:id", server.getMarket)
@@ -43,6 +44,7 @@ func NewServer(store db.Store_interface) *server {
 
     router.POST("/orders", server.createOrder)
     router.GET("/orders/:id", server.getOrder)
+    router.DELETE("/orders/:id", server.deleteOrder)
 
     router.POST("/trades", server.createTrade)
     router.GET("/trades/:id", server.getTrade)
@@ -53,7 +55,7 @@ func NewServer(store db.Store_interface) *server {
     router.PUT("/wallets/:id", server.updateWallet)
     router.DELETE("/wallets/:id", server.deleteWallet)
 
-    router.GET("/audit-logs/user/:email", server.listUserAuditLogs)
+    router.GET("/audit-logs/user/:user_email", server.listUserAuditLogs)
     router.GET("/audit-logs/:id", server.getAuditLog)
 
     server.router = router

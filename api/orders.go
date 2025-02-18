@@ -1,12 +1,14 @@
 package api
 
 import (
-    db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
-    "database/sql"
-    "net/http"
+	"database/sql"
+	"log"
+	"net/http"
 
-    "github.com/gin-gonic/gin"
-    "github.com/google/uuid"
+	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type orderRequest struct {
@@ -14,7 +16,7 @@ type orderRequest struct {
     MarketID  uuid.UUID       `json:"market_id"`
     Type      db.OrderType    `json:"type"`
     Status    db.OrderStatus  `json:"status"`
-    Price     sql.NullString  `json:"price"`
+    Price     string          `json:"price"`
     Amount    string          `json:"amount"`
 }
 
@@ -22,6 +24,7 @@ func (server *server) createOrder(ctx *gin.Context) {
     var req orderRequest
 
     if err := ctx.ShouldBindJSON(&req); err != nil {
+        log.Println("JSON Binding Error:", err)
         ctx.JSON(http.StatusBadRequest, errorResponse(err))
         return
     }
@@ -31,7 +34,7 @@ func (server *server) createOrder(ctx *gin.Context) {
         MarketID:  req.MarketID,
         Type:      req.Type,
         Status:    req.Status,
-        Price:     req.Price,
+        Price:     sql.NullString{String: req.Price, Valid: req.Price != ""},
         Amount:    req.Amount,
     }
 
@@ -47,8 +50,14 @@ func (server *server) createOrder(ctx *gin.Context) {
 func (server *server) getOrder(ctx *gin.Context) {
     id := ctx.Param("id")
     orderID, err := uuid.Parse(id)
+
     if err != nil {
         ctx.JSON(http.StatusBadRequest, errorResponse(err))
+        return
+    }
+
+    if orderID == uuid.Nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
         return
     }
 
@@ -68,8 +77,14 @@ func (server *server) getOrder(ctx *gin.Context) {
 func (server *server) deleteOrder(ctx *gin.Context) {
     id := ctx.Param("id")
     orderID, err := uuid.Parse(id)
+
     if err != nil {
         ctx.JSON(http.StatusBadRequest, errorResponse(err))
+        return
+    }
+
+    if orderID == uuid.Nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
         return
     }
 
