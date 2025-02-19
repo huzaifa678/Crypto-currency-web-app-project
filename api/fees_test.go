@@ -1,23 +1,23 @@
 package api
 
-
 import (
-    "bytes"
-    "database/sql"
-    "encoding/json"
-    "fmt"
-    "io"
-    "net/http"
-    "net/http/httptest"
-    "testing"
-    "time"
+	"bytes"
+	"database/sql"
+	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"net/http"
+	"net/http/httptest"
+	"testing"
+	"time"
 
-    "github.com/gin-gonic/gin"
-    "github.com/golang/mock/gomock"
-    "github.com/google/uuid"
-    mockdb "github.com/huzaifa678/Crypto-currency-web-app-project/db/mock"
-    db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
-    "github.com/stretchr/testify/require"
+	"github.com/gin-gonic/gin"
+	"github.com/golang/mock/gomock"
+	"github.com/google/uuid"
+	mockdb "github.com/huzaifa678/Crypto-currency-web-app-project/db/mock"
+	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	"github.com/stretchr/testify/require"
 )
 
 func createRandomFee() (db.CreateFeeParams, db.Fee) {
@@ -279,7 +279,9 @@ func requireBodyMatchFee(t *testing.T, body *bytes.Buffer, fee db.Fee) {
     err = json.Unmarshal(data, &gotFee)
     require.NoError(t, err)
 
-    require.Equal(t, fee.ID, gotFee.ID)
+	log.Println("DATA: ", string(data))
+
+    require.Equal(t, fee.MarketID, gotFee.MarketID)
 }
 
 func requireBodyMatchFeeForGet(t *testing.T, body *bytes.Buffer, fee db.Fee) {
