@@ -48,6 +48,7 @@ func NewServer(store db.Store_interface) *server {
 
     router.POST("/trades", server.createTrade)
     router.GET("/trades/:id", server.getTrade)
+    router.GET("/trades/market/:market_id", server.listTrades)
     router.DELETE("/trades/:id", server.deleteTrade)
 
     router.POST("/wallets", server.createWallet)

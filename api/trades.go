@@ -86,8 +86,14 @@ func (server *server) getTrade(ctx *gin.Context) {
 func (server *server) deleteTrade(ctx *gin.Context) {
 	id := ctx.Param("id")
 	tradeID, err := uuid.Parse(id)
+
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+
+	if tradeID == uuid.Nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
 
