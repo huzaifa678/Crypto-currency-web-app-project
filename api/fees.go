@@ -35,7 +35,7 @@ func (server *server) createFee(ctx *gin.Context) {
         return
     }
 
-    ctx.JSON(http.StatusOK, gin.H{"market_id": fee.ID})
+    ctx.JSON(http.StatusOK, gin.H{"market_id": fee.MarketID})
 }
 
 func (server *server) getFee(ctx *gin.Context) {
