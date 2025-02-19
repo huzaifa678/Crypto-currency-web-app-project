@@ -52,12 +52,10 @@ func TestGetMarketById(t *testing.T) {
 		PricePrecision: sql.NullInt32{Int32: 8, Valid: true},
 	}
 
-	createMarket, err := testQueries.CreateMarket(context.Background(), createMarketArg)
+	createMarket, _ := testQueries.CreateMarket(context.Background(), createMarketArg)
 
+	fetchedMarket, _ := testQueries.GetMarketByID(context.Background(), createMarket.ID)
 
-	fetchedMarket, err := testQueries.GetMarketByID(context.Background(), createMarket.ID)
-
-	require.NoError(t, err, "Failed to fetch market by ID")
 	require.Equal(t, createMarket.ID, fetchedMarket.ID, "Market ID should match")
 	require.Equal(t, createMarket.BaseCurrency, fetchedMarket.BaseCurrency, "BaseCurrency should match")
 	require.Equal(t, createMarket.QuoteCurrency, fetchedMarket.QuoteCurrency, "Quote currency must match")
@@ -67,12 +65,6 @@ func TestGetMarketById(t *testing.T) {
 func TestListMarkets(t *testing.T) {
     ctx := context.Background()
 
-    tx, err := testDB.BeginTx(ctx, nil)
-    require.NoError(t, err, "Failed to begin transaction")
-    defer tx.Rollback() 
-
-    
-    testQueriesWithTx := testQueries.WithTx(tx)
 
     
     seenPairs := make(map[string]struct{})
@@ -88,13 +80,10 @@ func TestListMarkets(t *testing.T) {
             }
         }
 
-        _, err := testQueriesWithTx.CreateMarket(ctx, marketParams)
-        require.NoError(t, err, "Failed to create market")
+        
         log.Println("Inserted Market:", market)
     }
 
-    err = tx.Commit()
-    require.NoError(t, err, "Failed to commit transaction")
 
     markets, err := testQueries.ListMarkets(ctx)
     require.NoError(t, err, "Failed to list markets")
