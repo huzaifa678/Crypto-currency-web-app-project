@@ -1,17 +1,19 @@
 package api
 
 import (
-    db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
-    "database/sql"
-    "net/http"
+	"database/sql"
+	"net/http"
 
-    "github.com/gin-gonic/gin"
+	"github.com/google/uuid"
+	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+
+	"github.com/gin-gonic/gin"
 )
 
 type auditLogRequest struct {
     UserEmail string `json:"user_email"`
     Action    string `json:"action"`
-    IPAddress sql.NullString `json:"ip_address"`
+    IPAddress string `json:"ip_address"`
 }
 
 func (server *server) createAuditLog(ctx *gin.Context) {
@@ -25,7 +27,7 @@ func (server *server) createAuditLog(ctx *gin.Context) {
     arg := db.CreateAuditLogParams{
         UserEmail: req.UserEmail,
         Action:    req.Action,
-        IpAddress: req.IPAddress,
+        IpAddress: sql.NullString{String: req.IPAddress, Valid: req.IPAddress != ""},
     }
 
     auditLog, err := server.store.CreateAuditLog(ctx, arg)
@@ -34,11 +36,11 @@ func (server *server) createAuditLog(ctx *gin.Context) {
         return
     }
 
-    ctx.JSON(http.StatusOK, gin.H{"email": auditLog.UserEmail})
+    ctx.JSON(http.StatusOK, gin.H{"user_email": auditLog.UserEmail})
 }
 
 func (server *server) getAuditLog(ctx *gin.Context) {
-    email := ctx.Param("email")
+    email := ctx.Param("user_email")
 
     auditLog, err := server.store.GetAuditLogsByUserEmail(ctx, email)
     if err != nil {
@@ -51,6 +53,25 @@ func (server *server) getAuditLog(ctx *gin.Context) {
     }
 
     ctx.JSON(http.StatusOK, auditLog)
+}
+
+func (server *server) DeleteAuditLog(ctx *gin.Context) {
+    id := ctx.Param("id")
+
+    auditLogId, err := uuid.Parse(id)
+
+    if auditLogId == uuid.Nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+        return
+    }
+
+    err = server.store.DeleteAuditLog(ctx, auditLogId)
+
+    if err != nil {
+        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+        return
+    }
+    ctx.JSON(http.StatusOK, nil)
 }
 
 func (server *server) listUserAuditLogs(ctx *gin.Context) {
