@@ -3,16 +3,21 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
+	
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
 
 func TestCreateAuditLog(t *testing.T) {
 
+	email := createRandomEmailForAudits()
+
 	userArgs := CreateUserParams {
-		Email: "exam200@example.com",
+		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -33,8 +38,11 @@ func TestCreateAuditLog(t *testing.T) {
 }
 
 func TestDeleteAuditLog(t *testing.T) {
+
+	email := createRandomEmailForAudits()
+
 	userArgs := CreateUserParams {
-		Email: "exam201@example.com",
+		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -57,8 +65,10 @@ func TestDeleteAuditLog(t *testing.T) {
 
 func TestGetAuditLogByUserId(t *testing.T) {
 
+	email := createRandomEmailForAudits()
+
 	userArgs := CreateUserParams {
-		Email: "exam202@example.com",
+		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -80,4 +90,8 @@ func TestGetAuditLogByUserId(t *testing.T) {
 	require.NoError(t, err, "Failed to get audit log by user ID")
 	require.NotEmpty(t, auditLogByUserId, "Audit log should not be empty")
 	require.Equal(t, auditLog.UserEmail, auditLogByUserId[0].UserEmail, "UserID should match")
+}
+
+func createRandomEmailForAudits() string {
+	return fmt.Sprintf("audits-%s@example.com", uuid.New().String())
 }
