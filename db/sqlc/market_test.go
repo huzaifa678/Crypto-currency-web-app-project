@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"log"
 	"testing"
 	"time"
@@ -16,14 +15,12 @@ import (
 
 func TestCreateMarket (t *testing.T) {
 	
-	marketParams, _, _ := createRandomMarket()
+	marketParams, _, marketRow := createRandomMarket()
 
-	market, err := testQueries.CreateMarket(context.Background(), marketParams)
-	require.NoError(t, err, "Failed to create market")
-	require.NotEmpty(t, market.ID, "Market ID should not be empty")
-	require.Equal(t, market.BaseCurrency, marketParams.BaseCurrency, "BaseCurrency should match")
-	require.Equal(t, market.QuoteCurrency, marketParams.QuoteCurrency, "QuoteCurrency should match")
-	require.NotZero(t, market.CreatedAt, "CreatedAt should not be zero")
+	require.NotEmpty(t, marketRow.ID, "Market ID should not be empty")
+	require.Equal(t, marketRow.BaseCurrency, marketParams.BaseCurrency, "BaseCurrency should match")
+	require.Equal(t, marketRow.QuoteCurrency, marketParams.QuoteCurrency, "QuoteCurrency should match")
+	require.NotZero(t, marketRow.CreatedAt, "CreatedAt should not be zero")
 }
 
 func TestDeleteMarket(t *testing.T) {
@@ -48,17 +45,23 @@ func TestDeleteMarket(t *testing.T) {
 
 func TestGetMarketById(t *testing.T) {
 
-	_, _, marketRow := createRandomMarket()
+	createMarketArg := CreateMarketParams {
+		BaseCurrency: "BTC",
+		QuoteCurrency: "INR",
+		MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
+		PricePrecision: sql.NullInt32{Int32: 8, Valid: true},
+	}
 
-	fmt.Println(marketRow.ID)
+	createMarket, err := testQueries.CreateMarket(context.Background(), createMarketArg)
 
-	fetchedMarket, err := testQueries.GetMarketByID(context.Background(), marketRow.ID)
+
+	fetchedMarket, err := testQueries.GetMarketByID(context.Background(), createMarket.ID)
 
 	require.NoError(t, err, "Failed to fetch market by ID")
-	require.Equal(t, marketRow.ID, fetchedMarket.ID, "Market ID should match")
-	require.Equal(t, marketRow.BaseCurrency, fetchedMarket.BaseCurrency, "BaseCurrency should match")
-	require.Equal(t, marketRow.QuoteCurrency, fetchedMarket.QuoteCurrency, "Quote currency must match")
-	require.Equal(t, marketRow.CreatedAt, fetchedMarket.CreatedAt, "CreatedAt should match")
+	require.Equal(t, createMarket.ID, fetchedMarket.ID, "Market ID should match")
+	require.Equal(t, createMarket.BaseCurrency, fetchedMarket.BaseCurrency, "BaseCurrency should match")
+	require.Equal(t, createMarket.QuoteCurrency, fetchedMarket.QuoteCurrency, "Quote currency must match")
+	require.Equal(t, createMarket.CreatedAt, fetchedMarket.CreatedAt, "CreatedAt should match")
 }
 
 func TestListMarkets(t *testing.T) {
