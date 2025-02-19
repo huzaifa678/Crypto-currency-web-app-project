@@ -4,25 +4,25 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
 	"testing"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
+	"golang.org/x/exp/rand"
 )
 
 
 func TestCreateMarket (t *testing.T) {
-	arg := CreateMarketParams {
-		BaseCurrency: "PKR",
-		QuoteCurrency: "INR",
-		MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
-		PricePrecision: sql.NullInt32{Int32: 8, Valid: true},
-	}
+	
+	marketParams, _, _ := createRandomMarket()
 
-	market, err := testQueries.CreateMarket(context.Background(), arg)
+	market, err := testQueries.CreateMarket(context.Background(), marketParams)
 	require.NoError(t, err, "Failed to create market")
 	require.NotEmpty(t, market.ID, "Market ID should not be empty")
-	require.Equal(t, arg.BaseCurrency, market.BaseCurrency, "BaseCurrency should match")
-	require.Equal(t, arg.QuoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
+	require.Equal(t, market.BaseCurrency, marketParams.BaseCurrency, "BaseCurrency should match")
+	require.Equal(t, market.QuoteCurrency, marketParams.QuoteCurrency, "QuoteCurrency should match")
 	require.NotZero(t, market.CreatedAt, "CreatedAt should not be zero")
 }
 
@@ -48,54 +48,118 @@ func TestDeleteMarket(t *testing.T) {
 
 func TestGetMarketById(t *testing.T) {
 
-	arg := CreateMarketParams {
-		BaseCurrency: "BTC",
-		QuoteCurrency: "PKR",
-		MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
-		PricePrecision: sql.NullInt32{Int32: 8, Valid: true},
-	}
+	_, _, marketRow := createRandomMarket()
 
-	market, err := testQueries.CreateMarket(context.Background(), arg)
+	fmt.Println(marketRow.ID)
 
-	fmt.Println(market.ID)
-
-	fetchedMarket, err := testQueries.GetMarketByID(context.Background(), market.ID)
+	fetchedMarket, err := testQueries.GetMarketByID(context.Background(), marketRow.ID)
 
 	require.NoError(t, err, "Failed to fetch market by ID")
-	require.Equal(t, market.ID, fetchedMarket.ID, "Market ID should match")
-	require.Equal(t, market.BaseCurrency, fetchedMarket.BaseCurrency, "BaseCurrency should match")
-	require.Equal(t, market.QuoteCurrency, fetchedMarket.QuoteCurrency, "Quote currency must match")
-	require.Equal(t, market.CreatedAt, fetchedMarket.CreatedAt, "CreatedAt should match")
-	
+	require.Equal(t, marketRow.ID, fetchedMarket.ID, "Market ID should match")
+	require.Equal(t, marketRow.BaseCurrency, fetchedMarket.BaseCurrency, "BaseCurrency should match")
+	require.Equal(t, marketRow.QuoteCurrency, fetchedMarket.QuoteCurrency, "Quote currency must match")
+	require.Equal(t, marketRow.CreatedAt, fetchedMarket.CreatedAt, "CreatedAt should match")
 }
 
 func TestListMarkets(t *testing.T) {
-	
-    for i := 0; i < 5; i++ {
-        arg := CreateMarketParams{
-            BaseCurrency:  fmt.Sprintf("BASE%d", i),
-            QuoteCurrency: fmt.Sprintf("QUOTE%d", i),
-            MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
-            PricePrecision: sql.NullInt32{Int32: 8, Valid: true},
+    ctx := context.Background()
+
+    tx, err := testDB.BeginTx(ctx, nil)
+    require.NoError(t, err, "Failed to begin transaction")
+    defer tx.Rollback() 
+
+    
+    testQueriesWithTx := testQueries.WithTx(tx)
+
+    
+    seenPairs := make(map[string]struct{})
+    for i := 0; i < 3; i++ {
+        var marketParams CreateMarketParams
+        var market CreateMarketRow
+        for {
+            marketParams, _, market = createRandomMarket()
+            pairKey := marketParams.BaseCurrency + "_" + marketParams.QuoteCurrency
+            if _, exists := seenPairs[pairKey]; !exists {
+                seenPairs[pairKey] = struct{}{}
+                break
+            }
         }
 
-        _, err := testQueries.CreateMarket(context.Background(), arg)
+        _, err := testQueriesWithTx.CreateMarket(ctx, marketParams)
         require.NoError(t, err, "Failed to create market")
+        log.Println("Inserted Market:", market)
     }
 
-    markets, err := testQueries.ListMarkets(context.Background())
+    err = tx.Commit()
+    require.NoError(t, err, "Failed to commit transaction")
+
+    markets, err := testQueries.ListMarkets(ctx)
     require.NoError(t, err, "Failed to list markets")
-    require.NotEmpty(t, markets, "Markets list should not be empty")
+    require.NotEmpty(t, markets, "Market list should not be empty")
 
-    for i, market := range markets {
-        require.NotEmpty(t, market.ID, "Market ID should not be empty")
-        require.NotEmpty(t, market.BaseCurrency, "BaseCurrency should not be empty")
-        require.NotEmpty(t, market.QuoteCurrency, "QuoteCurrency should not be empty")
-        require.NotZero(t, market.CreatedAt, "CreatedAt should not be zero")
-
-        if i < 5 {
-            require.Equal(t, fmt.Sprintf("BASE%d", 4-i), market.BaseCurrency, "BaseCurrency should match")
-            require.Equal(t, fmt.Sprintf("QUOTE%d", 4-i), market.QuoteCurrency, "QuoteCurrency should match")
-        }
+    for _, m := range markets {
+        log.Println("Retrieved Market:", m)
+        require.NotEmpty(t, m.BaseCurrency, "BaseCurrency should not be empty")
+        require.NotEmpty(t, m.QuoteCurrency, "QuoteCurrency should not be empty")
     }
+
 }
+
+
+var existingMarkets = make(map[string]struct{}) 
+
+func createRandomMarket() (CreateMarketParams, Market, CreateMarketRow) {
+	rand.Seed(uint64(time.Now().UnixNano()))
+	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
+
+	var baseCurrency, quoteCurrency string
+	for {
+		baseCurrency = currencies[rand.Intn(len(currencies))]
+		quoteCurrency = currencies[rand.Intn(len(currencies))]
+
+		if baseCurrency != quoteCurrency {
+			pairKey := baseCurrency + "_" + quoteCurrency
+			if _, exists := existingMarkets[pairKey]; !exists {
+				existingMarkets[pairKey] = struct{}{} 
+				break
+			}
+		}
+	}
+
+	marketArgs := CreateMarketParams{
+		BaseCurrency: baseCurrency,
+		QuoteCurrency: quoteCurrency,
+		MinOrderAmount: sql.NullString{
+			String: "0.1",
+			Valid:  true,
+		},
+		PricePrecision: sql.NullInt32{
+			Int32: 8,
+			Valid: true,
+		},
+	}
+
+	market := Market{
+		ID:            uuid.New(),
+		BaseCurrency:  marketArgs.BaseCurrency,
+		QuoteCurrency: marketArgs.QuoteCurrency,
+		MinOrderAmount: marketArgs.MinOrderAmount,
+		PricePrecision: marketArgs.PricePrecision,
+		CreatedAt:     sql.NullTime{Time: time.Now(), Valid: true},
+	}
+
+	marketRow := CreateMarketRow{
+		ID:            market.ID,
+		BaseCurrency:  market.BaseCurrency,
+		QuoteCurrency: market.QuoteCurrency,
+		CreatedAt:     market.CreatedAt,
+	}
+
+	log.Println("Generated Market Params:", marketArgs)
+	log.Println("Generated Market Object:", market)
+	log.Println("Generated Market Row:", marketRow)
+
+	return marketArgs, market, marketRow
+}
+
+

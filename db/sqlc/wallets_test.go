@@ -3,17 +3,20 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
 
-
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
 
 func TestCreateWallet(t *testing.T) {
 
+	email := createRandomEmailForWallet()
+
 	userArgs := CreateUserParams {
-		Email: "exam8000@example.com",
+		Email: email,
 		PasswordHash: "12345rtyu",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -38,8 +41,11 @@ func TestCreateWallet(t *testing.T) {
 }
 
 func TestDeleteWallet(t *testing.T) {
+
+	email := createRandomEmailForWallet()
+
 	userArgs := CreateUserParams {
-		Email: "exam8001@example.com",
+		Email: email,
 		PasswordHash: "12345rtyuzhht",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -62,8 +68,11 @@ func TestDeleteWallet(t *testing.T) {
 }
 
 func TestGetWalletByUserEmailAndCurrency(t *testing.T) {
+
+	email := createRandomEmailForWallet()
+
 	userArgs := CreateUserParams {
-		Email: "exam8002@example.com",
+		Email: email,
 		PasswordHash: "vfvfe33433gtgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -88,8 +97,11 @@ func TestGetWalletByUserEmailAndCurrency(t *testing.T) {
 }
 
 func TestUpdateWallet(t *testing.T) {
+
+	email := createRandomEmailForWallet()
+
 	userArgs := CreateUserParams {
-		Email: "exam8004@example.com",
+		Email: email,
 		PasswordHash: "vfvfe33433gtgccecdfrfr",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -121,4 +133,8 @@ func TestUpdateWallet(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, updatedWallet.Balance, updatedWalletArgs.Balance)
 	require.Equal(t, updatedWallet.LockedBalance, updatedWalletArgs.LockedBalance)
+}
+
+func createRandomEmailForWallet() string {
+	return fmt.Sprintf("test-%s@example.com", uuid.New().String())
 }

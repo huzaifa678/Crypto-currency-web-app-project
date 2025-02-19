@@ -3,15 +3,20 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
 func TestCreateUser(t *testing.T) {
+
+	email := createRandomEmail()
+
 	arg := CreateUserParams {
-		Email: "exam10000@example.com",
+		Email: email,
 		PasswordHash: "rhfcjndwd3344ndd",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -28,8 +33,11 @@ func TestCreateUser(t *testing.T) {
 }
 
 func TestDeleteUser(t *testing.T) {
+
+	email := createRandomEmail()
+
 	arg := CreateUserParams{
-		Email:        "deleteuser10000@example.com",
+		Email:        email,
 		PasswordHash: "hashedpassword",
 		Role:         "user",
 		IsVerified:   sql.NullBool{Bool: true, Valid: true},
@@ -47,8 +55,10 @@ func TestDeleteUser(t *testing.T) {
 
 func TestGetUserByEmail(t *testing.T) {
 
+	email := createRandomEmail()
+
 	arg := CreateUserParams{
-		Email:        "exam10001@example.com",
+		Email:        email,
 		PasswordHash: "3535554frff",
 		Role:         "admin",
 		IsVerified:   sql.NullBool{Bool: true, Valid: true},
@@ -66,8 +76,10 @@ func TestGetUserByEmail(t *testing.T) {
 
 func TestUpdateUser(t *testing.T) {
 
+	email := createRandomEmail()
+
 	arg := CreateUserParams{
-		Email:        "exam10002@example.com",
+		Email:        email,
 		PasswordHash: "54ffv895tnng",
 		Role:         "user",
 		IsVerified:   sql.NullBool{Bool: false, Valid: true},
@@ -88,5 +100,11 @@ func TestUpdateUser(t *testing.T) {
 	require.Equal(t, updateArg.PasswordHash, updatedUser.PasswordHash)
 	require.Equal(t, updateArg.IsVerified.Bool, updatedUser.IsVerified.Bool)
 }
+
+
+func createRandomEmail() string {
+	return fmt.Sprintf("testing-%s@example.com", uuid.New().String())
+}
+
 
 

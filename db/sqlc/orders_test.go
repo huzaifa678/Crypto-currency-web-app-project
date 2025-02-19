@@ -1,11 +1,14 @@
 package db
 
+
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -13,8 +16,10 @@ import (
 
 func TestCreateOrder(t *testing.T) {
 
+	email := createRandomEmailForOrder()
+
     userArgs := CreateUserParams {
-		Email: "exam910@example.com",
+		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -46,8 +51,11 @@ func TestCreateOrder(t *testing.T) {
 }
 
 func TestGetOrderById(t *testing.T) {
+
+	email := createRandomEmailForOrder()
+
 	userArgs := CreateUserParams {
-		Email: "exam911@example.com",
+		Email: email,
 		PasswordHash: "9009909dddxxwd",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -82,8 +90,11 @@ func TestGetOrderById(t *testing.T) {
 }
 
 func TestDeleteOrder(t *testing.T) {
+
+	email := createRandomEmailForOrder()
+
 	userArgs := CreateUserParams {
-		Email: "exam912@example.com",
+		Email: email,
 		PasswordHash: "9009909dddxxwd",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -114,8 +125,11 @@ func TestDeleteOrder(t *testing.T) {
 }
 
 func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
+
+	email := createRandomEmailForOrder()
+
 	userArgs := CreateUserParams {
-		Email: "exam913@example.com",
+		Email: email,
 		PasswordHash: "9009909dddxxwd",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -200,3 +214,8 @@ func createRandomMarketForOrder(t *testing.T) CreateMarketRow {
 	return market
 }
 
+
+func createRandomEmailForOrder() string {
+	
+	return fmt.Sprintf("order-%s@example.com", uuid.New().String())
+}

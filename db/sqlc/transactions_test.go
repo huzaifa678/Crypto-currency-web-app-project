@@ -3,15 +3,19 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
 func TestCreateTransaction(t *testing.T) {
 
+	email := createRandomEmailForTransaction()
+
 	userArgs := CreateUserParams {
-		Email: "exam112@example.com",
+		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -36,8 +40,10 @@ func TestCreateTransaction(t *testing.T) {
 
 func TestDeleteTransaction(t *testing.T) {
 
+	email := createRandomEmailForTransaction()
+
 	userArgs := CreateUserParams {
-		Email: "exam113@example.com",
+		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -67,8 +73,10 @@ func TestDeleteTransaction(t *testing.T) {
 }
 
 func TestGetTransactionById(t *testing.T) {
+
+	email := createRandomEmailForTransaction()
 	userArgs := CreateUserParams {
-		Email: "exam114@example.com",
+		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -102,8 +110,11 @@ func TestGetTransactionById(t *testing.T) {
 }
 
 func TestGetTransactionsByUserID(t *testing.T) {
+
+	email := createRandomEmailForTransaction()
+
 	userArgs := CreateUserParams {
-		Email: "exam115@example.com",
+		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -129,3 +140,8 @@ func TestGetTransactionsByUserID(t *testing.T) {
 	require.NotEmpty(t, transactionsByUserID, "Transaction should not be empty")
 	require.Equal(t, transaction.ID, transactionsByUserID[0].ID, "Transaction ID should match")
 }
+
+func createRandomEmailForTransaction() string {
+	return fmt.Sprintf("example-%s@example.com", uuid.New().String())
+}
+

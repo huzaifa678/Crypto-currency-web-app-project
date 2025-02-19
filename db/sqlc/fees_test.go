@@ -102,5 +102,7 @@ func createRandomMarketForFee(t *testing.T) CreateMarketRow {
 	require.NotEmpty(t, market.ID, "Market ID should not be empty")
 	require.Equal(t, baseCurrency, market.BaseCurrency, "BaseCurrency should match")
 	require.Equal(t, quoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
+
 	return market
 }
+

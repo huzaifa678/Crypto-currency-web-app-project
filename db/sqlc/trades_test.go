@@ -3,15 +3,20 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
+
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
 
 func TestCreateTrade(t *testing.T) {
+
+	email := createRandomEmailForTrade()
 	
 	buyerUsersArgs := CreateUserParams {
-		Email: "exam360@example.com",
+		Email: email,
 		PasswordHash: "kddeoovpds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -34,8 +39,10 @@ func TestCreateTrade(t *testing.T) {
 	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
 	require.NoError(t, err, "Failed to create order for the buyer")
 
+	email2 := createRandomEmailForTrade()
+
 	sellerUsersArgs := CreateUserParams {
-		Email: "exam361@example.com",
+		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -78,8 +85,10 @@ func TestCreateTrade(t *testing.T) {
 func TestDeleteTrade(t *testing.T) {
 	market := createRandomMarketForTrade(t)
 
+	email := createRandomEmailForTrade()
+
 	buyerUsersArgs := CreateUserParams {
-		Email: "exam362@example.com",
+		Email: email,
 		PasswordHash: "kddeoovpds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -101,8 +110,10 @@ func TestDeleteTrade(t *testing.T) {
 	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
 	require.NoError(t, err, "Failed to create order for the buyer")
 
+	email2 := createRandomEmailForTrade()
+
 	sellerUsersArgs := CreateUserParams {
-		Email: "exam363@example.com",
+		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -143,8 +154,10 @@ func TestDeleteTrade(t *testing.T) {
 func TestGetTradeById(t *testing.T) {
 	market := createRandomMarketForTrade(t)
 
+	email := createRandomEmailForTrade()
+
 	buyerUsersArgs := CreateUserParams {
-		Email: "exam309@example.com",
+		Email: email,
 		PasswordHash: "kddeoovpds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -166,8 +179,10 @@ func TestGetTradeById(t *testing.T) {
 	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
 	require.NoError(t, err, "Failed to create order for the buyer")
 
+	email2 := createRandomEmailForTrade()
+
 	sellerUsersArgs := CreateUserParams {
-		Email: "exam389@example.com",
+		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -211,9 +226,11 @@ func TestGetTradeById(t *testing.T) {
 
 func TestGetTradeByMarketID(t *testing.T) {
 	market := createRandomMarketForTrade(t)
+
+	email := createRandomEmailForTrade()
 	
 	buyerUsersArgs := CreateUserParams {
-		Email: "exam4000@example.com",
+		Email: email,
 		PasswordHash: "kddeoovpds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -235,8 +252,10 @@ func TestGetTradeByMarketID(t *testing.T) {
 	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
 	require.NoError(t, err, "Failed to create order for the buyer")
 
+	email2 := createRandomEmailForTrade()
+
 	sellerUsersArgs := CreateUserParams {
-		Email: "exam4001@example.com",
+		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -316,5 +335,12 @@ func createRandomMarketForTrade(t *testing.T) CreateMarketRow {
 	require.NotEmpty(t, market.ID, "Market ID should not be empty")
 	require.Equal(t, baseCurrency, market.BaseCurrency, "BaseCurrency should match")
 	require.Equal(t, quoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
+
 	return market
+}
+
+
+
+func createRandomEmailForTrade() string {
+    return fmt.Sprintf("trade-%s@example.com", uuid.New().String())
 }

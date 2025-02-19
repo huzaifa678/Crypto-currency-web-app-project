@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
@@ -15,8 +16,10 @@ import (
 func TestCreateTransactionTx(t *testing.T) {
 	store := NewStore(testDB)
 
+	email := createRandomEmailForTx()
+
 	userArgs := CreateUserParams{
-		Email: "exam1003@example.com",
+		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
@@ -74,8 +77,10 @@ func TestCreateTransactionTx(t *testing.T) {
 func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	store := NewStore(testDB)
 
+	email := createRandomEmailForTx()
+
 	createUserParams := CreateUserParams{
-		Email:        "exam5000@example.com",
+		Email:        email,
 		PasswordHash: "8rrfrf4t45",
 		Role:         "user",
 		IsVerified:   sql.NullBool{Bool: true, Valid: true},
@@ -144,8 +149,10 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	store := NewStore(testDB)
 
+	email := createRandomEmailForTx()
+
 	createUser1Params := CreateUserParams{
-		Email:	"exam5001@example.com",
+		Email:	email,
 		PasswordHash: "cdcewcds",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: true, Valid: true},
@@ -154,8 +161,10 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	user1, err := testQueries.CreateUser(context.Background(), createUser1Params)
 	require.NoError(t, err, "Failed to create user")
 
+	email2 := createRandomEmailForTx()
+
 	createUser2Params := CreateUserParams{
-		Email: "exam5002@example.com",
+		Email: email2,
 		PasswordHash: "cdcewcccfvs",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: true, Valid: true},
@@ -226,3 +235,8 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 		}
 	}
 }
+
+func createRandomEmailForTx() string {
+	return fmt.Sprintf("tx-%s@example.com", uuid.New().String())
+}
+
