@@ -10,9 +10,9 @@ import (
 )
 
 type feeRequest struct {
-    MarketID uuid.UUID      `json:"market_id"`
-    MakerFee sql.NullString `json:"maker_fee"`
-    TakerFee sql.NullString `json:"taker_fee"`
+    MarketID uuid.UUID `json:"market_id"`
+    MakerFee string `json:"maker_fee"`
+    TakerFee string `json:"taker_fee"`
 }
 
 func (server *server) createFee(ctx *gin.Context) {
@@ -25,8 +25,8 @@ func (server *server) createFee(ctx *gin.Context) {
 
     arg := db.CreateFeeParams{
         MarketID: req.MarketID,
-        MakerFee: req.MakerFee,
-        TakerFee: req.TakerFee,
+        MakerFee: sql.NullString{String: req.MakerFee, Valid: req.MakerFee != ""},
+        TakerFee: sql.NullString{String: req.TakerFee, Valid: req.TakerFee != ""},
     }
 
     fee, err := server.store.CreateFee(ctx, arg)
@@ -35,15 +35,21 @@ func (server *server) createFee(ctx *gin.Context) {
         return
     }
 
-    ctx.JSON(http.StatusOK, gin.H{"id": fee.ID})
+    ctx.JSON(http.StatusOK, gin.H{"market_id": fee.ID})
 }
 
 func (server *server) getFee(ctx *gin.Context) {
-    id := ctx.Param("id")
+    id := ctx.Param("market_id")
     feeID, err := uuid.Parse(id)
+
+
     if err != nil {
         ctx.JSON(http.StatusBadRequest, errorResponse(err))
         return
+    }
+
+    if feeID == uuid.Nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
     }
 
     fee, err := server.store.GetFeeByMarketID(ctx, feeID)
@@ -62,8 +68,14 @@ func (server *server) getFee(ctx *gin.Context) {
 func (server *server) deleteFee(ctx *gin.Context) {
     id := ctx.Param("id")
     feeID, err := uuid.Parse(id)
+
     if err != nil {
         ctx.JSON(http.StatusBadRequest, errorResponse(err))
+        return
+    }
+
+    if feeID == uuid.Nil {
+        ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
         return
     }
 
