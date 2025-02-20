@@ -21,7 +21,7 @@ const (
 )
 
 
-type userRequest struct {
+type UserRequest struct {
 	Email        string       `json:"email" binding:"required,email"` 
 	Password string       `json:"password_hash" binding:"required"`
 	Role         UserRole     `json:"role" binding:"required"`
@@ -29,7 +29,7 @@ type userRequest struct {
 
 
 func (server *server) createUser(ctx *gin.Context) {
-	var req userRequest
+	var req UserRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -84,7 +84,7 @@ func (server *server) getUser(ctx *gin.Context) {
 
 func (server *server) updateUser(ctx *gin.Context) {
 
-	var req userRequest
+	var req UserRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))

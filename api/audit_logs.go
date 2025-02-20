@@ -10,14 +10,14 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type auditLogRequest struct {
+type AuditLogRequest struct {
     UserEmail string `json:"user_email"`
     Action    string `json:"action"`
     IPAddress string `json:"ip_address"`
 }
 
 func (server *server) createAuditLog(ctx *gin.Context) {
-    var req auditLogRequest
+    var req AuditLogRequest
 
     if err := ctx.ShouldBindJSON(&req); err != nil {
         ctx.JSON(http.StatusBadRequest, errorResponse(err))

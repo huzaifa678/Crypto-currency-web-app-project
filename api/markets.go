@@ -9,7 +9,7 @@ import (
     "github.com/google/uuid"
 )
 
-type marketRequest struct {
+type MarketRequest struct {
     BaseCurrency  string `json:"base_currency"`
     QuoteCurrency string `json:"quote_currency"`
     MinOrderAmount sql.NullString `json:"min_order_amount"`
@@ -17,7 +17,7 @@ type marketRequest struct {
 }
 
 func (server *server) createMarket(ctx *gin.Context) {
-    var req marketRequest
+    var req MarketRequest
 
     var err error
 
