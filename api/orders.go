@@ -11,7 +11,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type orderRequest struct {
+type OrderRequest struct {
     UserEmail string          `json:"user_email"`
     MarketID  uuid.UUID       `json:"market_id"`
     Type      db.OrderType    `json:"type"`
@@ -21,7 +21,7 @@ type orderRequest struct {
 }
 
 func (server *server) createOrder(ctx *gin.Context) {
-    var req orderRequest
+    var req OrderRequest
 
     if err := ctx.ShouldBindJSON(&req); err != nil {
         log.Println("JSON Binding Error:", err)

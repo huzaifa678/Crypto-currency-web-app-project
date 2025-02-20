@@ -9,12 +9,12 @@ import (
     "github.com/google/uuid"
 )
 
-type walletRequest struct {
+type WalletRequest struct {
     UserEmail string         `json:"user_email" binding:"required,email"`
     Currency  string         `json:"currency"`
 }
 
-type updateWalletRequest struct {
+type UpdateWalletRequest struct {
 	Balance       sql.NullString `json:"balance"`
 	LockedBalance sql.NullString `json:"locked_balance"`
 	UserEmail     string         `json:"user_email"`
@@ -22,7 +22,7 @@ type updateWalletRequest struct {
 }
 
 func (server *server) createWallet(ctx *gin.Context) {
-    var req walletRequest
+    var req WalletRequest
 
     if err := ctx.ShouldBindJSON(&req); err != nil {
         ctx.JSON(http.StatusBadRequest, errorResponse(err))
@@ -77,7 +77,7 @@ func (server *server) updateWallet(ctx *gin.Context) {
 
 
 
-	var req updateWalletRequest
+	var req UpdateWalletRequest
 
     if err := ctx.ShouldBindJSON(&req); err != nil {
         ctx.JSON(http.StatusBadRequest, errorResponse(err))

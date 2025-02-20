@@ -13,7 +13,7 @@ import (
 )
 
 
-type transactionRequest struct {
+type TransactionRequest struct {
 	UserEmail string         `json:"user_email"`
 	Type     db.TransactionType `json:"type"`
 	Currency string          `json:"currency"`
@@ -23,7 +23,7 @@ type transactionRequest struct {
 }
 
 func (server *server) createTransaction(ctx *gin.Context) {
-	var req transactionRequest
+	var req TransactionRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
         log.Printf("JSON Binding Error: %v", err)

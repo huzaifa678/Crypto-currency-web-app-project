@@ -9,14 +9,14 @@ import (
     "github.com/google/uuid"
 )
 
-type feeRequest struct {
+type FeeRequest struct {
     MarketID uuid.UUID `json:"market_id"`
     MakerFee string `json:"maker_fee"`
     TakerFee string `json:"taker_fee"`
 }
 
 func (server *server) createFee(ctx *gin.Context) {
-    var req feeRequest
+    var req FeeRequest
 
     if err := ctx.ShouldBindJSON(&req); err != nil {
         ctx.JSON(http.StatusBadRequest, errorResponse(err))
