@@ -11,12 +11,13 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (email, password_hash, role, is_verified)
-VALUES ($1, $2, $3, $4)
-RETURNING id, email, created_at, updated_at, role, is_verified
+INSERT INTO users (username, email, password_hash, role, is_verified)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, username, email, created_at, updated_at, role, is_verified
 `
 
 type CreateUserParams struct {
+	Username     string       `json:"username"`
 	Email        string       `json:"email"`
 	PasswordHash string       `json:"password_hash"`
 	Role         UserRole     `json:"role"`
@@ -25,6 +26,7 @@ type CreateUserParams struct {
 
 type CreateUserRow struct {
 	ID         uuid.UUID    `json:"id"`
+	Username   string       `json:"username"`
 	Email      string       `json:"email"`
 	CreatedAt  sql.NullTime `json:"created_at"`
 	UpdatedAt  sql.NullTime `json:"updated_at"`
@@ -34,6 +36,7 @@ type CreateUserRow struct {
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error) {
 	row := q.db.QueryRowContext(ctx, createUser,
+		arg.Username,
 		arg.Email,
 		arg.PasswordHash,
 		arg.Role,
@@ -42,6 +45,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (CreateU
 	var i CreateUserRow
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.Email,
 		&i.CreatedAt,
 		&i.UpdatedAt,
@@ -62,13 +66,14 @@ func (q *Queries) DeleteUser(ctx context.Context, id uuid.UUID) error {
 }
 
 const getUserByEmail = `-- name: GetUserByEmail :one
-SELECT id, email, password_hash, created_at, updated_at, role, is_verified
+SELECT id, username, email, password_hash, created_at, updated_at, role, is_verified
 FROM users
 WHERE email = $1
 `
 
 type GetUserByEmailRow struct {
 	ID           uuid.UUID    `json:"id"`
+	Username     string       `json:"username"`
 	Email        string       `json:"email"`
 	PasswordHash string       `json:"password_hash"`
 	CreatedAt    sql.NullTime `json:"created_at"`
@@ -82,6 +87,7 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 	var i GetUserByEmailRow
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.Email,
 		&i.PasswordHash,
 		&i.CreatedAt,
@@ -93,13 +99,14 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 }
 
 const getUserByID = `-- name: GetUserByID :one
-SELECT id, email, password_hash, created_at, updated_at, role, is_verified
+SELECT id, username, email, password_hash, created_at, updated_at, role, is_verified
 FROM users
 WHERE id = $1
 `
 
 type GetUserByIDRow struct {
 	ID           uuid.UUID    `json:"id"`
+	Username     string       `json:"username"`
 	Email        string       `json:"email"`
 	PasswordHash string       `json:"password_hash"`
 	CreatedAt    sql.NullTime `json:"created_at"`
@@ -113,6 +120,7 @@ func (q *Queries) GetUserByID(ctx context.Context, id uuid.UUID) (GetUserByIDRow
 	var i GetUserByIDRow
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.Email,
 		&i.PasswordHash,
 		&i.CreatedAt,

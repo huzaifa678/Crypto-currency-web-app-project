@@ -1,6 +1,5 @@
 package db
 
-
 import (
 	"context"
 	"database/sql"
@@ -9,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -19,6 +19,7 @@ func TestCreateOrder(t *testing.T) {
 	email := createRandomEmailForOrder()
 
     userArgs := CreateUserParams {
+		Username: utils.RandomString(15),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -55,6 +56,7 @@ func TestGetOrderById(t *testing.T) {
 	email := createRandomEmailForOrder()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(10),
 		Email: email,
 		PasswordHash: "9009909dddxxwd",
 		Role: "user",
@@ -94,6 +96,7 @@ func TestDeleteOrder(t *testing.T) {
 	email := createRandomEmailForOrder()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(12),
 		Email: email,
 		PasswordHash: "9009909dddxxwd",
 		Role: "user",
@@ -129,6 +132,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 	email := createRandomEmailForOrder()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(13),
 		Email: email,
 		PasswordHash: "9009909dddxxwd",
 		Role: "user",

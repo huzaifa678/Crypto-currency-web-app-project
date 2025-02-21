@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/jackc/pgconn"
 
 	"github.com/stretchr/testify/require"
@@ -19,6 +20,7 @@ func TestCreateTransactionTx(t *testing.T) {
 	email := createRandomEmailForTx()
 
 	userArgs := CreateUserParams{
+		Username: utils.RandomString(10),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -80,6 +82,7 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	email := createRandomEmailForTx()
 
 	createUserParams := CreateUserParams{
+		Username: utils.RandomString(11),
 		Email:        email,
 		PasswordHash: "8rrfrf4t45",
 		Role:         "user",
@@ -152,6 +155,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	email := createRandomEmailForTx()
 
 	createUser1Params := CreateUserParams{
+		Username: utils.RandomString(12),
 		Email:	email,
 		PasswordHash: "cdcewcds",
 		Role: "user",
@@ -164,6 +168,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	email2 := createRandomEmailForTx()
 
 	createUser2Params := CreateUserParams{
+		Username: utils.RandomString(13),
 		Email: email2,
 		PasswordHash: "cdcewcccfvs",
 		Role: "user",

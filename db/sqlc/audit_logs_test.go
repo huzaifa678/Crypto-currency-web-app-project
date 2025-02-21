@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
-	
 
 	"github.com/google/uuid"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,6 +17,7 @@ func TestCreateAuditLog(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(14),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -42,6 +43,7 @@ func TestDeleteAuditLog(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(11),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -68,6 +70,7 @@ func TestGetAuditLogByUserId(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(10),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",

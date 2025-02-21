@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -15,6 +16,7 @@ func TestCreateTransaction(t *testing.T) {
 	email := createRandomEmailForTransaction()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(33),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -43,6 +45,7 @@ func TestDeleteTransaction(t *testing.T) {
 	email := createRandomEmailForTransaction()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(30),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -76,6 +79,7 @@ func TestGetTransactionById(t *testing.T) {
 
 	email := createRandomEmailForTransaction()
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(32),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -114,6 +118,7 @@ func TestGetTransactionsByUserID(t *testing.T) {
 	email := createRandomEmailForTransaction()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(34),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",

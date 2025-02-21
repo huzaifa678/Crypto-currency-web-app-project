@@ -170,6 +170,7 @@ type Transaction struct {
 
 type User struct {
 	ID           uuid.UUID    `json:"id"`
+	Username     string       `json:"username"`
 	Email        string       `json:"email"`
 	PasswordHash string       `json:"password_hash"`
 	CreatedAt    sql.NullTime `json:"created_at"`
