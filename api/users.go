@@ -22,9 +22,10 @@ const (
 
 
 type UserRequest struct {
-	Email        string       `json:"email" binding:"required,email"` 
-	Password string       `json:"password_hash" binding:"required"`
-	Role         UserRole     `json:"role" binding:"required"`
+	Username	 string	   `json:"username" binding:"required"`
+	Email        string    `json:"email" binding:"required,email"` 
+	Password 	 string    `json:"password_hash" binding:"required"`
+	Role         UserRole  `json:"role" binding:"required"`
 }
 
 
@@ -44,6 +45,7 @@ func (server *server) createUser(ctx *gin.Context) {
 	}
 
 	arg := db.CreateUserParams {
+		Username: req.Username,
 		Email: req.Email,
 		PasswordHash: hashedPassword,
 		Role: db.UserRole(req.Role),

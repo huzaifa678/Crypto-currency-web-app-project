@@ -98,6 +98,7 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "OK",
 			body: gin.H{
+				"username":		 userArgs.Username,
 				"email":         userArgs.Email,
 				"password_hash": userArgs.PasswordHash,
 				"role":          userArgs.Role,
@@ -116,6 +117,7 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "InternalError",
 			body: gin.H{
+				"username":		 userArgs.Username,
 				"email":         userArgs.Email,
 				"password_hash": userArgs.PasswordHash,
 				"role":          userArgs.Role,
@@ -133,6 +135,7 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "DuplicateEmail",
 			body: gin.H{
+				"username":		 userArgs.Username,
 				"email":         userArgs.Email,
 				"password_hash": userArgs.PasswordHash,
 				"role":          user.Role,
@@ -150,6 +153,7 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "InvalidEmail",
 			body: gin.H{
+				"username":	   userArgs.Username,
 				"email":       "invalid-email",
 				"password":    userArgs.PasswordHash,
 				"role":        user.Role,
@@ -167,6 +171,7 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "TooShortPassword",
 			body: gin.H{
+				"username":	   userArgs.Username,
 				"email":       user.Email,
 				"password":    "123",
 				"role":        user.Role,
@@ -298,7 +303,8 @@ func TestUpdateUserAPI(t *testing.T) {
 			name:   "OK",
 			userID: user.ID,
 			body: gin.H{
-				"email":         user.Email,
+				"username": user.Username,
+				"email": 	user.Email,
 				"password_hash": "password123",
 				"role":          user.Role,
 			},
@@ -480,6 +486,7 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 	randomPassword := fmt.Sprintf("password%d", rand.Intn(1000))
 
 	userArgs := db.CreateUserParams{
+		Username: 	  utils.RandomString(32),
 		Email:        randomEmail,
 		PasswordHash: randomPassword,
 		Role:         db.UserRole("user"),
@@ -487,7 +494,8 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 	}
 
 	user := db.User{
-		ID:           uuid.New(),
+		ID: 		  uuid.New(),
+		Username: 	  userArgs.Username,
 		Email:        userArgs.Email,
 		PasswordHash: userArgs.PasswordHash,
 		Role:         userArgs.Role,
@@ -496,6 +504,7 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 
 	userRow := db.CreateUserRow{
 		ID:         user.ID,
+		Username: 	user.Username,
 		Email:      user.Email,
 		CreatedAt:  sql.NullTime{Time: time.Now(), Valid: true},
 		UpdatedAt:  sql.NullTime{Time: time.Now(), Valid: true},
@@ -505,6 +514,7 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 
 	getUserRow := db.GetUserByIDRow{
 		ID:           user.ID,
+		Username: 	  user.Username,	
 		Email:        user.Email,
 		PasswordHash: user.PasswordHash,
 		CreatedAt:    sql.NullTime{Time: time.Now(), Valid: true},

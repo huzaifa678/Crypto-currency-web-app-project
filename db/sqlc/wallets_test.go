@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,6 +17,7 @@ func TestCreateWallet(t *testing.T) {
 	email := createRandomEmailForWallet()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(35),
 		Email: email,
 		PasswordHash: "12345rtyu",
 		Role: "user",
@@ -45,6 +47,7 @@ func TestDeleteWallet(t *testing.T) {
 	email := createRandomEmailForWallet()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(36),
 		Email: email,
 		PasswordHash: "12345rtyuzhht",
 		Role: "user",
@@ -72,6 +75,7 @@ func TestGetWalletByUserEmailAndCurrency(t *testing.T) {
 	email := createRandomEmailForWallet()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(37),
 		Email: email,
 		PasswordHash: "vfvfe33433gtgtg",
 		Role: "user",
@@ -101,6 +105,7 @@ func TestUpdateWallet(t *testing.T) {
 	email := createRandomEmailForWallet()
 
 	userArgs := CreateUserParams {
+		Username: utils.RandomString(38),
 		Email: email,
 		PasswordHash: "vfvfe33433gtgccecdfrfr",
 		Role: "user",

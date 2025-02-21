@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -16,6 +17,7 @@ func TestCreateTrade(t *testing.T) {
 	email := createRandomEmailForTrade()
 	
 	buyerUsersArgs := CreateUserParams {
+		Username: utils.RandomString(18),
 		Email: email,
 		PasswordHash: "kddeoovpds",
 		Role: "user",
@@ -42,6 +44,7 @@ func TestCreateTrade(t *testing.T) {
 	email2 := createRandomEmailForTrade()
 
 	sellerUsersArgs := CreateUserParams {
+		Username: utils.RandomString(19),
 		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
@@ -88,6 +91,7 @@ func TestDeleteTrade(t *testing.T) {
 	email := createRandomEmailForTrade()
 
 	buyerUsersArgs := CreateUserParams {
+		Username: utils.RandomString(17),
 		Email: email,
 		PasswordHash: "kddeoovpds",
 		Role: "user",
@@ -113,6 +117,7 @@ func TestDeleteTrade(t *testing.T) {
 	email2 := createRandomEmailForTrade()
 
 	sellerUsersArgs := CreateUserParams {
+		Username: utils.RandomString(8),
 		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
@@ -157,6 +162,7 @@ func TestGetTradeById(t *testing.T) {
 	email := createRandomEmailForTrade()
 
 	buyerUsersArgs := CreateUserParams {
+		Username: utils.RandomString(6),
 		Email: email,
 		PasswordHash: "kddeoovpds",
 		Role: "user",
@@ -182,6 +188,7 @@ func TestGetTradeById(t *testing.T) {
 	email2 := createRandomEmailForTrade()
 
 	sellerUsersArgs := CreateUserParams {
+		Username: utils.RandomString(5),
 		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
@@ -230,6 +237,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 	email := createRandomEmailForTrade()
 	
 	buyerUsersArgs := CreateUserParams {
+		Username: utils.RandomString(10),
 		Email: email,
 		PasswordHash: "kddeoovpds",
 		Role: "user",
@@ -255,6 +263,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 	email2 := createRandomEmailForTrade()
 
 	sellerUsersArgs := CreateUserParams {
+		Username: utils.RandomString(11),
 		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",

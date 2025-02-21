@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -16,6 +17,7 @@ func TestCreateUser(t *testing.T) {
 	email := createRandomEmail()
 
 	arg := CreateUserParams {
+		Username: utils.RandomString(10),
 		Email: email,
 		PasswordHash: "rhfcjndwd3344ndd",
 		Role: "user",
@@ -26,6 +28,7 @@ func TestCreateUser(t *testing.T) {
 
 	require.NoError(t, err)
 	require.NotEmpty(t, users)
+	require.Equal(t, arg.Username, users.Username)
 	require.Equal(t, arg.Email, users.Email)
 	require.Equal(t, arg.Role, users.Role)
 	require.Equal(t, arg.IsVerified, users.IsVerified)
@@ -37,6 +40,7 @@ func TestDeleteUser(t *testing.T) {
 	email := createRandomEmail()
 
 	arg := CreateUserParams{
+		Username: utils.RandomString(30),
 		Email:        email,
 		PasswordHash: "hashedpassword",
 		Role:         "user",
@@ -58,6 +62,7 @@ func TestGetUserByEmail(t *testing.T) {
 	email := createRandomEmail()
 
 	arg := CreateUserParams{
+		Username: utils.RandomString(31),
 		Email:        email,
 		PasswordHash: "3535554frff",
 		Role:         "admin",
@@ -79,6 +84,7 @@ func TestUpdateUser(t *testing.T) {
 	email := createRandomEmail()
 
 	arg := CreateUserParams{
+		Username: utils.RandomString(28),
 		Email:        email,
 		PasswordHash: "54ffv895tnng",
 		Role:         "user",

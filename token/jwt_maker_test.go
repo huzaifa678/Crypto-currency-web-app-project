@@ -1,24 +1,23 @@
 package token
 
 import (
-	"strings"
 	"testing"
 	"time"
 
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/rand"
 )
 
 
 
 func TestJWTMaker(t *testing.T) {
 
-	secretKey := RandomString(32)
+	secretKey := utils.RandomString(32)
 	maker, err := NewJWTMaker(secretKey)
 
 	require.NoError(t, err)
 
-	username := RandomString(12)
+	username := utils.RandomString(12)
 	duration := time.Minute
 
 	token, err := maker.CreateToken(username, duration)
@@ -42,9 +41,9 @@ func TestJWTMaker(t *testing.T) {
 }
 
 func TestTokenExpired(t *testing.T) {
-	maker, err := NewJWTMaker(RandomString(32))
+	maker, err := NewJWTMaker(utils.RandomString(32))
 	require.NoError(t, err)
-	username := RandomString(12)
+	username := utils.RandomString(12)
 
 	token, err := maker.CreateToken(username, -time.Minute)
 	require.NoError(t, err)
@@ -58,32 +57,21 @@ func TestTokenExpired(t *testing.T) {
 
 func TestInvalidSecret(t *testing.T) {
 
-	invalidSecret := RandomString(10)
+	invalidSecret := utils.RandomString(10)
 	_, err := NewJWTMaker(invalidSecret)
 
 	require.EqualError(t, err, "Invalid key size: The secret key size is not equal to minimum of 32 size")
 }
 
 func TestInvalidToken(t *testing.T) {
-	secretKey := RandomString(32)
+	secretKey := utils.RandomString(32)
 	maker, err := NewJWTMaker(secretKey)
 	require.NoError(t, err)
 
-	invalidToken := RandomString(20)
+	invalidToken := utils.RandomString(20)
 
 	payload, err := maker.VerifyToken(invalidToken)
 	require.Error(t, err)
 	require.EqualError(t, err, ErrInvalidToken.Error())
 	require.Nil(t, payload)
-}
-
-func RandomString(length int) string {
-	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ01234567890"
-
-	var sb strings.Builder
-
-	for i := 0; i < length; i++ {
-		sb.WriteByte(letters[rand.Intn(len(letters))])
-	}
-	return sb.String()
 }
