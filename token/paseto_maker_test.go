@@ -9,11 +9,10 @@ import (
 )
 
 
+func TestPasetoMaker(t *testing.T) {
 
-func TestJWTMaker(t *testing.T) {
-
-	secretKey := utils.RandomString(32)
-	maker, err := NewJWTMaker(secretKey)
+	symmetricKey := utils.RandomString(32)
+	maker, err := NewPasetoMaker(symmetricKey)
 
 	require.NoError(t, err)
 
@@ -40,8 +39,8 @@ func TestJWTMaker(t *testing.T) {
 
 }
 
-func TestJWTTokenExpired(t *testing.T) {
-	maker, err := NewJWTMaker(utils.RandomString(32))
+func TestPasetoTokenExpired(t *testing.T) {
+	maker, err := NewPasetoMaker(utils.RandomString(32))
 	require.NoError(t, err)
 	username := utils.RandomString(12)
 
@@ -55,17 +54,17 @@ func TestJWTTokenExpired(t *testing.T) {
 	require.Nil(t, payload)
 }
 
-func TestInvalidSecret(t *testing.T) {
+func TestInvalidSymmetricKey(t *testing.T) {
 
-	invalidSecret := utils.RandomString(10)
-	_, err := NewJWTMaker(invalidSecret)
+	invalidSymmetricKey := utils.RandomString(10)
+	_, err := NewPasetoMaker(invalidSymmetricKey)
 
-	require.EqualError(t, err, "Invalid key size: The secret key size is not equal to minimum of 32 size")
+	require.EqualError(t, err, "Invalid key size: The secret key size is not equal to 32")
 }
 
-func TestInvalidJWTToken(t *testing.T) {
-	secretKey := utils.RandomString(32)
-	maker, err := NewJWTMaker(secretKey)
+func TestInvalidPasetoToken(t *testing.T) {
+	symmetricKey := utils.RandomString(32)
+	maker, err := NewJWTMaker(symmetricKey)
 	require.NoError(t, err)
 
 	invalidToken := utils.RandomString(20)
@@ -75,3 +74,4 @@ func TestInvalidJWTToken(t *testing.T) {
 	require.EqualError(t, err, ErrInvalidToken.Error())
 	require.Nil(t, payload)
 }
+
