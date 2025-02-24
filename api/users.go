@@ -28,6 +28,55 @@ type UserRequest struct {
 	Role         UserRole  `json:"role" binding:"required"`
 }
 
+type UserLoginRequest struct {
+	Email string `json:"username" binding:"required, email"`
+	Password string `json:"password_hash" binding:"required"`
+}
+
+type UserLoginResponse struct {
+	AccessToken string  `json:"access_token"`
+	User		db.GetUserByEmailRow  `json:"user"`
+}
+
+
+func (server *server) loginUser(ctx *gin.Context) {
+	var req UserLoginRequest
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+	}
+
+	user, err := server.store.GetUserByEmail(ctx, req.Email)
+
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, gin.H{"Email not found": "Username not found with the given email"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	}
+
+	err = utils.ComparePasswords(user.PasswordHash, req.Password)
+
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"Password unmatched": "Passowrd does not match"})
+	}
+
+	accessToken, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	res := UserLoginResponse {
+		AccessToken: accessToken,
+		User: user,
+	}
+
+	ctx.JSON(http.StatusOK, res)
+
+}
+
 
 func (server *server) createUser(ctx *gin.Context) {
 	var req UserRequest

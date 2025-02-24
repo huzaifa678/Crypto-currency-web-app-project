@@ -110,7 +110,7 @@ func TestCreateWalletAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             data, err := json.Marshal(tc.body)
@@ -213,7 +213,7 @@ func TestGetWalletAPI(t *testing.T) {
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-			server := NewServer(store)
+			server := NewTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/wallets/%s", tc.WalletID)
@@ -315,7 +315,7 @@ func TestUpdateWalletAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             data, err := json.Marshal(tc.body)
@@ -403,7 +403,7 @@ func TestDeleteWalletAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             url := fmt.Sprintf("/wallets/%s", tc.WalletID)

@@ -106,7 +106,7 @@ func TestCreateTransactionAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             data, err := json.Marshal(tc.body)
@@ -196,7 +196,7 @@ func TestGetTransactionAPI(t *testing.T) {
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-			server := NewServer(store)
+			server := NewTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			url := fmt.Sprintf("/transactions/%s", tc.txID)
@@ -263,7 +263,7 @@ func TestListUserTransactionsAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             url := fmt.Sprintf("/transactions/user/%s", tc.userEmail)
@@ -348,7 +348,7 @@ func TestDeleteTransactionAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             url := fmt.Sprintf("/transactions/%s", tc.txID)

@@ -116,7 +116,7 @@ func TestCreateMarketAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             data, err := json.Marshal(tc.body)
@@ -193,7 +193,7 @@ func TestGetMarketByIDAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             url := fmt.Sprintf("/markets/%s", tc.MarketID)
@@ -266,7 +266,7 @@ func TestDeleteMarketAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             url := fmt.Sprintf("/markets/%s", tc.MarketID)
@@ -333,7 +333,7 @@ func TestListMarketsAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             url := "/markets"

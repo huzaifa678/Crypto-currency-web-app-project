@@ -25,7 +25,8 @@ func main() {
 	}
 
 	store := db.NewStore(conn)
-	server := api.NewServer(store)
+	config, err = utils.LoadConfig(".")
+	server, err := api.NewServer(store, config)
 
 	err = server.Start(config.ServerAddr)
 	if err != nil {

@@ -103,7 +103,7 @@ func TestCreateAuditLogAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             data, err := json.Marshal(tc.body)
@@ -168,7 +168,7 @@ func TestGetAuditLogsByUserEmailAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             url := fmt.Sprintf("/audit-logs/%s", tc.userEmail)
@@ -251,7 +251,7 @@ func TestListUserAuditLogsAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             url := fmt.Sprintf("/audit-logs/user/%s", tc.userEmail)
@@ -323,7 +323,7 @@ func TestDeleteAuditLogslAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             url := fmt.Sprintf("/audit-logs/%s", tc.AuditLogId)
