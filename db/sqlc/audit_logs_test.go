@@ -17,7 +17,7 @@ func TestCreateAuditLog(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
-		Username: utils.RandomString(14),
+		Username: utils.RandomString(29),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -43,7 +43,7 @@ func TestDeleteAuditLog(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
-		Username: utils.RandomString(11),
+		Username: utils.RandomString(5),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -70,7 +70,7 @@ func TestGetAuditLogByUserId(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
-		Username: utils.RandomString(10),
+		Username: utils.RandomString(8),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",

@@ -20,7 +20,7 @@ func TestCreateTransactionTx(t *testing.T) {
 	email := createRandomEmailForTx()
 
 	userArgs := CreateUserParams{
-		Username: utils.RandomString(10),
+		Username: utils.RandomString(20),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",

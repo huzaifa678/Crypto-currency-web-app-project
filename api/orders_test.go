@@ -102,7 +102,7 @@ func TestCreateOrderAPI(t *testing.T) {
             store := mockdb.NewMockStore_interface(ctrl)
             tc.buildStubs(store)
 
-            server := NewServer(store)
+            server := NewTestServer(t, store)
             recorder := httptest.NewRecorder()
 
             data, err := json.Marshal(tc.body)
@@ -191,7 +191,7 @@ func TestGetOrderAPI(t *testing.T) {
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-			server := NewServer(store)
+			server := NewTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			url := "/orders/" + tc.orderID
@@ -278,7 +278,7 @@ func TestDeleteOrderAPI(t *testing.T) {
 			defer ctrl.Finish()
 
 			store := mockdb.NewMockStore_interface(ctrl)
-   			server := NewServer(store)
+   			server := NewTestServer(t, store)
 
 			tc.buildStubs(store)
 			recorder := httptest.NewRecorder()
