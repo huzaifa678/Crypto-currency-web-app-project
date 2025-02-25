@@ -17,9 +17,6 @@ type server struct {
 }
 
 
-func (server *server) Start(serverAddr string) error {
-	return server.router.Run(serverAddr)
-}
 
 func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
 
@@ -36,6 +33,7 @@ func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
 
 	router := gin.Default()
 
+	router.POST("/users/login", server.loginUser)
 	router.POST("/users", server.createUser)
 	router.GET("/users/:id", server.getUser)
 	router.PUT("/users/:id", server.updateUser)
@@ -78,7 +76,7 @@ func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
 	return server, nil
 }
 
-func (server *server) start (address string) error {
+func (server *server) Start (address string) error {
     return server.router.Run(address)
 }
 

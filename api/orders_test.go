@@ -139,7 +139,7 @@ func TestGetOrderAPI(t *testing.T) {
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				requireBodyMatchOrder(t, recorder.Body, order)
+				requireBodyMatchOrderForGet(t, recorder.Body, order)
 			},
 		},
 		{
