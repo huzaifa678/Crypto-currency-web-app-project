@@ -29,7 +29,7 @@ type UserRequest struct {
 }
 
 type UserLoginRequest struct {
-	Email string `json:"username" binding:"required, email"`
+	Email string `json:"email" binding:"required,email"`
 	Password string `json:"password_hash" binding:"required"`
 }
 
@@ -44,15 +44,20 @@ func (server *server) loginUser(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
 	}
 
 	user, err := server.store.GetUserByEmail(ctx, req.Email)
 
+	log.Println("User", user)
+
 	if err != nil {
 		if err == sql.ErrNoRows {
+			log.Println("error", err)
 			ctx.JSON(http.StatusNotFound, gin.H{"Email not found": "Username not found with the given email"})
 			return
 		}
+		log.Println("Error in getting user by email", err)
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
 
@@ -93,6 +98,17 @@ func (server *server) createUser(ctx *gin.Context) {
 		return
 	}
 
+	_, err = server.store.GetUserByEmail(ctx, req.Email)
+	if err == nil { 
+		ctx.JSON(http.StatusConflict, gin.H{"error": "User with this email already exists"})
+		return
+	}
+
+	if err != sql.ErrNoRows {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
 	arg := db.CreateUserParams {
 		Username: req.Username,
 		Email: req.Email,
@@ -100,6 +116,7 @@ func (server *server) createUser(ctx *gin.Context) {
 		Role: db.UserRole(req.Role),
 		IsVerified: sql.NullBool{Bool: true, Valid: true},
 	}
+
 
 	user, err := server.store.CreateUser(ctx, arg)
 

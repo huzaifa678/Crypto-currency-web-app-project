@@ -85,7 +85,7 @@ func EqUpdateUserParams(arg db.UpdateUserParams, password string) gomock.Matcher
 }
 
 func TestCreateUserAPI(t *testing.T) {
-	userArgs, user, userRows, _ := createRandomUser()
+	userArgs, user, userRows, _, userEmailGetArgs := createRandomUser()
 
 	log.Println("userArgs.email: ", userArgs.Email)
 
@@ -104,6 +104,11 @@ func TestCreateUserAPI(t *testing.T) {
 				"role":          userArgs.Role,
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
+				store.EXPECT().
+                    GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+                    Times(1).
+                    Return(userEmailGetArgs, sql.ErrNoRows)
+
 				store.EXPECT().
 					CreateUser(gomock.Any(), EqCreateUserParams(userArgs, userArgs.PasswordHash)).
 					Times(1).
@@ -124,6 +129,11 @@ func TestCreateUserAPI(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
+                    GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+                    Times(1).
+                    Return(userEmailGetArgs, sql.ErrNoRows)
+
+				store.EXPECT().
 					CreateUser(gomock.Any(), EqCreateUserParams(userArgs, userArgs.PasswordHash)).
 					Times(1).
 					Return(userRows, sql.ErrConnDone)
@@ -141,6 +151,11 @@ func TestCreateUserAPI(t *testing.T) {
 				"role":          user.Role,
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
+				store.EXPECT().
+                    GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+                    Times(1).
+                    Return(userEmailGetArgs, sql.ErrNoRows)
+
 				store.EXPECT().
 					CreateUser(gomock.Any(), EqCreateUserParams(userArgs, userArgs.PasswordHash)).
 					Times(1).
@@ -215,7 +230,7 @@ func TestCreateUserAPI(t *testing.T) {
 }
 
 func TestGetUserAPI(t *testing.T) {
-	_, user, _, getUserParams := createRandomUser()
+	_, user, _, getUserParams, _ := createRandomUser()
 
 	testCases := []struct {
 		name          string
@@ -289,7 +304,7 @@ func TestGetUserAPI(t *testing.T) {
 }
 
 func TestUpdateUserAPI(t *testing.T) {
-	_, user, _, _ := createRandomUser()
+	_, user, _, _, _ := createRandomUser()
 
 	log.Println("UPDATE USER ARGS: ", user)
 	testCases := []struct {
@@ -397,7 +412,7 @@ func TestUpdateUserAPI(t *testing.T) {
 }
 
 func TestDeleteUserAPI(t *testing.T) {
-	_, user, _, _ := createRandomUser()
+	_, user, _, _, _ := createRandomUser()
 
 	testCases := []struct {
 		name          string
@@ -481,7 +496,7 @@ func TestDeleteUserAPI(t *testing.T) {
 	}
 }
 
-func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetUserByIDRow) {
+func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetUserByIDRow, db.GetUserByEmailRow) {
 	randomEmail := fmt.Sprintf("testing%d@example.com", rand.Intn(1000))
 	randomPassword := fmt.Sprintf("password%d", rand.Intn(1000))
 
@@ -523,8 +538,20 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 		IsVerified:   userArgs.IsVerified,
 	}
 
-	return userArgs, user, userRow, getUserRow
+	userEmailGetArgs := db.GetUserByEmailRow {
+		ID:           user.ID,
+		Username: 	  user.Username,	
+		Email:        user.Email,
+		PasswordHash: user.PasswordHash,
+		CreatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
+		UpdatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
+		Role:         userArgs.Role,
+		IsVerified:   userArgs.IsVerified,
+	}
+
+	return userArgs, user, userRow, getUserRow, userEmailGetArgs
 }
+
 
 func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
 	data, err := io.ReadAll(body)

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"log"
 
-	"github.com/huzaifa678/Crypto-currency-web-app-project/api"
+	api "github.com/huzaifa678/Crypto-currency-web-app-project/api"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	_ "github.com/lib/pq"
@@ -25,9 +25,11 @@ func main() {
 	}
 
 	store := db.NewStore(conn)
-	config, err = utils.LoadConfig(".")
 	server, err := api.NewServer(store, config)
-
+	if err != nil {
+		log.Fatal("failed to create server:", err)
+	}
+	
 	err = server.Start(config.ServerAddr)
 	if err != nil {
 		log.Fatal("failed to start the server:", err)
