@@ -1,12 +1,14 @@
 package api
 
 import (
-    db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
-    "database/sql"
-    "net/http"
+	"database/sql"
+	"net/http"
 
-    "github.com/gin-gonic/gin"
-    "github.com/google/uuid"
+	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type MarketRequest struct {
@@ -26,7 +28,10 @@ func (server *server) createMarket(ctx *gin.Context) {
         return
     }
 
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
     arg := db.CreateMarketParams{
+        Username: authPayload.Username,
         BaseCurrency:  req.BaseCurrency,
         QuoteCurrency: req.QuoteCurrency,
         MinOrderAmount: req.MinOrderAmount,
@@ -72,6 +77,13 @@ func (server *server) getMarket(ctx *gin.Context) {
         return
     }
 
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
+    if authPayload.Username != market.Username {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
+        return
+    }
+
     ctx.JSON(http.StatusOK, market)
 }
 
@@ -86,6 +98,23 @@ func (server *server) deleteMarket(ctx *gin.Context) {
 
     if id == uuid.Nil.String() {
         ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
+        return
+    }
+
+    market, err := server.store.GetMarketByID(ctx, marketID)
+
+    if err != nil {
+        if err == sql.ErrNoRows {
+            ctx.JSON(http.StatusNotFound, errorResponse(err))
+            return
+        }
+        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+    }
+
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
+    if authPayload.Username != market.Username {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
         return
     }
 

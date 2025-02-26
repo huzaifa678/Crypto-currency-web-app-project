@@ -8,7 +8,7 @@ import (
 
 
 func RandomString(length int) string {
-	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ01234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ01234567890"
+	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ01234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ01234567890njnkuhbnhbbiibjbhjbihbibi"
 
 	var sb strings.Builder
 
@@ -16,4 +16,8 @@ func RandomString(length int) string {
 		sb.WriteByte(letters[rand.Intn(len(letters))])
 	}
 	return sb.String()
+}
+
+func RandomUser() string {
+	return RandomString(10)
 }

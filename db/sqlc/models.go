@@ -109,6 +109,7 @@ func (e *UserRole) Scan(src interface{}) error {
 
 type AuditLog struct {
 	ID        uuid.UUID      `json:"id"`
+	Username  string         `json:"username"`
 	UserEmail string         `json:"user_email"`
 	Action    string         `json:"action"`
 	IpAddress sql.NullString `json:"ip_address"`
@@ -117,6 +118,7 @@ type AuditLog struct {
 
 type Fee struct {
 	ID        uuid.UUID      `json:"id"`
+	Username  string         `json:"username"`
 	MarketID  uuid.UUID      `json:"market_id"`
 	MakerFee  sql.NullString `json:"maker_fee"`
 	TakerFee  sql.NullString `json:"taker_fee"`
@@ -125,6 +127,7 @@ type Fee struct {
 
 type Market struct {
 	ID             uuid.UUID      `json:"id"`
+	Username       string         `json:"username"`
 	BaseCurrency   string         `json:"base_currency"`
 	QuoteCurrency  string         `json:"quote_currency"`
 	MinOrderAmount sql.NullString `json:"min_order_amount"`
@@ -134,6 +137,7 @@ type Market struct {
 
 type Order struct {
 	ID           uuid.UUID      `json:"id"`
+	Username     string         `json:"username"`
 	UserEmail    string         `json:"user_email"`
 	MarketID     uuid.UUID      `json:"market_id"`
 	Type         OrderType      `json:"type"`
@@ -147,6 +151,7 @@ type Order struct {
 
 type Trade struct {
 	ID          uuid.UUID      `json:"id"`
+	Username    string         `json:"username"`
 	BuyOrderID  uuid.UUID      `json:"buy_order_id"`
 	SellOrderID uuid.UUID      `json:"sell_order_id"`
 	MarketID    uuid.UUID      `json:"market_id"`
@@ -158,6 +163,7 @@ type Trade struct {
 
 type Transaction struct {
 	ID        uuid.UUID         `json:"id"`
+	Username  string            `json:"username"`
 	UserEmail string            `json:"user_email"`
 	Type      TransactionType   `json:"type"`
 	Currency  string            `json:"currency"`
@@ -181,6 +187,7 @@ type User struct {
 
 type Wallet struct {
 	ID            uuid.UUID      `json:"id"`
+	Username      string         `json:"username"`
 	UserEmail     string         `json:"user_email"`
 	Currency      string         `json:"currency"`
 	Balance       sql.NullString `json:"balance"`

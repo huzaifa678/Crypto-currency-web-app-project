@@ -26,6 +26,7 @@ func TestCreateWallet(t *testing.T) {
 	user, err := testQueries.CreateUser(context.Background(), userArgs)
 
 	arg := CreateWalletParams{
+		Username: user.Username,
 		UserEmail:   user.Email,
 		Currency: "USD",
 		Balance:  sql.NullString{String: "1000.00000000", Valid: true},
@@ -35,6 +36,7 @@ func TestCreateWallet(t *testing.T) {
 	require.NoError(t, err, "Failed to create wallet")
 
 	require.NotZero(t, wallet.ID)
+	require.Equal(t, arg.Username, wallet.Username)
 	require.Equal(t, arg.UserEmail, wallet.UserEmail)
 	require.Equal(t, arg.Currency, wallet.Currency)
 	require.Equal(t, arg.Balance.String, wallet.Balance.String)
@@ -57,6 +59,7 @@ func TestDeleteWallet(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	walletArg := CreateWalletParams{
+		Username: user.Username,
 		UserEmail:   user.Email,
 		Currency: "USD",
 		Balance:  sql.NullString{String: "1000.00000000", Valid: true},
@@ -85,6 +88,7 @@ func TestGetWalletByUserEmailAndCurrency(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	walletArgs := CreateWalletParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		Currency: "USD",
 		Balance: sql.NullString{String: "1000.00000000", Valid: true},
@@ -115,6 +119,7 @@ func TestUpdateWallet(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	walletArgs := CreateWalletParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		Currency: "USD",
 		Balance: sql.NullString{String: "1000.00000000", Valid: true},

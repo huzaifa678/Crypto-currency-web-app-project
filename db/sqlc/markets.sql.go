@@ -11,12 +11,13 @@ import (
 )
 
 const createMarket = `-- name: CreateMarket :one
-INSERT INTO markets (base_currency, quote_currency, min_order_amount, price_precision)
-VALUES ($1, $2, $3, $4)
-RETURNING id, base_currency, quote_currency, created_at
+INSERT INTO markets (username, base_currency, quote_currency, min_order_amount, price_precision)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, username, base_currency, quote_currency, created_at
 `
 
 type CreateMarketParams struct {
+	Username       string         `json:"username"`
 	BaseCurrency   string         `json:"base_currency"`
 	QuoteCurrency  string         `json:"quote_currency"`
 	MinOrderAmount sql.NullString `json:"min_order_amount"`
@@ -25,6 +26,7 @@ type CreateMarketParams struct {
 
 type CreateMarketRow struct {
 	ID            uuid.UUID    `json:"id"`
+	Username      string       `json:"username"`
 	BaseCurrency  string       `json:"base_currency"`
 	QuoteCurrency string       `json:"quote_currency"`
 	CreatedAt     sql.NullTime `json:"created_at"`
@@ -32,6 +34,7 @@ type CreateMarketRow struct {
 
 func (q *Queries) CreateMarket(ctx context.Context, arg CreateMarketParams) (CreateMarketRow, error) {
 	row := q.db.QueryRowContext(ctx, createMarket,
+		arg.Username,
 		arg.BaseCurrency,
 		arg.QuoteCurrency,
 		arg.MinOrderAmount,
@@ -40,6 +43,7 @@ func (q *Queries) CreateMarket(ctx context.Context, arg CreateMarketParams) (Cre
 	var i CreateMarketRow
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.BaseCurrency,
 		&i.QuoteCurrency,
 		&i.CreatedAt,
@@ -58,7 +62,7 @@ func (q *Queries) DeleteMarket(ctx context.Context, id uuid.UUID) error {
 }
 
 const getMarketByCurrencies = `-- name: GetMarketByCurrencies :one
-SELECT id, base_currency, quote_currency, min_order_amount, price_precision, created_at
+SELECT id, username, base_currency, quote_currency, min_order_amount, price_precision, created_at
 FROM markets
 WHERE base_currency = $1 AND quote_currency = $2
 `
@@ -73,6 +77,7 @@ func (q *Queries) GetMarketByCurrencies(ctx context.Context, arg GetMarketByCurr
 	var i Market
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.BaseCurrency,
 		&i.QuoteCurrency,
 		&i.MinOrderAmount,
@@ -83,7 +88,7 @@ func (q *Queries) GetMarketByCurrencies(ctx context.Context, arg GetMarketByCurr
 }
 
 const getMarketByID = `-- name: GetMarketByID :one
-SELECT id, base_currency, quote_currency, min_order_amount, price_precision, created_at
+SELECT id, username, base_currency, quote_currency, min_order_amount, price_precision, created_at
 FROM markets
 WHERE id = $1
 `
@@ -93,6 +98,7 @@ func (q *Queries) GetMarketByID(ctx context.Context, id uuid.UUID) (Market, erro
 	var i Market
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.BaseCurrency,
 		&i.QuoteCurrency,
 		&i.MinOrderAmount,
@@ -108,15 +114,24 @@ FROM markets
 ORDER BY created_at DESC
 `
 
-func (q *Queries) ListMarkets(ctx context.Context) ([]Market, error) {
+type ListMarketsRow struct {
+	ID             uuid.UUID      `json:"id"`
+	BaseCurrency   string         `json:"base_currency"`
+	QuoteCurrency  string         `json:"quote_currency"`
+	MinOrderAmount sql.NullString `json:"min_order_amount"`
+	PricePrecision sql.NullInt32  `json:"price_precision"`
+	CreatedAt      sql.NullTime   `json:"created_at"`
+}
+
+func (q *Queries) ListMarkets(ctx context.Context) ([]ListMarketsRow, error) {
 	rows, err := q.db.QueryContext(ctx, listMarkets)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Market
+	var items []ListMarketsRow
 	for rows.Next() {
-		var i Market
+		var i ListMarketsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.BaseCurrency,

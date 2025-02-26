@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 	mockdb "github.com/huzaifa678/Crypto-currency-web-app-project/db/mock"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
@@ -30,6 +31,7 @@ func TestCreateMarketAPI(t *testing.T) {
         name          string
         body          gin.H
         buildStubs    func(store *mockdb.MockStore_interface)
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         checkResponse func(recorder *httptest.ResponseRecorder)
     }{
         {
@@ -45,6 +47,9 @@ func TestCreateMarketAPI(t *testing.T) {
                     CreateMarket(gomock.Any(), gomock.Eq(marketArgs)).
                     Times(1).
                     Return(marketRow, nil)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, market.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusOK, recorder.Code)
@@ -65,6 +70,9 @@ func TestCreateMarketAPI(t *testing.T) {
                     Times(1).
                     Return(db.CreateMarketRow{}, sql.ErrConnDone)
             },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, market.Username, time.Minute)
+            },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusInternalServerError, recorder.Code)
             },
@@ -81,6 +89,9 @@ func TestCreateMarketAPI(t *testing.T) {
                 store.EXPECT().
                     CreateMarket(gomock.Any(), gomock.Any()).
                     Times(0)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, market.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -99,6 +110,9 @@ func TestCreateMarketAPI(t *testing.T) {
                     CreateMarket(gomock.Any(), gomock.Eq(marketArgs)).
                     Times(1).
                     Return(db.CreateMarketRow{}, &pq.Error{Code: "23505"})
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, market.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -126,6 +140,8 @@ func TestCreateMarketAPI(t *testing.T) {
             request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
             require.NoError(t, err)
 
+            tc.setupAuth(t, request, server.tokenMaker)
+
             server.router.ServeHTTP(recorder, request)
             tc.checkResponse(recorder)
         })
@@ -139,6 +155,7 @@ func TestGetMarketByIDAPI(t *testing.T) {
         name          string
         MarketID      uuid.UUID
         buildStubs    func(store *mockdb.MockStore_interface)
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         checkResponse func(recorder *httptest.ResponseRecorder)
     }{
         {
@@ -150,9 +167,12 @@ func TestGetMarketByIDAPI(t *testing.T) {
                     Times(1).
                     Return(market, nil)
             },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, market.Username, time.Minute)
+            },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusOK, recorder.Code)
-                requireBodyMatchMarkets(t, recorder.Body, market)
+                requireBodyMatchMarket(t, recorder.Body, market)
             },
         },
         {
@@ -163,6 +183,9 @@ func TestGetMarketByIDAPI(t *testing.T) {
                     GetMarketByID(gomock.Any(), gomock.Eq(market.ID)).
                     Times(1).
                     Return(market, sql.ErrNoRows)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, market.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -176,6 +199,9 @@ func TestGetMarketByIDAPI(t *testing.T) {
                     GetMarketByID(gomock.Any(), gomock.Eq(market.ID)).
                     Times(1).
                     Return(market, sql.ErrConnDone)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, market.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -200,6 +226,8 @@ func TestGetMarketByIDAPI(t *testing.T) {
             request, err := http.NewRequest(http.MethodGet, url, nil)
             require.NoError(t, err)
 
+            tc.setupAuth(t, request, server.tokenMaker)
+
             server.router.ServeHTTP(recorder, request)
             tc.checkResponse(recorder)
         })
@@ -213,12 +241,22 @@ func TestDeleteMarketAPI(t *testing.T) {
         name          string
         MarketID      uuid.UUID
         buildStubs    func(store *mockdb.MockStore_interface)
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         checkResponse func(recorder *httptest.ResponseRecorder)
     }{
         {
             name: "OK",
             MarketID: market.ID,
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, market.Username, time.Minute)
+            },
             buildStubs: func(store *mockdb.MockStore_interface) {
+
+                store.EXPECT().
+                    GetMarketByID(gomock.Any(), gomock.Eq(market.ID)).
+                    Times(1).
+                    Return(market, nil)
+
                 store.EXPECT().
                     DeleteMarket(gomock.Any(), gomock.Eq(market.ID)).
                     Times(1).
@@ -231,20 +269,37 @@ func TestDeleteMarketAPI(t *testing.T) {
         {
             name: "NotFound",
             MarketID: market.ID,
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, market.Username, time.Minute)
+            },
             buildStubs: func(store *mockdb.MockStore_interface) {
+
+                store.EXPECT().
+                    GetMarketByID(gomock.Any(), gomock.Eq(market.ID)).
+                    Times(1).
+                    Return(market, sql.ErrNoRows)
+
                 store.EXPECT().
                     DeleteMarket(gomock.Any(), gomock.Eq(market.ID)).
-                    Times(1).
-                    Return(sql.ErrNoRows)
+                    Times(0)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusInternalServerError, recorder.Code)
+                require.Equal(t, http.StatusNotFound, recorder.Code)
             },
         },
         {
             name: "InternalError",
             MarketID: market.ID,
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, market.Username, time.Minute)
+            },
             buildStubs: func(store *mockdb.MockStore_interface) {
+
+                store.EXPECT().
+                    GetMarketByID(gomock.Any(), gomock.Eq(market.ID)).
+                    Times(1).
+                    Return(market, nil)
+
                 store.EXPECT().
                     DeleteMarket(gomock.Any(), gomock.Eq(market.ID)).
                     Times(1).
@@ -273,6 +328,8 @@ func TestDeleteMarketAPI(t *testing.T) {
             request, err := http.NewRequest(http.MethodDelete, url, nil)
             require.NoError(t, err)
 
+            tc.setupAuth(t, request, server.tokenMaker)
+
             server.router.ServeHTTP(recorder, request)
             tc.checkResponse(recorder)
         })
@@ -285,10 +342,31 @@ func TestListMarketsAPI(t *testing.T) {
     _, market2, _ := createRandomMarket()
     _, market3, _ := createRandomMarket()
 
-    markets := []db.Market{
-        market1,
-        market2,
-        market3,
+    markets := []db.ListMarketsRow{
+        {
+            ID:            market1.ID,
+            BaseCurrency:  market1.BaseCurrency,
+            QuoteCurrency: market1.QuoteCurrency,
+            MinOrderAmount: market1.MinOrderAmount,
+            PricePrecision: market1.PricePrecision,
+            CreatedAt:     market1.CreatedAt,
+        },
+        {
+            ID:            market2.ID,
+            BaseCurrency:  market2.BaseCurrency,
+            QuoteCurrency: market2.QuoteCurrency,
+            MinOrderAmount: market2.MinOrderAmount,
+            PricePrecision: market2.PricePrecision,
+            CreatedAt:     market2.CreatedAt,
+        },
+        {
+            ID:            market3.ID,
+            BaseCurrency:  market3.BaseCurrency,
+            QuoteCurrency: market3.QuoteCurrency,
+            MinOrderAmount: market3.MinOrderAmount,
+            PricePrecision: market3.PricePrecision,
+            CreatedAt:     market3.CreatedAt,
+        },
     }
 
     testCases := []struct {
@@ -306,7 +384,18 @@ func TestListMarketsAPI(t *testing.T) {
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusOK, recorder.Code)
-                requireBodyMatchMarketsForLists(t, recorder.Body, markets)
+                var convertedMarkets []db.Market
+                for _, market := range markets {
+                    convertedMarkets = append(convertedMarkets, db.Market{
+                        ID:            market.ID,
+                        BaseCurrency:  market.BaseCurrency,
+                        QuoteCurrency: market.QuoteCurrency,
+                        MinOrderAmount: market.MinOrderAmount,
+                        PricePrecision: market.PricePrecision,
+                        CreatedAt:     market.CreatedAt,
+                    })
+                }
+                requireBodyMatchMarketsForLists(t, recorder.Body, convertedMarkets)
             },
         },
         {
@@ -359,7 +448,7 @@ func requireBodyMatchMarket(t *testing.T, body *bytes.Buffer, market db.Market) 
     require.Equal(t, market.ID, gotMarket.ID)
 }
 
-func requireBodyMatchMarkets(t *testing.T, body *bytes.Buffer, market db.Market) {
+func requireBodyMatchMarkets(t *testing.T, body *bytes.Buffer, market db.ListMarketsRow) {
     data, err := io.ReadAll(body)
     require.NoError(t, err)
 

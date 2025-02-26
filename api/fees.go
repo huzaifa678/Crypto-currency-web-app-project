@@ -1,12 +1,14 @@
 package api
 
 import (
-    db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
-    "database/sql"
-    "net/http"
+	"database/sql"
+	"net/http"
 
-    "github.com/gin-gonic/gin"
-    "github.com/google/uuid"
+	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+
+	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type FeeRequest struct {
@@ -23,7 +25,11 @@ func (server *server) createFee(ctx *gin.Context) {
         return
     }
 
+
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
     arg := db.CreateFeeParams{
+        Username: authPayload.Username,
         MarketID: req.MarketID,
         MakerFee: sql.NullString{String: req.MakerFee, Valid: req.MakerFee != ""},
         TakerFee: sql.NullString{String: req.TakerFee, Valid: req.TakerFee != ""},
@@ -79,12 +85,26 @@ func (server *server) deleteFee(ctx *gin.Context) {
         return
     }
 
-    err = server.store.DeleteFee(ctx, feeID)
+    fee, err := server.store.GetFeeByMarketID(ctx, feeID)
+
     if err != nil {
         if err == sql.ErrNoRows {
             ctx.JSON(http.StatusNotFound, errorResponse(err))
             return
         }
+        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+        return
+    }
+
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
+    if authPayload.Username != fee.Username {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
+        return
+    }
+
+    err = server.store.DeleteFee(ctx, feeID)
+    if err != nil {
         ctx.JSON(http.StatusInternalServerError, errorResponse(err))
         return
     }

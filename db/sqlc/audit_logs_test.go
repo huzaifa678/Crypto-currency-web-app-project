@@ -17,7 +17,7 @@ func TestCreateAuditLog(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
-		Username: utils.RandomString(29),
+		Username: utils.RandomUser(),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -28,6 +28,7 @@ func TestCreateAuditLog(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	AuditLogArgs := CreateAuditLogParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		Action: "login",
 		IpAddress: sql.NullString{String: "0.0.0.0", Valid: true},
@@ -43,7 +44,7 @@ func TestDeleteAuditLog(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
-		Username: utils.RandomString(5),
+		Username: utils.RandomUser(),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -54,6 +55,7 @@ func TestDeleteAuditLog(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	AuditlogArgs := CreateAuditLogParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		Action: "login",
 		IpAddress: sql.NullString{String: "0.0.0.1", Valid: true},
@@ -70,7 +72,7 @@ func TestGetAuditLogByUserId(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
-		Username: utils.RandomString(8),
+		Username: utils.RandomUser(),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -81,6 +83,7 @@ func TestGetAuditLogByUserId(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	AuditLogArgs := CreateAuditLogParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		Action: "login",
 		IpAddress: sql.NullString{String: "0.0.0.2", Valid: true},

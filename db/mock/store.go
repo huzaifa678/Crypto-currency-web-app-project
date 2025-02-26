@@ -52,10 +52,10 @@ func (mr *MockStore_interfaceMockRecorder) CreateAuditLog(arg0, arg1 interface{}
 }
 
 // CreateFee mocks base method.
-func (m *MockStore_interface) CreateFee(arg0 context.Context, arg1 db.CreateFeeParams) (db.Fee, error) {
+func (m *MockStore_interface) CreateFee(arg0 context.Context, arg1 db.CreateFeeParams) (db.CreateFeeRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateFee", arg0, arg1)
-	ret0, _ := ret[0].(db.Fee)
+	ret0, _ := ret[0].(db.CreateFeeRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -82,10 +82,10 @@ func (mr *MockStore_interfaceMockRecorder) CreateMarket(arg0, arg1 interface{}) 
 }
 
 // CreateOrder mocks base method.
-func (m *MockStore_interface) CreateOrder(arg0 context.Context, arg1 db.CreateOrderParams) (db.Order, error) {
+func (m *MockStore_interface) CreateOrder(arg0 context.Context, arg1 db.CreateOrderParams) (db.CreateOrderRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateOrder", arg0, arg1)
-	ret0, _ := ret[0].(db.Order)
+	ret0, _ := ret[0].(db.CreateOrderRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -112,10 +112,10 @@ func (mr *MockStore_interfaceMockRecorder) CreateTrade(arg0, arg1 interface{}) *
 }
 
 // CreateTransaction mocks base method.
-func (m *MockStore_interface) CreateTransaction(arg0 context.Context, arg1 db.CreateTransactionParams) (db.Transaction, error) {
+func (m *MockStore_interface) CreateTransaction(arg0 context.Context, arg1 db.CreateTransactionParams) (db.CreateTransactionRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateTransaction", arg0, arg1)
-	ret0, _ := ret[0].(db.Transaction)
+	ret0, _ := ret[0].(db.CreateTransactionRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -463,10 +463,10 @@ func (mr *MockStore_interfaceMockRecorder) GetWalletByID(arg0, arg1 interface{})
 }
 
 // ListMarkets mocks base method.
-func (m *MockStore_interface) ListMarkets(arg0 context.Context) ([]db.Market, error) {
+func (m *MockStore_interface) ListMarkets(arg0 context.Context) ([]db.ListMarketsRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ListMarkets", arg0)
-	ret0, _ := ret[0].([]db.Market)
+	ret0, _ := ret[0].([]db.ListMarketsRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }

@@ -19,12 +19,13 @@ import (
 	"github.com/google/uuid"
 	mockdb "github.com/huzaifa678/Crypto-currency-web-app-project/db/mock"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/stretchr/testify/require"
 )
 
 
 func TestCreateTransactionAPI(t *testing.T) {
-    transaction, transactionArgs := createRandomTransaction()
+    transaction, transactionArgs, trasnactionRow := createRandomTransaction()
 
 	log.Println(transactionArgs)
 
@@ -32,6 +33,7 @@ func TestCreateTransactionAPI(t *testing.T) {
         name          string
         body          gin.H
         buildStubs    func(store *mockdb.MockStore_interface)
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         checkResponse func(recorder *httptest.ResponseRecorder)
     }{
         {
@@ -44,11 +46,14 @@ func TestCreateTransactionAPI(t *testing.T) {
                 "address":        transactionArgs.Address.String,
                 "tx_hash":        transactionArgs.TxHash.String,
             },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
+            },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
                     CreateTransaction(gomock.Any(), gomock.Eq(transactionArgs)).
                     Times(1).
-                    Return(transaction, nil)
+                    Return(trasnactionRow, nil)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusOK, recorder.Code)
@@ -65,11 +70,14 @@ func TestCreateTransactionAPI(t *testing.T) {
                 "address":        transactionArgs.Address.String,
                 "tx_hash":        transactionArgs.TxHash.String,
             },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
+            },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
                     CreateTransaction(gomock.Any(), gomock.Eq(transactionArgs)).
                     Times(1).
-                    Return(transaction, sql.ErrConnDone)
+                    Return(trasnactionRow, sql.ErrConnDone)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -84,6 +92,9 @@ func TestCreateTransactionAPI(t *testing.T) {
                 "amount":         transactionArgs.Amount,
                 "address":        transactionArgs.Address.String,
                 "tx_hash":        transactionArgs.TxHash.String,
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
             },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
@@ -116,6 +127,8 @@ func TestCreateTransactionAPI(t *testing.T) {
             request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
             require.NoError(t, err)
 
+            tc.setupAuth(t, request, server.tokenMaker)
+
             server.router.ServeHTTP(recorder, request)
             tc.checkResponse(recorder)
         })
@@ -124,17 +137,21 @@ func TestCreateTransactionAPI(t *testing.T) {
 
 func TestGetTransactionAPI(t *testing.T) {
 
-    transaction, _ := createRandomTransaction()
+    transaction, _, _ := createRandomTransaction()
     
     testCases := []struct {
         name          string
         txID          uuid.UUID
         buildStubs    func(store *mockdb.MockStore_interface)
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         checkResponse func(recorder *httptest.ResponseRecorder)
     }{
         {
             name: "OK",
             txID: transaction.ID,
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
+            },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
                 GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
@@ -149,6 +166,9 @@ func TestGetTransactionAPI(t *testing.T) {
         {
             name:   "NotFound",
 			txID: transaction.ID,
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
+            },
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
@@ -162,6 +182,9 @@ func TestGetTransactionAPI(t *testing.T) {
         {
             name: "InvalidID",
             txID: uuid.Nil,
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
+            },
             buildStubs : func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
                     GetTransactionByID(gomock.Any(), gomock.Any()).
@@ -174,6 +197,9 @@ func TestGetTransactionAPI(t *testing.T) {
         {
             name:   "InternalError",
 			txID: transaction.ID,
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
+            },
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
@@ -202,6 +228,8 @@ func TestGetTransactionAPI(t *testing.T) {
 			url := fmt.Sprintf("/transactions/%s", tc.txID)
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
+
+            tc.setupAuth(t, request, server.tokenMaker)
 
 			server.router.ServeHTTP(recorder, request)
 			tc.checkResponse(recorder)
@@ -277,12 +305,13 @@ func TestListUserTransactionsAPI(t *testing.T) {
 }
 
 func TestDeleteTransactionAPI(t *testing.T) {
-    transaction, _ := createRandomTransaction()
+    transaction, _, _ := createRandomTransaction()
     
     testCases := []struct {
         name          string
         txID          uuid.UUID
         buildStubs    func(store *mockdb.MockStore_interface)
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         checkResponse func(recorder *httptest.ResponseRecorder)
     }{
         {
@@ -290,9 +319,17 @@ func TestDeleteTransactionAPI(t *testing.T) {
             txID: transaction.ID,
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
+                    GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
+                    Times(1).
+                    Return(transaction, nil)
+
+                store.EXPECT().
                     DeleteTransaction(gomock.Any(), gomock.Eq(transaction.ID)).
                     Times(1).
                     Return(nil)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusOK, recorder.Code)
@@ -303,9 +340,16 @@ func TestDeleteTransactionAPI(t *testing.T) {
             txID: transaction.ID,
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
-                    DeleteTransaction(gomock.Any(), gomock.Eq(transaction.ID)).
+                    GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
                     Times(1).
-                    Return(sql.ErrNoRows)
+                    Return(db.Transaction{}, sql.ErrNoRows)
+
+                store.EXPECT().
+                    DeleteTransaction(gomock.Any(), gomock.Any()).
+                    Times(0)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -316,8 +360,15 @@ func TestDeleteTransactionAPI(t *testing.T) {
             txID: uuid.Nil,
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
+                    GetTransactionByID(gomock.Any(), gomock.Any()).
+                    Times(0)
+
+                store.EXPECT().
                     DeleteTransaction(gomock.Any(), gomock.Any()).
                     Times(0)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -328,9 +379,17 @@ func TestDeleteTransactionAPI(t *testing.T) {
             txID: transaction.ID,
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
+                    GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
+                    Times(1).
+                    Return(transaction, nil)
+
+                store.EXPECT().
                     DeleteTransaction(gomock.Any(), gomock.Eq(transaction.ID)).
                     Times(1).
                     Return(sql.ErrConnDone)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -355,6 +414,7 @@ func TestDeleteTransactionAPI(t *testing.T) {
             request, err := http.NewRequest(http.MethodDelete, url, nil)
             require.NoError(t, err)
 
+            tc.setupAuth(t, request, server.tokenMaker)
             server.router.ServeHTTP(recorder, request)
             tc.checkResponse(recorder)
         })
@@ -393,7 +453,7 @@ func requireBodyMatchTransactions(t *testing.T, body *bytes.Buffer, transactionA
     require.WithinDuration(t, transactionArgs.CreatedAt.Time, gotTransaction.CreatedAt.Time, time.Second)
 }
 
-func createRandomTransaction() (transaction db.Transaction, transactionArgs db.CreateTransactionParams) {
+func createRandomTransaction() (transaction db.Transaction, transactionArgs db.CreateTransactionParams, transactionRow db.CreateTransactionRow) {
 	rand.Seed(time.Now().UnixNano())
 
 	id := uuid.New()
@@ -434,6 +494,18 @@ func createRandomTransaction() (transaction db.Transaction, transactionArgs db.C
 		CreatedAt: createdAt,
 	}
 
+    transactionRow = db.CreateTransactionRow {
+        ID: id,
+		UserEmail: email,
+		Type: txType,
+		Currency: currency,
+		Amount: amount,
+		Status: txStatus,
+		Address: address,
+		TxHash: txHash,
+		CreatedAt: createdAt,
+    }
+
 	args := db.CreateTransactionParams{
 		UserEmail: email,
 		Type: txType,
@@ -443,7 +515,7 @@ func createRandomTransaction() (transaction db.Transaction, transactionArgs db.C
 		TxHash: txHash,
 	}
 
-	return transactions, args
+	return transactions, args, transactionRow
 }
 
 func createRandomTransactionWithEmail(Email string) (transaction db.Transaction) {

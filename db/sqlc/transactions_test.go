@@ -27,6 +27,7 @@ func TestCreateTransaction(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	transactionsArgs := CreateTransactionParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		Type: TransactionType("deposit"),
 		Currency: "USD",
@@ -56,6 +57,7 @@ func TestDeleteTransaction(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	transactionsArgs := CreateTransactionParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		Type: TransactionType("deposit"),
 		Currency: "USD",
@@ -90,6 +92,7 @@ func TestGetTransactionById(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	transactionsArgs := CreateTransactionParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		Type: TransactionType("deposit"),
 		Currency: "USD",
@@ -129,6 +132,7 @@ func TestGetTransactionsByUserID(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	transactionsArgs := CreateTransactionParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		Type: TransactionType("deposit"),
 		Currency: "USD",
