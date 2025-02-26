@@ -3,11 +3,13 @@ package db
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"testing"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -24,8 +26,11 @@ func TestCreateMarket (t *testing.T) {
 }
 
 func TestDeleteMarket(t *testing.T) {
+
+	marketParams, _, _ := createRandomMarket()
 	
 	createMarketArg := CreateMarketParams {
+		Username: marketParams.Username,
 		BaseCurrency: "BTC",
 		QuoteCurrency: "USD",
 		MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
@@ -45,7 +50,10 @@ func TestDeleteMarket(t *testing.T) {
 
 func TestGetMarketById(t *testing.T) {
 
+	marketParams, _, _ := createRandomMarket()
+
 	createMarketArg := CreateMarketParams {
+		Username: marketParams.Username,
 		BaseCurrency: "BTC",
 		QuoteCurrency: "INR",
 		MinOrderAmount: sql.NullString{String: "0.01", Valid: true},
@@ -101,6 +109,18 @@ func TestListMarkets(t *testing.T) {
 var existingMarkets = make(map[string]struct{}) 
 
 func createRandomMarket() (CreateMarketParams, Market, CreateMarketRow) {
+	ctx := context.Background()
+
+    userArgs := CreateUserParams{
+        Username:     utils.RandomString(29),
+        Email:        fmt.Sprintf("market-%s@example.com", uuid.New().String()),
+        PasswordHash: "randompassword",
+        Role:         "user",
+        IsVerified:   sql.NullBool{Bool: true, Valid: true},
+    }
+
+    user, _ := testQueries.CreateUser(ctx, userArgs)
+
 	rand.Seed(uint64(time.Now().UnixNano()))
 	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
 
@@ -119,6 +139,7 @@ func createRandomMarket() (CreateMarketParams, Market, CreateMarketRow) {
 	}
 
 	marketArgs := CreateMarketParams{
+		Username: user.Username,
 		BaseCurrency: baseCurrency,
 		QuoteCurrency: quoteCurrency,
 		MinOrderAmount: sql.NullString{
@@ -133,6 +154,7 @@ func createRandomMarket() (CreateMarketParams, Market, CreateMarketRow) {
 
 	market := Market{
 		ID:            uuid.New(),
+		Username:  	   marketArgs.Username,
 		BaseCurrency:  marketArgs.BaseCurrency,
 		QuoteCurrency: marketArgs.QuoteCurrency,
 		MinOrderAmount: marketArgs.MinOrderAmount,
@@ -142,6 +164,7 @@ func createRandomMarket() (CreateMarketParams, Market, CreateMarketRow) {
 
 	marketRow := CreateMarketRow{
 		ID:            market.ID,
+		Username: 	   market.Username,
 		BaseCurrency:  market.BaseCurrency,
 		QuoteCurrency: market.QuoteCurrency,
 		CreatedAt:     market.CreatedAt,

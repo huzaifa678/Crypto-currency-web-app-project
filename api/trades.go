@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -36,7 +37,10 @@ func (server *server) createTrade(ctx *gin.Context) {
 		return
 	}
 
+	authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
 	arg := db.CreateTradeParams{
+		Username:  authPayload.Username,
 		BuyOrderID:  req.BuyOrderID,
 		SellOrderID: req.SellOrderID,
 		MarketID:    req.MarketID,
@@ -94,6 +98,23 @@ func (server *server) deleteTrade(ctx *gin.Context) {
 
 	if tradeID == uuid.Nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	trade, err := server.store.GetTradeByID(ctx, tradeID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+	authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
+	if authPayload.Username != trade.Username {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
 		return
 	}
 

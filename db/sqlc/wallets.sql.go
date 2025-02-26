@@ -11,22 +11,29 @@ import (
 )
 
 const createWallet = `-- name: CreateWallet :one
-INSERT INTO wallets (user_email, currency, balance)
-VALUES ($1, $2, $3)
-RETURNING id, user_email, currency, balance, locked_balance, created_at
+INSERT INTO wallets (username, user_email, currency, balance)
+VALUES ($1, $2, $3, $4)
+RETURNING id, username, user_email, currency, balance, locked_balance, created_at
 `
 
 type CreateWalletParams struct {
+	Username  string         `json:"username"`
 	UserEmail string         `json:"user_email"`
 	Currency  string         `json:"currency"`
 	Balance   sql.NullString `json:"balance"`
 }
 
 func (q *Queries) CreateWallet(ctx context.Context, arg CreateWalletParams) (Wallet, error) {
-	row := q.db.QueryRowContext(ctx, createWallet, arg.UserEmail, arg.Currency, arg.Balance)
+	row := q.db.QueryRowContext(ctx, createWallet,
+		arg.Username,
+		arg.UserEmail,
+		arg.Currency,
+		arg.Balance,
+	)
 	var i Wallet
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.UserEmail,
 		&i.Currency,
 		&i.Balance,
@@ -47,7 +54,7 @@ func (q *Queries) DeleteWallet(ctx context.Context, id uuid.UUID) error {
 }
 
 const getWalletByID = `-- name: GetWalletByID :one
-SELECT id, user_email, currency, balance, locked_balance, created_at
+SELECT id, username, user_email, currency, balance, locked_balance, created_at
 FROM wallets
 WHERE id = $1
 `
@@ -57,6 +64,7 @@ func (q *Queries) GetWalletByID(ctx context.Context, id uuid.UUID) (Wallet, erro
 	var i Wallet
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.UserEmail,
 		&i.Currency,
 		&i.Balance,

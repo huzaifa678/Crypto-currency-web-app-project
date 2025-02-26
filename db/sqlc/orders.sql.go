@@ -11,12 +11,13 @@ import (
 )
 
 const createOrder = `-- name: CreateOrder :one
-INSERT INTO orders (user_email, market_id, type, status, price, amount)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO orders (username, user_email, market_id, type, status, price, amount)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING id, user_email, market_id, type, status, price, amount, filled_amount, created_at, updated_at
 `
 
 type CreateOrderParams struct {
+	Username  string         `json:"username"`
 	UserEmail string         `json:"user_email"`
 	MarketID  uuid.UUID      `json:"market_id"`
 	Type      OrderType      `json:"type"`
@@ -25,8 +26,22 @@ type CreateOrderParams struct {
 	Amount    string         `json:"amount"`
 }
 
-func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error) {
+type CreateOrderRow struct {
+	ID           uuid.UUID      `json:"id"`
+	UserEmail    string         `json:"user_email"`
+	MarketID     uuid.UUID      `json:"market_id"`
+	Type         OrderType      `json:"type"`
+	Status       OrderStatus    `json:"status"`
+	Price        sql.NullString `json:"price"`
+	Amount       string         `json:"amount"`
+	FilledAmount sql.NullString `json:"filled_amount"`
+	CreatedAt    sql.NullTime   `json:"created_at"`
+	UpdatedAt    sql.NullTime   `json:"updated_at"`
+}
+
+func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (CreateOrderRow, error) {
 	row := q.db.QueryRowContext(ctx, createOrder,
+		arg.Username,
 		arg.UserEmail,
 		arg.MarketID,
 		arg.Type,
@@ -34,7 +49,7 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (Order
 		arg.Price,
 		arg.Amount,
 	)
-	var i Order
+	var i CreateOrderRow
 	err := row.Scan(
 		&i.ID,
 		&i.UserEmail,
@@ -61,7 +76,7 @@ func (q *Queries) DeleteOrder(ctx context.Context, id uuid.UUID) error {
 }
 
 const getOrderByID = `-- name: GetOrderByID :one
-SELECT id, user_email, market_id, type, status, price, amount, filled_amount, created_at, updated_at
+SELECT id, username, user_email, market_id, type, status, price, amount, filled_amount, created_at, updated_at
 FROM orders
 WHERE id = $1
 `
@@ -71,6 +86,7 @@ func (q *Queries) GetOrderByID(ctx context.Context, id uuid.UUID) (Order, error)
 	var i Order
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.UserEmail,
 		&i.MarketID,
 		&i.Type,

@@ -11,20 +11,34 @@ import (
 )
 
 const createFee = `-- name: CreateFee :one
-INSERT INTO fees (market_id, maker_fee, taker_fee)
-VALUES ($1, $2, $3)
+INSERT INTO fees (username, market_id, maker_fee, taker_fee)
+VALUES ($1, $2, $3, $4)
 RETURNING id, market_id, maker_fee, taker_fee, created_at
 `
 
 type CreateFeeParams struct {
+	Username string         `json:"username"`
 	MarketID uuid.UUID      `json:"market_id"`
 	MakerFee sql.NullString `json:"maker_fee"`
 	TakerFee sql.NullString `json:"taker_fee"`
 }
 
-func (q *Queries) CreateFee(ctx context.Context, arg CreateFeeParams) (Fee, error) {
-	row := q.db.QueryRowContext(ctx, createFee, arg.MarketID, arg.MakerFee, arg.TakerFee)
-	var i Fee
+type CreateFeeRow struct {
+	ID        uuid.UUID      `json:"id"`
+	MarketID  uuid.UUID      `json:"market_id"`
+	MakerFee  sql.NullString `json:"maker_fee"`
+	TakerFee  sql.NullString `json:"taker_fee"`
+	CreatedAt sql.NullTime   `json:"created_at"`
+}
+
+func (q *Queries) CreateFee(ctx context.Context, arg CreateFeeParams) (CreateFeeRow, error) {
+	row := q.db.QueryRowContext(ctx, createFee,
+		arg.Username,
+		arg.MarketID,
+		arg.MakerFee,
+		arg.TakerFee,
+	)
+	var i CreateFeeRow
 	err := row.Scan(
 		&i.ID,
 		&i.MarketID,
@@ -46,7 +60,7 @@ func (q *Queries) DeleteFee(ctx context.Context, id uuid.UUID) error {
 }
 
 const getFeeByMarketID = `-- name: GetFeeByMarketID :one
-SELECT id, market_id, maker_fee, taker_fee, created_at
+SELECT id, username, market_id, maker_fee, taker_fee, created_at
 FROM fees
 WHERE market_id = $1
 `
@@ -56,6 +70,7 @@ func (q *Queries) GetFeeByMarketID(ctx context.Context, marketID uuid.UUID) (Fee
 	var i Fee
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.MarketID,
 		&i.MakerFee,
 		&i.TakerFee,

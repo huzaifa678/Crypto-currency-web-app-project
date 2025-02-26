@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -38,7 +39,10 @@ func (server *server) createTransaction(ctx *gin.Context) {
         return
     }
 
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
 	arg := db.CreateTransactionParams{
+        Username: authPayload.Username,
 		UserEmail: req.UserEmail,
 		Type: db.TransactionType(req.Type),
 		Currency: req.Currency,
@@ -80,6 +84,13 @@ func (server *server) getTransaction(ctx *gin.Context) {
         return
     }
 
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
+    if authPayload.Username != transaction.Username {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
+        return
+    }
+
     ctx.JSON(http.StatusOK, transaction)
 }
 
@@ -110,7 +121,7 @@ func (server *server) deleteTransaction(ctx *gin.Context) {
         return
     }
 
-    err = server.store.DeleteTransaction(ctx, transactionID)
+    transaction, err := server.store.GetTransactionByID(ctx, transactionID)
     if err != nil {
         if err == sql.ErrNoRows {
             ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -119,6 +130,19 @@ func (server *server) deleteTransaction(ctx *gin.Context) {
         ctx.JSON(http.StatusInternalServerError, errorResponse(err))
         return
     }
+
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
+    if authPayload.Username != transaction.Username {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
+        return
+    }
+
+    err = server.store.DeleteTransaction(ctx, transactionID)
+    if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
     ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }

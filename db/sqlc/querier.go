@@ -10,11 +10,11 @@ import (
 
 type Querier interface {
 	CreateAuditLog(ctx context.Context, arg CreateAuditLogParams) (AuditLog, error)
-	CreateFee(ctx context.Context, arg CreateFeeParams) (Fee, error)
+	CreateFee(ctx context.Context, arg CreateFeeParams) (CreateFeeRow, error)
 	CreateMarket(ctx context.Context, arg CreateMarketParams) (CreateMarketRow, error)
-	CreateOrder(ctx context.Context, arg CreateOrderParams) (Order, error)
+	CreateOrder(ctx context.Context, arg CreateOrderParams) (CreateOrderRow, error)
 	CreateTrade(ctx context.Context, arg CreateTradeParams) (Trade, error)
-	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error)
+	CreateTransaction(ctx context.Context, arg CreateTransactionParams) (CreateTransactionRow, error)
 	CreateUser(ctx context.Context, arg CreateUserParams) (CreateUserRow, error)
 	CreateWallet(ctx context.Context, arg CreateWalletParams) (Wallet, error)
 	DeleteAuditLog(ctx context.Context, id uuid.UUID) error
@@ -37,7 +37,7 @@ type Querier interface {
 	GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error)
 	GetUserByID(ctx context.Context, id uuid.UUID) (GetUserByIDRow, error)
 	GetWalletByID(ctx context.Context, id uuid.UUID) (Wallet, error)
-	ListMarkets(ctx context.Context) ([]Market, error)
+	ListMarkets(ctx context.Context) ([]ListMarketsRow, error)
 	UpdateOrderStatusAndFilledAmount(ctx context.Context, arg UpdateOrderStatusAndFilledAmountParams) error
 	UpdateTransactionStatus(ctx context.Context, arg UpdateTransactionStatusParams) error
 	UpdateUser(ctx context.Context, arg UpdateUserParams) error

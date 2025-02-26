@@ -16,6 +16,7 @@ import (
 	"github.com/google/uuid"
 	mockdb "github.com/huzaifa678/Crypto-currency-web-app-project/db/mock"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/stretchr/testify/require"
 )
 
@@ -26,6 +27,7 @@ func TestCreateTradeAPI(t *testing.T) {
 		name          string
 		body          gin.H
 		buildStubs    func(store *mockdb.MockStore_interface)
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
@@ -38,6 +40,9 @@ func TestCreateTradeAPI(t *testing.T) {
 				"amount":        createTradeParams.Amount,
 				"fee":           createTradeParams.Fee.String,
 			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
 					CreateTrade(gomock.Any(), gomock.Eq(createTradeParams)).
@@ -59,6 +64,9 @@ func TestCreateTradeAPI(t *testing.T) {
 				"amount":        trade.Amount,
 				"fee":           trade.Fee.String,
 			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
 					CreateTrade(gomock.Any(), gomock.Eq(createTradeParams)).
@@ -79,6 +87,9 @@ func TestCreateTradeAPI(t *testing.T) {
 				"amount":        trade.Amount,
 				"fee":           "invalid-fee",
 			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
 					CreateTrade(gomock.Any(), gomock.Any()).
@@ -105,11 +116,13 @@ func TestCreateTradeAPI(t *testing.T) {
 
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
+			
 
 			url := "/trades"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
 			require.NoError(t, err)
 
+			tc.setupAuth(t, request, server.tokenMaker)
 			server.router.ServeHTTP(recorder, request)
 			tc.checkResponse(recorder)
 		})
@@ -123,11 +136,15 @@ func TestGetTradeAPI(t *testing.T) {
 		name          string
 		tradeID       uuid.UUID
 		buildStubs    func(store *mockdb.MockStore_interface)
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
 			tradeID: trade.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
@@ -142,6 +159,9 @@ func TestGetTradeAPI(t *testing.T) {
 		{
 			name: "NotFound",
 			tradeID: trade.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
@@ -155,6 +175,9 @@ func TestGetTradeAPI(t *testing.T) {
 		{
 			name: "InvalidID",
 			tradeID: uuid.Nil,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Any()).
@@ -167,6 +190,9 @@ func TestGetTradeAPI(t *testing.T) {
 		{
 			name: "InternalError",
 			tradeID: trade.ID,
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
@@ -196,6 +222,8 @@ func TestGetTradeAPI(t *testing.T) {
 			request, err := http.NewRequest(http.MethodGet, url, nil)
 			require.NoError(t, err)
 
+			tc.setupAuth(t, request, server.tokenMaker)
+
 			server.router.ServeHTTP(recorder, request)
 			tc.checkResponse(recorder)
 		})
@@ -203,88 +231,120 @@ func TestGetTradeAPI(t *testing.T) {
 }
 
 func TestDeleteTradeAPI(t *testing.T) {
-	trade, _ := createRandomTrade()
+    trade, _ := createRandomTrade()
 
-	testCases := []struct {
-		name          string
-		tradeID       uuid.UUID
-		buildStubs    func(store *mockdb.MockStore_interface)
-		checkResponse func(recorder *httptest.ResponseRecorder)
-	}{
-		{
-			name:    "OK",
-			tradeID: trade.ID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+    testCases := []struct {
+        name          string
+        tradeID       uuid.UUID
+        buildStubs    func(store *mockdb.MockStore_interface)
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+        checkResponse func(recorder *httptest.ResponseRecorder)
+    }{
+        {
+            name:    "OK",
+            tradeID: trade.ID,
+            buildStubs: func(store *mockdb.MockStore_interface) {
+                store.EXPECT().
+                    GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
+                    Times(1).
+                    Return(trade, nil)
+				
 				store.EXPECT().
-					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
-					Times(1).
-					Return(nil)
-			},
-			checkResponse: func(recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusOK, recorder.Code)
-			},
-		},
-		{
-			name:    "NotFound",
-			tradeID: trade.ID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+                    DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
+                    Times(1).
+                    Return(nil)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
+            checkResponse: func(recorder *httptest.ResponseRecorder) {
+                require.Equal(t, http.StatusOK, recorder.Code)
+            },
+        },
+        {
+            name:    "NotFound",
+            tradeID: trade.ID,
+            buildStubs: func(store *mockdb.MockStore_interface) {
+                store.EXPECT().
+                    GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
+                    Times(1).
+                    Return(db.Trade{}, sql.ErrNoRows)
+				
 				store.EXPECT().
-					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
-					Times(1).
-					Return(sql.ErrNoRows)
-			},
-			checkResponse: func(recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusInternalServerError, recorder.Code)
-			},
-		},
-		{
-			name:    "InvalidID",
-			tradeID: uuid.Nil,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+                    DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
+                    Times(0)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
+            checkResponse: func(recorder *httptest.ResponseRecorder) {
+                require.Equal(t, http.StatusNotFound, recorder.Code)
+            },
+        },
+        {
+            name:    "InvalidUUID",
+            tradeID: uuid.Nil,
+            buildStubs: func(store *mockdb.MockStore_interface) {
+                store.EXPECT().
+                    GetTradeByID(gomock.Any(), gomock.Any()).
+                    Times(0)
+
 				store.EXPECT().
-					DeleteTrade(gomock.Any(), gomock.Any()).
-					Times(0)
-			},
-			checkResponse: func(recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusBadRequest, recorder.Code)
-			},
-		},
-		{
-			name:    "InternalError",
-			tradeID: trade.ID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
-				store.EXPECT().
-					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
-					Times(1).
-					Return(sql.ErrConnDone)
-			},
-			checkResponse: func(recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusInternalServerError, recorder.Code)
-			},
-		},
-	}
+                    DeleteTrade(gomock.Any(), gomock.Any()).
+                    Times(0)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
+            checkResponse: func(recorder *httptest.ResponseRecorder) {
+                require.Equal(t, http.StatusBadRequest, recorder.Code)
+            },
+        },
+        {
+            name:    "InternalError",
+            tradeID: trade.ID,
+            buildStubs: func(store *mockdb.MockStore_interface) {
+                store.EXPECT().
+                    GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
+                    Times(1).
+                    Return(trade, nil)
 
-	for i := range testCases {
-		tc := testCases[i]
+					store.EXPECT().
+                    DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
+                    Times(1).
+                    Return(sql.ErrConnDone)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+            },
+            checkResponse: func(recorder *httptest.ResponseRecorder) {
+                require.Equal(t, http.StatusInternalServerError, recorder.Code)
+            },
+        },
+    }
 
-		t.Run(tc.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
+    for i := range testCases {
+        tc := testCases[i]
 
-			store := mockdb.NewMockStore_interface(ctrl)
-			tc.buildStubs(store)
+        t.Run(tc.name, func(t *testing.T) {
+            ctrl := gomock.NewController(t)
+            defer ctrl.Finish()
 
-			server := NewTestServer(t, store)
-			recorder := httptest.NewRecorder()
+            store := mockdb.NewMockStore_interface(ctrl)
+            tc.buildStubs(store)
 
-			url := fmt.Sprintf("/trades/%s", tc.tradeID)
-			request, err := http.NewRequest(http.MethodDelete, url, nil)
-			require.NoError(t, err)
+            server := NewTestServer(t, store)
+            recorder := httptest.NewRecorder()
 
-			server.router.ServeHTTP(recorder, request)
-			tc.checkResponse(recorder)
-		})
-	}
+            url := fmt.Sprintf("/trades/%s", tc.tradeID)
+            request, err := http.NewRequest(http.MethodDelete, url, nil)
+            require.NoError(t, err)
+
+            tc.setupAuth(t, request, server.tokenMaker)
+            server.router.ServeHTTP(recorder, request)
+            tc.checkResponse(recorder)
+        })
+    }
 }
 
 func TestListTradesByMarketIDAPI(t *testing.T) {
@@ -417,8 +477,8 @@ func requireBodyMatchTradesList(t *testing.T, body *bytes.Buffer, trades []db.Tr
 
 func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams) {
 
-	_, sellOrder, _ := createRandomOrder()
-	_, BuyOrder, _ := createRandomOrder()
+	_, sellOrder, _, _ := createRandomOrder()
+	_, BuyOrder, _, _ := createRandomOrder()
 	_, market, _ := createRandomMarket()
 
 	createTradeParams = db.CreateTradeParams {

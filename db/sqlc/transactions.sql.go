@@ -11,12 +11,13 @@ import (
 )
 
 const createTransaction = `-- name: CreateTransaction :one
-INSERT INTO transactions (user_email, type, currency, amount, address, tx_hash)
-VALUES ($1, $2, $3, $4, $5, $6)
+INSERT INTO transactions (username, user_email, type, currency, amount, address, tx_hash)
+VALUES ($1, $2, $3, $4, $5, $6, $7)
 RETURNING id, user_email, type, currency, amount, status, address, tx_hash, created_at
 `
 
 type CreateTransactionParams struct {
+	Username  string          `json:"username"`
 	UserEmail string          `json:"user_email"`
 	Type      TransactionType `json:"type"`
 	Currency  string          `json:"currency"`
@@ -25,8 +26,21 @@ type CreateTransactionParams struct {
 	TxHash    sql.NullString  `json:"tx_hash"`
 }
 
-func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (Transaction, error) {
+type CreateTransactionRow struct {
+	ID        uuid.UUID         `json:"id"`
+	UserEmail string            `json:"user_email"`
+	Type      TransactionType   `json:"type"`
+	Currency  string            `json:"currency"`
+	Amount    string            `json:"amount"`
+	Status    TransactionStatus `json:"status"`
+	Address   sql.NullString    `json:"address"`
+	TxHash    sql.NullString    `json:"tx_hash"`
+	CreatedAt sql.NullTime      `json:"created_at"`
+}
+
+func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionParams) (CreateTransactionRow, error) {
 	row := q.db.QueryRowContext(ctx, createTransaction,
+		arg.Username,
 		arg.UserEmail,
 		arg.Type,
 		arg.Currency,
@@ -34,7 +48,7 @@ func (q *Queries) CreateTransaction(ctx context.Context, arg CreateTransactionPa
 		arg.Address,
 		arg.TxHash,
 	)
-	var i Transaction
+	var i CreateTransactionRow
 	err := row.Scan(
 		&i.ID,
 		&i.UserEmail,
@@ -60,7 +74,7 @@ func (q *Queries) DeleteTransaction(ctx context.Context, id uuid.UUID) error {
 }
 
 const getTransactionByID = `-- name: GetTransactionByID :one
-SELECT id, user_email, type, currency, amount, status, address, tx_hash, created_at
+SELECT id, username, user_email, type, currency, amount, status, address, tx_hash, created_at
 FROM transactions
 WHERE id = $1
 `
@@ -70,6 +84,7 @@ func (q *Queries) GetTransactionByID(ctx context.Context, id uuid.UUID) (Transac
 	var i Transaction
 	err := row.Scan(
 		&i.ID,
+		&i.Username,
 		&i.UserEmail,
 		&i.Type,
 		&i.Currency,
@@ -83,7 +98,7 @@ func (q *Queries) GetTransactionByID(ctx context.Context, id uuid.UUID) (Transac
 }
 
 const getTransactionsByUserEmail = `-- name: GetTransactionsByUserEmail :many
-SELECT id, user_email, type, currency, amount, status, address, tx_hash, created_at
+SELECT id, username, user_email, type, currency, amount, status, address, tx_hash, created_at
 FROM transactions
 WHERE user_email = $1
 ORDER BY created_at DESC
@@ -100,6 +115,7 @@ func (q *Queries) GetTransactionsByUserEmail(ctx context.Context, userEmail stri
 		var i Transaction
 		if err := rows.Scan(
 			&i.ID,
+			&i.Username,
 			&i.UserEmail,
 			&i.Type,
 			&i.Currency,

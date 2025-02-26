@@ -17,7 +17,7 @@ func TestCreateTrade(t *testing.T) {
 	email := createRandomEmailForTrade()
 	
 	buyerUsersArgs := CreateUserParams {
-		Username: utils.RandomString(18),
+		Username: utils.RandomString(23),
 		Email: email,
 		PasswordHash: "kddeoovpds",
 		Role: "user",
@@ -30,6 +30,7 @@ func TestCreateTrade(t *testing.T) {
 	market := createRandomMarketForTrade(t)
 
 	buyOrderArgs := CreateOrderParams {
+		Username: buyer.Username,
 		UserEmail: buyer.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -55,6 +56,7 @@ func TestCreateTrade(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	sellOrderArgs := CreateOrderParams {
+		Username: seller.Username,
 		UserEmail: seller.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -67,6 +69,7 @@ func TestCreateTrade(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the seller")
 
 	tradeArgs := CreateTradeParams {
+		Username: market.Username,
 		BuyOrderID: buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID: market.ID,
@@ -91,7 +94,7 @@ func TestDeleteTrade(t *testing.T) {
 	email := createRandomEmailForTrade()
 
 	buyerUsersArgs := CreateUserParams {
-		Username: utils.RandomString(17),
+		Username: utils.RandomUser(),
 		Email: email,
 		PasswordHash: "kddeoovpds",
 		Role: "user",
@@ -103,6 +106,7 @@ func TestDeleteTrade(t *testing.T) {
 
 
 	buyOrderArgs := CreateOrderParams {
+		Username: buyer.Username,
 		UserEmail: buyer.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -117,7 +121,7 @@ func TestDeleteTrade(t *testing.T) {
 	email2 := createRandomEmailForTrade()
 
 	sellerUsersArgs := CreateUserParams {
-		Username: utils.RandomString(8),
+		Username: utils.RandomUser(),
 		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
@@ -128,6 +132,7 @@ func TestDeleteTrade(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	sellOrderArgs := CreateOrderParams {
+		Username: seller.Username,
 		UserEmail: seller.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -140,6 +145,7 @@ func TestDeleteTrade(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the seller")
 
 	tradeArgs := CreateTradeParams {
+		Username: market.Username,
 		BuyOrderID: buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID: market.ID,
@@ -174,6 +180,7 @@ func TestGetTradeById(t *testing.T) {
 
 
 	buyOrderArgs := CreateOrderParams {
+		Username: buyer.Username,
 		UserEmail: buyer.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -188,7 +195,7 @@ func TestGetTradeById(t *testing.T) {
 	email2 := createRandomEmailForTrade()
 
 	sellerUsersArgs := CreateUserParams {
-		Username: utils.RandomString(5),
+		Username: utils.RandomUser(),
 		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
@@ -199,6 +206,7 @@ func TestGetTradeById(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	sellOrderArgs := CreateOrderParams {
+		Username: seller.Username,
 		UserEmail: seller.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -211,6 +219,7 @@ func TestGetTradeById(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the seller")
 
 	tradeArgs := CreateTradeParams {
+		Username: market.Username,
 		BuyOrderID: buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID: market.ID,
@@ -249,6 +258,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 
 
 	buyOrderArgs := CreateOrderParams {
+		Username: buyer.Username,
 		UserEmail: buyer.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -263,7 +273,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 	email2 := createRandomEmailForTrade()
 
 	sellerUsersArgs := CreateUserParams {
-		Username: utils.RandomString(11),
+		Username: utils.RandomUser(),
 		Email: email2,
 		PasswordHash: "fvfdvrrgtg",
 		Role: "user",
@@ -274,6 +284,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	sellOrderArgs := CreateOrderParams {
+		Username: seller.Username,
 		UserEmail: seller.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -286,6 +297,7 @@ func TestGetTradeByMarketID(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the seller")
 
 	tradeArgs := CreateTradeParams {
+		Username: market.Username,
 		BuyOrderID: buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID: market.ID,
@@ -301,54 +313,66 @@ func TestGetTradeByMarketID(t *testing.T) {
 	require.Equal(t, trade.MarketID, tradeByMarketID[0].MarketID, "The MarketID is matched")
 }
 
+
 func createRandomMarketForTrade(t *testing.T) CreateMarketRow {
-	ctx := context.Background()
+    ctx := context.Background()
 
-	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
-	baseCurrency := currencies[rand.Intn(len(currencies))]
-	quoteCurrency := currencies[rand.Intn(len(currencies))]
+    userArgs := CreateUserParams{
+        Username:     utils.RandomUser(),
+        Email:        fmt.Sprintf("market-%s@example.com", uuid.New().String()),
+        PasswordHash: "randompassword",
+        Role:         "user",
+        IsVerified:   sql.NullBool{Bool: true, Valid: true},
+    }
 
-	for baseCurrency == quoteCurrency {
-		quoteCurrency = currencies[rand.Intn(len(currencies))]
-	}
+    user, err := testQueries.CreateUser(ctx, userArgs)
+    require.NoError(t, err, "Failed to create user for market")
 
-	existingMarket, err := testQueries.GetMarketByCurrencies(ctx, GetMarketByCurrenciesParams{
-		BaseCurrency:  baseCurrency,
-		QuoteCurrency: quoteCurrency,
-	})
+    currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
+    baseCurrency := currencies[rand.Intn(len(currencies))]
+    quoteCurrency := currencies[rand.Intn(len(currencies))]
 
-	if err == nil {
-		return CreateMarketRow{
-			ID:            existingMarket.ID,
-			BaseCurrency:  existingMarket.BaseCurrency,
-			QuoteCurrency: existingMarket.QuoteCurrency,
-			CreatedAt:     existingMarket.CreatedAt,
-		}
-	}
+    for baseCurrency == quoteCurrency {
+        quoteCurrency = currencies[rand.Intn(len(currencies))]
+    }
 
-	arg := CreateMarketParams{
-		BaseCurrency:  baseCurrency,
-		QuoteCurrency: quoteCurrency,
-		MinOrderAmount: sql.NullString{
-			String: "0.1",
-			Valid:  true,
-		},
-		PricePrecision: sql.NullInt32{
-			Int32: 6,
-			Valid: true,
-		},
-	}
+    existingMarket, err := testQueries.GetMarketByCurrencies(ctx, GetMarketByCurrenciesParams{
+        BaseCurrency:  baseCurrency,
+        QuoteCurrency: quoteCurrency,
+    })
 
-	market, err := testQueries.CreateMarket(ctx, arg)
-	require.NoError(t, err, "Failed to create random market")
-	require.NotEmpty(t, market.ID, "Market ID should not be empty")
-	require.Equal(t, baseCurrency, market.BaseCurrency, "BaseCurrency should match")
-	require.Equal(t, quoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
+    if err == nil {
+        return CreateMarketRow{
+            ID:            existingMarket.ID,
+            Username:      existingMarket.Username,
+            BaseCurrency:  existingMarket.BaseCurrency,
+            QuoteCurrency: existingMarket.QuoteCurrency,
+            CreatedAt:     existingMarket.CreatedAt,
+        }
+    }
 
-	return market
+    arg := CreateMarketParams{
+        Username:       user.Username, 
+        BaseCurrency:  baseCurrency,
+        QuoteCurrency: quoteCurrency,
+        MinOrderAmount: sql.NullString{
+            String: "0.1",
+            Valid:  true,
+        },
+        PricePrecision: sql.NullInt32{
+            Int32: 6,
+            Valid: true,
+        },
+    }
+
+    market, err := testQueries.CreateMarket(ctx, arg)
+    require.NoError(t, err, "Failed to create random market")
+    require.NotEmpty(t, market.ID, "Market ID should not be empty")
+    require.Equal(t, baseCurrency, market.BaseCurrency, "BaseCurrency should match")
+    require.Equal(t, quoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
+
+    return market
 }
-
-
 
 func createRandomEmailForTrade() string {
     return fmt.Sprintf("trade-%s@example.com", uuid.New().String())

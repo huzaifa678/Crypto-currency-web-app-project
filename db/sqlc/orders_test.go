@@ -31,6 +31,7 @@ func TestCreateOrder(t *testing.T) {
 	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -69,6 +70,7 @@ func TestGetOrderById(t *testing.T) {
 	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -109,6 +111,7 @@ func TestDeleteOrder(t *testing.T) {
 	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -145,6 +148,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 	market := createRandomMarketForOrder(t)
 
 	args := CreateOrderParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		MarketID: market.ID,
 		Type: OrderType("buy"),
@@ -174,48 +178,61 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 func createRandomMarketForOrder(t *testing.T) CreateMarketRow {
 	ctx := context.Background()
 
-	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
-	baseCurrency := currencies[rand.Intn(len(currencies))]
-	quoteCurrency := currencies[rand.Intn(len(currencies))]
+    userArgs := CreateUserParams{
+        Username:     utils.RandomString(29),
+        Email:        fmt.Sprintf("market-%s@example.com", uuid.New().String()),
+        PasswordHash: "randompassword",
+        Role:         "user",
+        IsVerified:   sql.NullBool{Bool: true, Valid: true},
+    }
 
-	for baseCurrency == quoteCurrency {
-		quoteCurrency = currencies[rand.Intn(len(currencies))]
-	}
+    user, err := testQueries.CreateUser(ctx, userArgs)
+    require.NoError(t, err, "Failed to create user for market")
 
-	existingMarket, err := testQueries.GetMarketByCurrencies(ctx, GetMarketByCurrenciesParams{
-		BaseCurrency:  baseCurrency,
-		QuoteCurrency: quoteCurrency,
-	})
+    currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
+    baseCurrency := currencies[rand.Intn(len(currencies))]
+    quoteCurrency := currencies[rand.Intn(len(currencies))]
 
-	if err == nil {
-		return CreateMarketRow{
-			ID:            existingMarket.ID,
-			BaseCurrency:  existingMarket.BaseCurrency,
-			QuoteCurrency: existingMarket.QuoteCurrency,
-			CreatedAt:     existingMarket.CreatedAt,
-		}
-	}
+    for baseCurrency == quoteCurrency {
+        quoteCurrency = currencies[rand.Intn(len(currencies))]
+    }
 
-	arg := CreateMarketParams{
-		BaseCurrency:  baseCurrency,
-		QuoteCurrency: quoteCurrency,
-		MinOrderAmount: sql.NullString{
-			String: "0.1",
-			Valid:  true,
-		},
-		PricePrecision: sql.NullInt32{
-			Int32: 6,
-			Valid: true,
-		},
-	}
+    existingMarket, err := testQueries.GetMarketByCurrencies(ctx, GetMarketByCurrenciesParams{
+        BaseCurrency:  baseCurrency,
+        QuoteCurrency: quoteCurrency,
+    })
 
-	market, err := testQueries.CreateMarket(ctx, arg)
-	require.NoError(t, err, "Failed to create random market")
-	require.NotEmpty(t, market.ID, "Market ID should not be empty")
-	require.Equal(t, baseCurrency, market.BaseCurrency, "BaseCurrency should match")
-	require.Equal(t, quoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
+    if err == nil {
+        return CreateMarketRow{
+            ID:            existingMarket.ID,
+            Username:      existingMarket.Username,
+            BaseCurrency:  existingMarket.BaseCurrency,
+            QuoteCurrency: existingMarket.QuoteCurrency,
+            CreatedAt:     existingMarket.CreatedAt,
+        }
+    }
 
-	return market
+    arg := CreateMarketParams{
+        Username:       user.Username, 
+        BaseCurrency:  baseCurrency,
+        QuoteCurrency: quoteCurrency,
+        MinOrderAmount: sql.NullString{
+            String: "0.1",
+            Valid:  true,
+        },
+        PricePrecision: sql.NullInt32{
+            Int32: 6,
+            Valid: true,
+        },
+    }
+
+    market, err := testQueries.CreateMarket(ctx, arg)
+    require.NoError(t, err, "Failed to create random market")
+    require.NotEmpty(t, market.ID, "Market ID should not be empty")
+    require.Equal(t, baseCurrency, market.BaseCurrency, "BaseCurrency should match")
+    require.Equal(t, quoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
+
+    return market
 }
 
 

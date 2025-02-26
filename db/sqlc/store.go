@@ -49,13 +49,14 @@ func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
 }
 
 type TransactionsParams struct {
-	UserEmail string `json:"user_email"`  
-	Type     TransactionType `json:"type"`
-	Currency string          `json:"currency"`
-	Amount   string          `json:"amount"`
-	Status   string          `json:"status"`
-	Address  sql.NullString  `json:"address"`
-	TxHash   sql.NullString  `json:"tx_hash"`
+	Username  string 		 `json:"username"`
+	UserEmail string 		 `json:"user_email"`  
+	Type      TransactionType `json:"type"`
+	Currency  string          `json:"currency"`
+	Amount    string          `json:"amount"`
+	Status    string          `json:"status"`
+	Address   sql.NullString  `json:"address"`
+	TxHash    sql.NullString  `json:"tx_hash"`
 }
 
 type FeeParams struct {
@@ -78,6 +79,7 @@ type ReturnAmountParams struct {
 func (store *Store) CreateTransactionTx(ctx context.Context, arg TransactionsParams, feeArgs FeeParams) error {
 	return store.execTx(ctx, func(q *Queries) error {
 		_, err := q.CreateTransaction(ctx, CreateTransactionParams{
+			Username: arg.Username,
 			UserEmail:   arg.UserEmail,
 			Type:     arg.Type,
 			Currency: arg.Currency,
@@ -90,6 +92,7 @@ func (store *Store) CreateTransactionTx(ctx context.Context, arg TransactionsPar
 		}
 
 		_, err = q.CreateFee(ctx, CreateFeeParams{
+			Username: arg.Username,
 			MarketID: feeArgs.MarketID,
 			MakerFee: feeArgs.Amount,
 			TakerFee: feeArgs.TakerFee,

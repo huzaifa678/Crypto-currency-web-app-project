@@ -17,13 +17,16 @@ import (
 	"github.com/google/uuid"
 	mockdb "github.com/huzaifa678/Crypto-currency-web-app-project/db/mock"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 )
 
-func createRandomFee() (db.CreateFeeParams, db.Fee) {
+func createRandomFee() (db.CreateFeeParams, db.Fee, db.CreateFeeRow) {
     marketID := uuid.New()
 
     feeArgs := db.CreateFeeParams{
+        Username:  utils.RandomUser(),
         MarketID: marketID,
         MakerFee: sql.NullString{String: "0.01", Valid: true},
         TakerFee: sql.NullString{String: "0.02", Valid: true},
@@ -31,22 +34,32 @@ func createRandomFee() (db.CreateFeeParams, db.Fee) {
 
     fee := db.Fee{
         ID:        uuid.New(),
+        Username:  feeArgs.Username,
         MarketID:  marketID,
         MakerFee:  feeArgs.MakerFee,
         TakerFee:  feeArgs.TakerFee,
         CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
     }
 
-    return feeArgs, fee
+    feeRow := db.CreateFeeRow {
+        ID:        uuid.New(),
+        MarketID:  marketID,
+        MakerFee:  feeArgs.MakerFee,
+        TakerFee:  feeArgs.TakerFee,
+        CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
+    }
+
+    return feeArgs, fee, feeRow
 }
 
 func TestCreateFeeAPI(t *testing.T) {
-    feeArgs, fee := createRandomFee()
+    feeArgs, fee, feeRow := createRandomFee()
 
     testCases := []struct {
         name          string
         body          gin.H
         buildStubs    func(store *mockdb.MockStore_interface)
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         checkResponse func(recorder *httptest.ResponseRecorder)
     }{
         {
@@ -60,7 +73,10 @@ func TestCreateFeeAPI(t *testing.T) {
                 store.EXPECT().
                     CreateFee(gomock.Any(), gomock.Eq(feeArgs)).
                     Times(1).
-                    Return(fee, nil)
+                    Return(feeRow, nil)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, fee.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusOK, recorder.Code)
@@ -78,7 +94,10 @@ func TestCreateFeeAPI(t *testing.T) {
                 store.EXPECT().
                     CreateFee(gomock.Any(), gomock.Eq(feeArgs)).
                     Times(1).
-                    Return(db.Fee{}, sql.ErrConnDone)
+                    Return(feeRow, sql.ErrConnDone)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, fee.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -106,6 +125,8 @@ func TestCreateFeeAPI(t *testing.T) {
             request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
             require.NoError(t, err)
 
+            tc.setupAuth(t, request, server.tokenMaker)
+
             server.router.ServeHTTP(recorder, request)
             tc.checkResponse(recorder)
         })
@@ -113,17 +134,21 @@ func TestCreateFeeAPI(t *testing.T) {
 }
 
 func TestGetFeeAPI(t *testing.T) {
-    _, fee := createRandomFee()
+    _, fee, _ := createRandomFee()
 
     testCases := []struct {
         name          string
         marketID      uuid.UUID
         buildStubs    func(store *mockdb.MockStore_interface)
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         checkResponse func(recorder *httptest.ResponseRecorder)
     }{
         {
             name: "OK",
             marketID: fee.MarketID,
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, fee.Username, time.Minute)
+            },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
                     GetFeeByMarketID(gomock.Any(), gomock.Eq(fee.MarketID)).
@@ -138,11 +163,14 @@ func TestGetFeeAPI(t *testing.T) {
         {
             name:     "NotFound",
             marketID: fee.MarketID,
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, fee.Username, time.Minute)
+            },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
                     GetFeeByMarketID(gomock.Any(), gomock.Eq(fee.MarketID)).
                     Times(1).
-                    Return(db.Fee{}, sql.ErrNoRows)
+                    Return(fee, sql.ErrNoRows)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -151,11 +179,14 @@ func TestGetFeeAPI(t *testing.T) {
         {
             name:     "InternalError",
             marketID: fee.MarketID,
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, fee.Username, time.Minute)
+            },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
                     GetFeeByMarketID(gomock.Any(), gomock.Eq(fee.MarketID)).
                     Times(1).
-                    Return(db.Fee{}, sql.ErrConnDone)
+                    Return(fee, sql.ErrConnDone)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -180,6 +211,8 @@ func TestGetFeeAPI(t *testing.T) {
             request, err := http.NewRequest(http.MethodGet, url, nil)
             require.NoError(t, err)
 
+            tc.setupAuth(t, request, server.tokenMaker)
+
             server.router.ServeHTTP(recorder, request)
             tc.checkResponse(recorder)
         })
@@ -187,22 +220,32 @@ func TestGetFeeAPI(t *testing.T) {
 }
 
 func TestDeleteFeeAPI(t *testing.T) {
-    _, fee := createRandomFee()
+    _, fee, _ := createRandomFee()
 
     testCases := []struct {
         name          string
-        feeID        uuid.UUID
+        feeID         uuid.UUID
         buildStubs    func(store *mockdb.MockStore_interface)
+        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
         checkResponse func(recorder *httptest.ResponseRecorder)
     }{
         {
             name:   "OK",
-            feeID: fee.ID,
+            feeID:  fee.ID,
             buildStubs: func(store *mockdb.MockStore_interface) {
+                
+                store.EXPECT().
+                    GetFeeByMarketID(gomock.Any(), gomock.Eq(fee.ID)).
+                    Times(1).
+                    Return(fee, nil)
+
                 store.EXPECT().
                     DeleteFee(gomock.Any(), gomock.Eq(fee.ID)).
                     Times(1).
                     Return(nil)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, fee.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusOK, recorder.Code)
@@ -210,12 +253,15 @@ func TestDeleteFeeAPI(t *testing.T) {
         },
         {
             name:   "NotFound",
-            feeID: fee.ID,
+            feeID:  fee.ID,
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
-                    DeleteFee(gomock.Any(), gomock.Eq(fee.ID)).
+                    GetFeeByMarketID(gomock.Any(), gomock.Eq(fee.ID)).
                     Times(1).
-                    Return(sql.ErrNoRows)
+                    Return(db.Fee{}, sql.ErrNoRows)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, fee.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -223,29 +269,40 @@ func TestDeleteFeeAPI(t *testing.T) {
         },
         {
             name:   "InternalError",
-            feeID: fee.ID,
+            feeID:  fee.ID,
             buildStubs: func(store *mockdb.MockStore_interface) {
+                store.EXPECT().
+                    GetFeeByMarketID(gomock.Any(), gomock.Eq(fee.ID)).
+                    Times(1).
+                    Return(fee, nil)
+
                 store.EXPECT().
                     DeleteFee(gomock.Any(), gomock.Eq(fee.ID)).
                     Times(1).
                     Return(sql.ErrConnDone)
             },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, fee.Username, time.Minute)
+            },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusInternalServerError, recorder.Code)
             },
         },
-		{
-			name: "Invalid ID",
-			feeID: uuid.Nil,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+        {
+            name:   "InvalidID",
+            feeID:  uuid.Nil,
+            buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
-                    DeleteFee(gomock.Any(), gomock.Any()).
+                    GetFeeByMarketID(gomock.Any(), gomock.Any()).
                     Times(0)
+            },
+            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, fee.Username, time.Minute)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusBadRequest, recorder.Code)
             },
-		},
+        },
     }
 
     for i := range testCases {
@@ -265,6 +322,7 @@ func TestDeleteFeeAPI(t *testing.T) {
             request, err := http.NewRequest(http.MethodDelete, url, nil)
             require.NoError(t, err)
 
+            tc.setupAuth(t, request, server.tokenMaker)
             server.router.ServeHTTP(recorder, request)
             tc.checkResponse(recorder)
         })

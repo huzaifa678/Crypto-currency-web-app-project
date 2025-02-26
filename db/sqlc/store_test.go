@@ -30,6 +30,7 @@ func TestCreateTransactionTx(t *testing.T) {
 	require.NoError(t, err, "Failed to create user")
 
 	transactionArgs := TransactionsParams {
+		Username: user.Username,
 		UserEmail: user.Email,
 		Type: "deposit",
 		Currency: "usd",
@@ -44,6 +45,7 @@ func TestCreateTransactionTx(t *testing.T) {
 	market := createRandomMarketForFee(t)
 
 	feeArgs := CreateFeeParams {
+		Username: market.Username,
 		MarketID: market.ID,
 		MakerFee: sql.NullString{String: "0.0100", Valid: true},
 		TakerFee: sql.NullString{String: "0.0200", Valid: true},
@@ -59,6 +61,7 @@ func TestCreateTransactionTx(t *testing.T) {
 	transaction, err := testQueries.GetTransactionsByUserEmail(context.Background(), transactionArgs.UserEmail)
     require.NoError(t, err, "Failed to get transaction")
     require.NotEmpty(t, transaction, "Transaction should not be empty")
+	require.Equal(t, transactionArgs.Username, transaction[0].Username, "UserID should match")
 	require.Equal(t, transactionArgs.UserEmail, transaction[0].UserEmail, "UserID should match")
 	require.Equal(t, transactionArgs.Type, transaction[0].Type, "Type should match")
 	require.Equal(t, transactionArgs.Currency, transaction[0].Currency, "Currency should match")
@@ -94,6 +97,7 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	errs := make(chan error, 2)
 
 	transactionParams1 := TransactionsParams{
+		Username: user.Username,
 		UserEmail:   user.Email,
 		Type:     "deposit",
 		Currency: "USD",
@@ -104,6 +108,7 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	}
 
 	transactionParams2 := TransactionsParams{
+		Username: user.Username,
 		UserEmail:   user.Email,
 		Type:     "withdrawal",
 		Currency: "usd",
@@ -116,6 +121,7 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	market := createRandomMarketForFee(t)
 
 	feeArgs := CreateFeeParams {
+		Username: market.Username,
 		MarketID: market.ID,
 		MakerFee: sql.NullString{String: "0.0100", Valid: true},
 		TakerFee: sql.NullString{String: "0.0200", Valid: true},
@@ -181,6 +187,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	market := createRandomMarketForOrder(t)
 
 	createOrder1Params := CreateOrderParams{
+		Username: user1.Username,
 		UserEmail: user1.Email,
 		MarketID: market.ID,
 		Type: "buy",
@@ -194,6 +201,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for user1")
 
 	createOrder2Params := CreateOrderParams{
+		Username: user2.Username,
 		UserEmail:   user2.Email,
 		MarketID: market.ID,
 		Type:     "sell",

@@ -19,6 +19,7 @@ CREATE TABLE users (
 
 CREATE TABLE wallets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(150) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
     user_email VARCHAR(255) NOT NULL REFERENCES users(email) ON DELETE CASCADE,
     currency VARCHAR(10) NOT NULL,
     balance DECIMAL(20, 8) DEFAULT 0.0,
@@ -29,6 +30,7 @@ CREATE TABLE wallets (
 
 CREATE TABLE markets (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(150) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
     base_currency VARCHAR(10) NOT NULL,
     quote_currency VARCHAR(10) NOT NULL,
     min_order_amount DECIMAL(20, 8) DEFAULT 0.001,
@@ -39,6 +41,7 @@ CREATE TABLE markets (
 
 CREATE TABLE orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(150) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
     user_email VARCHAR(255) NOT NULL REFERENCES users(email) ON DELETE CASCADE,
     market_id UUID NOT NULL REFERENCES markets(id) ON DELETE CASCADE,
     type order_type NOT NULL,
@@ -52,6 +55,7 @@ CREATE TABLE orders (
 
 CREATE TABLE trades (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(150) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
     buy_order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     sell_order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     market_id UUID NOT NULL REFERENCES markets(id) ON DELETE CASCADE,
@@ -63,6 +67,7 @@ CREATE TABLE trades (
 
 CREATE TABLE transactions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(150) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
     user_email VARCHAR(255) NOT NULL REFERENCES users(email) ON DELETE CASCADE,
     type transaction_type NOT NULL,
     currency VARCHAR(10) NOT NULL,
@@ -75,6 +80,7 @@ CREATE TABLE transactions (
 
 CREATE TABLE fees (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(150) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
     market_id UUID NOT NULL REFERENCES markets(id) ON DELETE CASCADE,
     maker_fee DECIMAL(10, 4) DEFAULT 0.001,
     taker_fee DECIMAL(10, 4) DEFAULT 0.002,
@@ -83,6 +89,7 @@ CREATE TABLE fees (
 
 CREATE TABLE audit_logs (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    username VARCHAR(150) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
     user_email VARCHAR(255) NOT NULL REFERENCES users(email) ON DELETE CASCADE,
     action TEXT NOT NULL,
     ip_address VARCHAR(45),

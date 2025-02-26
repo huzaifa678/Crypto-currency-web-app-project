@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -29,7 +30,10 @@ func (server *server) createOrder(ctx *gin.Context) {
         return
     }
 
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
     arg := db.CreateOrderParams{
+        Username:  authPayload.Username,
         UserEmail: req.UserEmail,
         MarketID:  req.MarketID,
         Type:      req.Type,
@@ -71,6 +75,13 @@ func (server *server) getOrder(ctx *gin.Context) {
         return
     }
 
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
+    if authPayload.Username != order.Username {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
+        return
+    }
+
     ctx.JSON(http.StatusOK, order)
 }
 
@@ -88,7 +99,8 @@ func (server *server) deleteOrder(ctx *gin.Context) {
         return
     }
 
-    err = server.store.DeleteOrder(ctx, orderID)
+    order, err := server.store.GetOrderByID(ctx, orderID)
+
     if err != nil {
         if err == sql.ErrNoRows {
             ctx.JSON(http.StatusNotFound, errorResponse(err))
@@ -97,6 +109,19 @@ func (server *server) deleteOrder(ctx *gin.Context) {
         ctx.JSON(http.StatusInternalServerError, errorResponse(err))
         return
     }
+
+    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+
+    if authPayload.Username != order.Username {
+        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
+        return
+    }
+
+    err = server.store.DeleteOrder(ctx, orderID)
+    if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
     ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }
