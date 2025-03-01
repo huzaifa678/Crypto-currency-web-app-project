@@ -236,7 +236,6 @@ func TestGetOrderAPI(t *testing.T) {
 	}
 }
 
-
 func TestDeleteOrderAPI(t *testing.T) {
     trade, _ := createRandomTrade()
 

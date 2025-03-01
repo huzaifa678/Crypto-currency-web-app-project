@@ -13,8 +13,10 @@ type server struct {
 	store      db.Store_interface
 	router *gin.Engine
 	tokenMaker token.Maker
-	config     utils.Config
+	config utils.Config
 }
+
+const url = "wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade/eurusdt@trade/jpyusdt@trade"
 
 
 
@@ -74,6 +76,12 @@ func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
 	router.GET("/audit-logs/user/:user_email", server.listUserAuditLogs)
 	authRoutes.GET("/audit-logs/:user_email", server.getAuditLog)
 	authRoutes.DELETE("/audit-logs/:id", server.DeleteAuditLog)
+
+	router.GET("/ws", func(ctx *gin.Context) {
+			WebSocket(ctx, url)
+		})
+
+
 
 	server.router = router
 	return server, nil
