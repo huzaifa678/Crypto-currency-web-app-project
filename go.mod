@@ -13,6 +13,8 @@ require (
 	golang.org/x/crypto v0.35.0
 )
 
+require github.com/gorilla/websocket v1.5.3
+
 require (
 	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
 	github.com/aead/chacha20poly1305 v0.0.0-20170617001512-233f39982aeb
