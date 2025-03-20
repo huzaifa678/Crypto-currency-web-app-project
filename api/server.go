@@ -33,6 +33,7 @@ func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
 		config:     config,
 	}
 
+
 	router := gin.Default()
 
 
