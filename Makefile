@@ -26,6 +26,6 @@ test:
 	go test -v -cover -short ./...
 
 go-backend-compose:
-			docker compose up --build  
+		docker compose up --build  
 
 .PHONY: createdb dropdb postgres migrateup migratedown sqlc server mock test go-backend-compose

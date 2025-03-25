@@ -443,7 +443,7 @@ func requireBodyMatchAuditLog(t *testing.T, body *bytes.Buffer, auditLog db.Audi
     require.Equal(t, auditLog.UserEmail, gotAuditLog.UserEmail)
 }
 
-func requireBodyMatchAuditLogForGet(t *testing.T, body *bytes.Buffer, auditLog db.AuditLog) {
+/*func requireBodyMatchAuditLogForGet(t *testing.T, body *bytes.Buffer, auditLog db.AuditLog) {
     data, err := io.ReadAll(body)
     require.NoError(t, err)
 
@@ -456,7 +456,7 @@ func requireBodyMatchAuditLogForGet(t *testing.T, body *bytes.Buffer, auditLog d
     require.Equal(t, auditLog.Action, gotAuditLog.Action)
     require.Equal(t, auditLog.IpAddress, gotAuditLog.IpAddress)
     require.WithinDuration(t, auditLog.CreatedAt.Time, gotAuditLog.CreatedAt.Time, time.Second)
-}
+}*/
 
 func requireBodyMatchAuditLogs(t *testing.T, body *bytes.Buffer, auditLogs []db.AuditLog) {
     data, err := io.ReadAll(body)
