@@ -448,7 +448,7 @@ func requireBodyMatchMarket(t *testing.T, body *bytes.Buffer, market db.Market) 
     require.Equal(t, market.ID, gotMarket.ID)
 }
 
-func requireBodyMatchMarkets(t *testing.T, body *bytes.Buffer, market db.ListMarketsRow) {
+/*func requireBodyMatchMarkets(t *testing.T, body *bytes.Buffer, market db.ListMarketsRow) {
     data, err := io.ReadAll(body)
     require.NoError(t, err)
 
@@ -462,7 +462,7 @@ func requireBodyMatchMarkets(t *testing.T, body *bytes.Buffer, market db.ListMar
     require.Equal(t, market.MinOrderAmount, gotMarket.MinOrderAmount)
     require.Equal(t, market.PricePrecision, gotMarket.PricePrecision)
     require.Equal(t, market.CreatedAt.Time.Unix(), gotMarket.CreatedAt.Time.Unix())
-}
+}*/
 
 func requireBodyMatchMarketsForLists(t *testing.T, body *bytes.Buffer, markets []db.Market) {
     data, err := io.ReadAll(body)
