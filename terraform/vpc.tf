@@ -1,6 +1,4 @@
 
-data "aws_availability_zones" "available" {}
-
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
   version = "5.19.0"
@@ -16,6 +14,6 @@ module "vpc" {
   enable_dns_support   = true
 
   tags = {
-        Name = "crypto-based-web-system-vpc-network"
+      Name = "crypto-based-web-system-vpc-network"
   }
 }
