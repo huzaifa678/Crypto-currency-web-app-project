@@ -1,6 +1,6 @@
 output "rds_db" {
   description = "RDS DB"
-  value       = aws_db_instance.postgres[0].db_name
+  value       = aws_db_instance.postgres.db_name
 }
 
 output "vpc_id" {

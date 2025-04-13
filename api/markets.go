@@ -12,8 +12,8 @@ import (
 )
 
 type MarketRequest struct {
-    BaseCurrency  string `json:"base_currency"`
-    QuoteCurrency string `json:"quote_currency"`
+    BaseCurrency   string `json:"base_currency"`
+    QuoteCurrency  string `json:"quote_currency"`
     MinOrderAmount sql.NullString `json:"min_order_amount"`
     PricePrecision sql.NullInt32 `json:"price_precision"`
 }

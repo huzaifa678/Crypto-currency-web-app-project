@@ -16,11 +16,11 @@ import (
 
 type TransactionRequest struct {
 	UserEmail string         `json:"user_email"`
-	Type     db.TransactionType `json:"type"`
-	Currency string          `json:"currency"`
-	Amount   string          `json:"amount"`
-	Address  string  `json:"address"`
-	TxHash   string  `json:"tx_hash"`
+	Type      db.TransactionType `json:"type"`
+	Currency  string          `json:"currency"`
+	Amount    string          `json:"amount"`
+	Address   string  `json:"address"`
+	TxHash    string  `json:"tx_hash"`
 }
 
 func (server *server) createTransaction(ctx *gin.Context) {
