@@ -1,3 +1,8 @@
+output "rds_db" {
+  description = "RDS DB"
+  value       = aws_db_instance.postgres[0].db_name
+}
+
 output "vpc_id" {
   description = "The VPC ID"
   value       = module.vpc.vpc_id

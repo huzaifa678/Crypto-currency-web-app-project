@@ -69,6 +69,7 @@ variable "rds_db_name" {
     default     = "cryptodb"
 }
 
+
 variable "rds_db_username" {
     description = "username credential for RDS DB"
     type        = string
