@@ -1,7 +1,7 @@
 resource "aws_db_instance" "postgres" {
-  count = length(data.aws_db_instance.existing_rds) == 0 ? 1 : 0
 
-  identifier           = "crypto-db"
+
+  identifier          = "crypto-db"
   engine              = "postgres"
   engine_version      = "16.2"
   instance_class      = "db.t3.micro"

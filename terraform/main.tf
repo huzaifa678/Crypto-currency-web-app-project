@@ -36,12 +36,3 @@ data "aws_availability_zones" "available" {}
 data "aws_secretsmanager_secret_version" "rds_credentials" {
   secret_id = aws_secretsmanager_secret.rds_credentials.id
 }
-
-data "aws_db_instance" "existing_rds" {
-  db_instance_identifier = "crypto-db"
-}
-
-data "aws_secretsmanager_secret" "existing_secret" {
-  name = "rds-credentials"
-}
-
