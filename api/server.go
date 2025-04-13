@@ -10,10 +10,10 @@ import (
 )
 
 type server struct {
-	store      db.Store_interface
-	router *gin.Engine
-	tokenMaker token.Maker
-	config utils.Config
+	store       db.Store_interface
+	router 	   *gin.Engine
+	tokenMaker  token.Maker
+	config 	    utils.Config
 }
 
 const url = "wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade/eurusdt@trade/jpyusdt@trade"

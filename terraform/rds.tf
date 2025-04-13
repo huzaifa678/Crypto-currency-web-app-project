@@ -1,6 +1,5 @@
 resource "aws_db_instance" "postgres" {
 
-
   identifier          = "crypto-db"
   engine              = "postgres"
   engine_version      = "16.2"

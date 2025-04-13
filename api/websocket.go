@@ -11,10 +11,10 @@ import (
 )
 
 type TradeData struct {
-	Symbol string `json:"symbol"` 
-	Price  string `json:"price"` 
-	Quantity   string `json:"quantity"` 
-	Time   int64  `json:"Time"` 
+	Symbol      string `json:"symbol"` 
+	Price       string `json:"price"` 
+	Quantity    string `json:"quantity"` 
+	Time        int64  `json:"Time"` 
 }
 
 

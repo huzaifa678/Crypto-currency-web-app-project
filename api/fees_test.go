@@ -26,7 +26,7 @@ func createRandomFee() (db.CreateFeeParams, db.Fee, db.CreateFeeRow) {
     marketID := uuid.New()
 
     feeArgs := db.CreateFeeParams{
-        Username:  utils.RandomUser(),
+        Username: utils.RandomUser(),
         MarketID: marketID,
         MakerFee: sql.NullString{String: "0.01", Valid: true},
         TakerFee: sql.NullString{String: "0.02", Valid: true},
