@@ -26,9 +26,11 @@ jobs:
 
       - name: Initialize Terraform
         run: terraform init
+        working-directory: ./terraform
 
       - name: Wait for 15 Minutes
         run: sleep 900  
 
       - name: Destroy Terraform Resources
         run: terraform destroy -auto-approve
+        working-directory: ./terraform
