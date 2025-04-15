@@ -34,5 +34,5 @@ terraform {
 data "aws_availability_zones" "available" {}
 
 data "aws_secretsmanager_secret_version" "rds_credentials" {
-  secret_id = aws_secretsmanager_secret.rds_credentials.id
+  secret_id = aws_secretsmanager_secret.rds_credentials[0].id
 }
