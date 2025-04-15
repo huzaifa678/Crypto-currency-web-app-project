@@ -1,9 +1,8 @@
 name: Terraform & AWS ECR Deployment
 
-on:
-  push:
-    branches:
-      - main
+on: 
+  schedule:
+    - cron: "*/10 3 * * *"  
 
 jobs:
   terraform:
@@ -31,11 +30,12 @@ jobs:
         
 
       - name: Terraform Plan
-        run: terraform plan -out=tfplan
+        run: terraform plan -out=tfplan -target=module.eks -target=module.vpc
         working-directory: ./terraform
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: |
+          terraform apply -auto-approve tfplan
         working-directory: ./terraform
 
   docker:

@@ -1,13 +1,13 @@
 name: Destroy Cloud Infrastructure
 
-on:
-  workflow_dispatch:  
+on:  
   schedule:
-    - cron: "*/30 * * * *"  
+    - cron: "*/20 4 * * *"  
 
 jobs:
   destroy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
@@ -27,10 +27,14 @@ jobs:
       - name: Initialize Terraform
         run: terraform init
         working-directory: ./terraform
+        
+      - name: Wait for 45 Minutes
+        run: sleep 2700  
 
-      - name: Wait for 15 Minutes
-        run: sleep 900  
+      - name: Destroy EKS Resources
+        run: terraform destroy -auto-approve -target=module.eks
+        working-directory: ./terraform
 
-      - name: Destroy Terraform Resources
-        run: terraform destroy -auto-approve
+      - name: Destroy VPC Resources
+        run: terraform destroy -auto-approve -target=module.vpc
         working-directory: ./terraform

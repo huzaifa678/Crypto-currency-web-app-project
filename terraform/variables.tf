@@ -63,6 +63,12 @@ variable "ecr_repo_name" {
   default     = "crypto-ecr-repo"
 }
 
+variable "existing_secret" {
+  description = "Existing secret"
+  type        = bool
+  default     = true
+}
+
 variable "rds_db_name" {
     description = "RDS DB name"
     type        = string
