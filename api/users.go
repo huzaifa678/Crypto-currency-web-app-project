@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"net/http"
+	"time"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
@@ -29,13 +30,17 @@ type UserRequest struct {
 }
 
 type UserLoginRequest struct {
-	Email string `json:"email" binding:"required,email"`
+	Email string 	`json:"email" binding:"required,email"`
 	Password string `json:"password_hash" binding:"required"`
 }
 
 type UserLoginResponse struct {
-	AccessToken string  `json:"access_token"`
-	User		db.GetUserByEmailRow  `json:"user"`
+	SessionID				string  			`json:"session_id"`
+	AccessToken 			string  			`json:"access_token"`
+	AccessTokenExpiration 	time.Time 			`json:"access_token_expiration"`
+	RefreshToken 			string 				`json:"refresh_token"`
+	RefreshTokenExpiration 	time.Time 			`json:"refresh_token_expiration"`
+	User					db.GetUserByEmailRow`json:"user"`
 }
 
 
@@ -44,10 +49,27 @@ func (server *server) loginUser(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		log.Println("Error in binding JSON", err)
 		return
 	}
 
 	user, err := server.store.GetUserByEmail(ctx, req.Email)
+
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "email not found"})
+		return
+	}
+
+	log.Println("user_email args", user)
+
+	err = utils.ComparePasswords(user.PasswordHash, req.Password)
+	log.Println("Password's Hash", user.PasswordHash)
+	log.Println("Password", req.Password)
+
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, errorResponse(err))
+		return
+	}
 
 	log.Println("User", user)
 
@@ -61,20 +83,40 @@ func (server *server) loginUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
 
-	err = utils.ComparePasswords(user.PasswordHash, req.Password)
-
-	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"Password unmatched": "Passowrd does not match"})
-	}
-
-	accessToken, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration)
+	accessToken, accessTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
+	refreshToken, refreshTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	}
+
+	args := db.CreateSessionParams {
+		ID: refreshTokenPayload.ID,
+		Username: user.Username,
+		RefreshToken: refreshToken,
+		UserAgent: ctx.Request.UserAgent(),
+		ClientIp: ctx.ClientIP(),
+		IsBlocked: false,
+		ExpiresAt: refreshTokenPayload.ExpiredAt,
+	}
+
+	session, err := server.store.CreateSession(ctx, args)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+
+
 	res := UserLoginResponse {
+		SessionID: session.ID.String(),
 		AccessToken: accessToken,
+		AccessTokenExpiration: accessTokenPayload.ExpiredAt,
+		RefreshToken: refreshToken,
+		RefreshTokenExpiration: refreshTokenPayload.ExpiredAt,
 		User: user,
 	}
 
@@ -88,6 +130,7 @@ func (server *server) createUser(ctx *gin.Context) {
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		log.Println("Error in binding JSON", err)
 		return
 	}
 

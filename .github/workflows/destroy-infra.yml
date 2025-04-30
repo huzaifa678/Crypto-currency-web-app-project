@@ -1,8 +1,12 @@
 name: Destroy Cloud Infrastructure
 
-on:  
-  schedule:
-    - cron: "*/20 4 * * *"  
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main  
 
 jobs:
   destroy:
@@ -28,8 +32,8 @@ jobs:
         run: terraform init
         working-directory: ./terraform
         
-      - name: Wait for 45 Minutes
-        run: sleep 2700  
+      - name: Wait for 60 Minutes
+        run: sleep 3600  
 
       - name: Destroy EKS Resources
         run: terraform destroy -auto-approve -target=module.eks
