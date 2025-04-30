@@ -229,6 +229,136 @@ func TestCreateUserAPI(t *testing.T) {
 	}
 }
 
+func TestLoginUserAPI(t *testing.T) {
+	userArgs, user, _, getUserArgs, getUserByEmailArgs := createRandomUser()
+
+	testCases := []struct {
+		name          string
+		body          gin.H
+		buildStubs    func(store *mockdb.MockStore_interface)
+		checkResponse func(recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			body: gin.H{
+				"email":    	 userArgs.Email,
+				"password_hash": userArgs.PasswordHash,
+			},
+			buildStubs: func(store *mockdb.MockStore_interface) {
+				user.PasswordHash = getUserArgs.PasswordHash
+
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Eq(userArgs.Email)).
+					Times(1).
+					Return(getUserByEmailArgs, nil)
+
+				HashedPassword, err := utils.HashPassword(getUserByEmailArgs.PasswordHash)
+				getUserArgs.PasswordHash = HashedPassword
+				err = utils.ComparePasswords(HashedPassword, getUserByEmailArgs.PasswordHash)
+				require.NoError(t, err)
+
+				store.EXPECT().
+					CreateSession(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.Session{
+						ID:        uuid.New(),
+						Username:  user.Username,
+						ExpiresAt: time.Now().Add(time.Minute * 15),
+					}, nil)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name: "EmailNotFound",
+			body: gin.H{
+				"email":    userArgs.Email,
+				"password_hash": userArgs.PasswordHash,
+			},
+			buildStubs: func(store *mockdb.MockStore_interface) {
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.GetUserByEmailRow{}, sql.ErrNoRows)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			name: "WrongPassword",
+			body: gin.H{
+				"email":    	  userArgs.Email,
+				"password_hash": "wrongpass12345678",
+			},
+			buildStubs: func(store *mockdb.MockStore_interface) {
+				user.PasswordHash = getUserArgs.PasswordHash
+
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Eq(userArgs.Email)).
+					Times(1).
+					Return(getUserByEmailArgs, nil)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusUnauthorized, recorder.Code)
+			},
+		},
+		{
+			name: "DBError",
+			body: gin.H{
+				"email":    user.Email,
+				"password_hash": getUserArgs.PasswordHash,
+			},
+			buildStubs: func(store *mockdb.MockStore_interface) {
+				store.EXPECT().
+					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+					Times(1).
+					Return(db.GetUserByEmailRow{}, sql.ErrConnDone)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			name: "InvalidBody",
+			body: gin.H{
+				"email": 12345,
+			},
+			buildStubs: func(store *mockdb.MockStore_interface) {
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
+
+	for i := range testCases {
+		tc := testCases[i]
+
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			store := mockdb.NewMockStore_interface(ctrl)
+			tc.buildStubs(store)
+
+			server := NewTestServer(t, store)
+			recorder := httptest.NewRecorder()
+
+			data, err := json.Marshal(tc.body)
+			require.NoError(t, err)
+
+			request, err := http.NewRequest(http.MethodPost, "/users/login", bytes.NewReader(data))
+			require.NoError(t, err)
+
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(recorder)
+		})
+	}
+}
+
+
 func TestGetUserAPI(t *testing.T) {
 	_, user, _, getUserParams, _ := createRandomUser()
 
@@ -499,6 +629,7 @@ func TestDeleteUserAPI(t *testing.T) {
 func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetUserByIDRow, db.GetUserByEmailRow) {
 	randomEmail := fmt.Sprintf("testing%d@example.com", rand.Intn(1000))
 	randomPassword := fmt.Sprintf("password%d", rand.Intn(1000))
+	hashedPassword, _ := utils.HashPassword(randomPassword)
 
 	userArgs := db.CreateUserParams{
 		Username: 	  utils.RandomString(32),
@@ -512,7 +643,7 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 		ID: 		  uuid.New(),
 		Username: 	  userArgs.Username,
 		Email:        userArgs.Email,
-		PasswordHash: userArgs.PasswordHash,
+		PasswordHash: hashedPassword,
 		Role:         userArgs.Role,
 		IsVerified:   userArgs.IsVerified,
 	}
@@ -531,7 +662,7 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 		ID:           user.ID,
 		Username: 	  user.Username,	
 		Email:        user.Email,
-		PasswordHash: user.PasswordHash,
+		PasswordHash: hashedPassword,
 		CreatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
 		UpdatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
 		Role:         userArgs.Role,
@@ -542,7 +673,7 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 		ID:           user.ID,
 		Username: 	  user.Username,	
 		Email:        user.Email,
-		PasswordHash: user.PasswordHash,
+		PasswordHash: hashedPassword,
 		CreatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
 		UpdatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
 		Role:         userArgs.Role,

@@ -1,4 +1,5 @@
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE TYPE user_role AS ENUM ('admin', 'user');
 CREATE TYPE order_type AS ENUM ('buy', 'sell');
