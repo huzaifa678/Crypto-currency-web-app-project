@@ -28,6 +28,13 @@ variable "private_subnets" {
   default     = ["10.0.3.0/24", "10.0.4.0/24"]
 }
 
+variable "cluster_endpoint_public_access_cidrs" {
+  description = "Public CIDR blocks"
+  type        = list(string)
+  default     = [ "0.0.0.0/0" ]
+
+}
+
 variable "cluster_name" {
   description = "EKS cluster name"
   type        = string
@@ -35,7 +42,7 @@ variable "cluster_name" {
 }
 
 variable "kubernetes_version" {
-  default     = 1.28
+  default     = 1.29
   description = "kubernetes version"
 }
 
@@ -61,12 +68,6 @@ variable "ecr_repo_name" {
   description = "ECR repository name"
   type        = string
   default     = "crypto-ecr-repo"
-}
-
-variable "existing_secret" {
-  description = "Existing secret"
-  type        = bool
-  default     = true
 }
 
 variable "rds_db_name" {

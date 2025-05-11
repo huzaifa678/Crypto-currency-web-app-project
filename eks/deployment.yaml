@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crypto-app--api-deployment
+  labels:
+    app: simple-bank-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: crypto-app-api
+  template:
+    metadata:
+      labels:
+        app: crypto-app-api
+    spec:
+      containers:
+      - name: crypto-app-api
+        image: 533267178572.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8081
+          name: http-server

@@ -1,0 +1,1 @@
+aws eks create-access-entry --cluster-name crypto-system-eks-cluster --principal-arn arn:aws:iam::533267178572:user/terraform --type STANDARD --username terraform

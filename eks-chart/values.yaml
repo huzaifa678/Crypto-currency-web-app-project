@@ -1,0 +1,27 @@
+domainName:
+  api.freeeasycrypto.com
+
+namespace: 
+  kube-system
+
+apiService:
+  crypto-api-service
+
+appName:
+  crypto-app-api
+
+httpPort:
+  80
+
+service:
+  port: 80
+
+ingress:
+  enabled: true
+  ingressClassName: nginx
+
+replicas:
+  2
+
+image:
+  533267178572.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:latest

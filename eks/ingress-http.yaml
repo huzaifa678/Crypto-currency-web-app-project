@@ -1,0 +1,20 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: crypto-app-api-ingress-http
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: "api.freeeascrypto.com"
+    zalando.org/aws-load-balancer-type: nlb
+
+spec:
+  rules:
+  - host: "api.freeeascrypto.com"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: crypto-api-service
+            port:
+              number: 80

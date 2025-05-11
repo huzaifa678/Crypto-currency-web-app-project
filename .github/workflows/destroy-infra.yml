@@ -36,7 +36,8 @@ jobs:
         run: sleep 3600  
 
       - name: Destroy EKS Resources
-        run: terraform destroy -auto-approve -target=module.eks
+        run: |
+          terraform destroy -auto-approve
         working-directory: ./terraform
 
       - name: Destroy VPC Resources
