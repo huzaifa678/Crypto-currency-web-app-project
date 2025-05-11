@@ -7,12 +7,16 @@ resource "aws_db_instance" "postgres" {
   allocated_storage   = 20
   db_name             = var.rds_db_name
 
-  username = jsondecode(data.aws_secretsmanager_secret_version.rds_credentials.secret_string)["username"]
-  password = jsondecode(data.aws_secretsmanager_secret_version.rds_credentials.secret_string)["password"]
+  username = local.db_creds.username
+  password = local.db_creds.password
 
   skip_final_snapshot = true
 
   tags = {
     Name = var.rds_db_name
+  }
+
+  lifecycle {
+   prevent_destroy = true
   }
 }

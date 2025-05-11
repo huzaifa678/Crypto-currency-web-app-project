@@ -1,0 +1,12 @@
+terraform plan -out=tfplan \
+  -target=aws_eks_cluster.eks_cluster \
+  -target=aws_eks_node_group.eks_node_group \
+  -target=aws_iam_role.eks_cluster_role \
+  -target=aws_iam_role.eks_node_role \
+  -target=aws_iam_role_policy_attachment.eks_cluster_creator_admin \
+  -target=aws_iam_role_policy_attachment.eks_node_policy_attachment \
+  -target=aws_iam_role_policy_attachment.eks_node_ecr_readonly \
+  -target=aws_iam_role_policy_attachment.eks_node_cni_policy \
+  -target=aws_iam_policy.custom_route53_policy \
+  -target=aws_iam_role_policy_attachment.eks_node_custom_route53_policy_attachment \
+  -target=module.vpc 
