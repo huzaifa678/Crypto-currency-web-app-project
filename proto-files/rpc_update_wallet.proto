@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message UpdateWalletRequest {
+  string balance = 1;
+  string locked_balance = 2;
+  string wallet_id = 3;
+}
+
+message UpdateWalletResponse {
+  string message = 1;
+}

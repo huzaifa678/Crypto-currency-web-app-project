@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 )
 
 type renewAccessTokenRequest struct {
@@ -29,7 +30,7 @@ func (server *server) renewAccessToken(ctx *gin.Context) {
 
 	log.Println("refresh token", req.RefreshToken)
 
-	refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken)
+	refreshPayload, err := server.tokenMaker.VerifyToken(req.RefreshToken, token.TokenTypeRefreshToken)
 	log.Println("refresh payload", refreshPayload)
 
 	if err != nil {
@@ -77,6 +78,7 @@ func (server *server) renewAccessToken(ctx *gin.Context) {
 	accessToken, accessPayload, err := server.tokenMaker.CreateToken(
 		refreshPayload.Username,
 		server.config.AccessTokenDuration,
+		token.TokenTypeRefreshToken,
 	)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))

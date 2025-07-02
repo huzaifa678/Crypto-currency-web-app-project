@@ -2,7 +2,6 @@ package api
 
 import (
 	"fmt"
-
 	"github.com/gin-gonic/gin"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
@@ -18,8 +17,6 @@ type server struct {
 
 const url = "wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade/eurusdt@trade/jpyusdt@trade"
 
-
-
 func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
 
 	tokenMaker, err := token.NewPasetoMaker(config.PasetoSymmetricKey)
@@ -33,6 +30,11 @@ func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
 		config:     config,
 	}
 
+	server.setupRouter()
+	return server, nil
+}
+
+func (server *server) setupRouter() {
 
 	router := gin.Default()
 
@@ -84,10 +86,7 @@ func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
 			WebSocket(ctx, url)
 		})
 
-
-
 	server.router = router
-	return server, nil
 }
 
 func (server *server) Start (address string) error {

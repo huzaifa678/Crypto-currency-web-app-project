@@ -317,7 +317,7 @@ func TestLoginUserAPI(t *testing.T) {
 					Return(db.GetUserByEmailRow{}, sql.ErrConnDone)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
-				require.Equal(t, http.StatusNotFound, recorder.Code)
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
 			},
 		},
 		{

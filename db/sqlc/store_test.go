@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
@@ -20,7 +21,7 @@ func TestCreateTransactionTx(t *testing.T) {
 	email := createRandomEmailForTx()
 
 	userArgs := CreateUserParams{
-		Username: utils.RandomString(20),
+		Username: fmt.Sprintf("testuser_%d", time.Now().UnixNano()),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -85,7 +86,7 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	email := createRandomEmailForTx()
 
 	createUserParams := CreateUserParams{
-		Username: utils.RandomString(11),
+		Username: utils.RandomUser(),
 		Email:        email,
 		PasswordHash: "8rrfrf4t45",
 		Role:         "user",
@@ -161,7 +162,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	email := createRandomEmailForTx()
 
 	createUser1Params := CreateUserParams{
-		Username: utils.RandomString(12),
+		Username: fmt.Sprintf("testuser_%d", time.Now().UnixNano()),
 		Email:	email,
 		PasswordHash: "cdcewcds",
 		Role: "user",
@@ -174,7 +175,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	email2 := createRandomEmailForTx()
 
 	createUser2Params := CreateUserParams{
-		Username: utils.RandomString(13),
+		Username: fmt.Sprintf("testuser_%d", time.Now().UnixNano()),
 		Email: email2,
 		PasswordHash: "cdcewcccfvs",
 		Role: "user",

@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+
+message Wallet {
+  string id = 1;
+  string user_email = 2;
+  string currency = 3;
+  string balance = 4;
+  string locked_balance = 5;
+  google.protobuf.Timestamp created_at = 6;
+}

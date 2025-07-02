@@ -26,6 +26,24 @@ test:
 	go test -v -cover -short ./...
 
 go-backend-compose:
-		docker compose up --build  
+	docker compose up --build  
 
-.PHONY: createdb dropdb postgres migrateup migratedown sqlc server mock test go-backend-compose
+proto:
+	rm -rf pb/*.go
+	rm -f docs/*.swagger.json
+	protoc --proto_path=proto-files --go_out=pb --go_opt=paths=source_relative \
+    --go-grpc_out=pb --go-grpc_opt=paths=source_relative \
+	--grpc-gateway_out=pb --grpc-gateway_opt paths=source_relative \
+	--openapiv2_out=docs --openapiv2_opt=allow_merge=true,merge_file_name=Crypto-currency-web-app \
+    proto-files/*.proto
+
+evans:
+	evans --host localhost --port 9090 -r repl
+
+go-tools:
+	go get -tool github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
+	go get -tool github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
+	go get -tool google.golang.org/protobuf/cmd/protoc-gen-go
+	go get -tool google.golang.org/grpc/cmd/protoc-gen-go-grpc
+
+.PHONY: createdb dropdb postgres migrateup migratedown sqlc server mock test go-backend-compose proto evans

@@ -18,6 +18,10 @@ func RandomString(length int) string {
 	return sb.String()
 }
 
+func RandomUserByLength(length int) string {
+	return RandomString(length)
+}
+
 func RandomUser() string {
 	return RandomString(10)
 }

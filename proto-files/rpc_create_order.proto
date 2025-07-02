@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package pb;
+
+import "order.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message CreateOrderRequest {
+  string user_email = 1;
+  string market_id = 2;
+  OrderType type = 3;
+  Status status = 4;
+  string price = 5;
+  string amount = 6;
+}
+
+message CreateOrderResponse {
+    string order_id = 1;
+}

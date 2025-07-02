@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/empty.proto";
+import "rpc_create_market.proto";
+import "rpc_delete_market.proto";
+import "rpc_get_market.proto";
+import "rpc_list_market.proto";
+import "rpc_create_order.proto";
+import "rpc_delete_order.proto";
+import "rpc_get_order.proto";
+import "rpc_create_user.proto";
+import "rpc_delete_user.proto";
+import "rpc_update_user.proto";
+import "rpc_get_user.proto";
+import "rpc_login_user.proto";
+import "rpc_create_wallet.proto";
+import "rpc_delete_wallet.proto";
+import "rpc_update_wallet.proto";
+import "rpc_get_wallet.proto";
+import "google/api/annotations.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_swagger) = {
+    info: {
+        title: "Crypto web app API";
+        version: "1.0";
+        contact: {
+            name: "Huzaifa Ahmad Gill";
+            url: "https://github.com/huzaifa678";
+            email: "huzaifagill411@gmail.com";
+        };
+    };
+};
+
+service CryptoWebApp {
+    rpc CreateUser (CreateUserRequest) returns (CreateUserResponse) {
+        option (google.api.http) = {
+            post: "/v1/create_user"
+            body: "*"
+        };
+    }
+    rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {
+        option (google.api.http) = {
+            delete: "/v1/users/{user_id}"
+        };
+    }
+
+    rpc UpdateUser (UpdateUserRequest) returns (UpdateUserResponse) {
+        option (google.api.http) = {
+            patch: "/v1/users/{user_id}"
+            body: "*"
+        };
+    }
+
+    rpc GetUser (GetUserRequest) returns (GetUserResponse) {
+        option (google.api.http) = {
+            get: "/v1/users/{user_id}"
+        };
+    }
+
+    rpc LoginUser (LoginUserRequest) returns (LoginUserResponse) {
+        option (google.api.http) = {
+            post: "/v1/login"
+            body: "*"
+        };
+    }
+
+    rpc CreateMarket (CreateMarketRequest) returns (CreateMarketResponse) {
+        option (google.api.http) = {
+            post: "/v1/markets"
+            body: "*"
+        };
+    }
+
+    rpc DeleteMarket (DeleteMarketRequest) returns (DeleteMarketResponse) {
+        option (google.api.http) = {
+            delete: "/v1/markets/{market_id}"
+        };
+    }
+
+    rpc GetMarket (GetMarketRequest) returns (GetMarketResponse) {
+        option (google.api.http) = {
+            get: "/v1/markets/{market_id}"
+        };
+    }
+
+    rpc MarketList (google.protobuf.Empty) returns (MarketListResponse) {
+        option (google.api.http) = {
+            get: "/v1/markets"
+        };
+    }
+
+    rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {
+        option (google.api.http) = {
+            post: "/v1/orders"
+            body: "*"
+        };
+    }
+
+    rpc DeleteOrder (DeleteOrderRequest) returns (DeleteOrderResponse) {
+        option (google.api.http) = {
+            delete: "/v1/orders/{order_id}"
+        };
+    }
+
+    rpc GetOrder (GetOrderRequest) returns (GetOrderResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders/{order_id}"
+        };
+    }
+
+    rpc CreateWallet (CreateWalletRequest) returns (CreateWalletResponse) {
+        option (google.api.http) = {
+            post: "/v1/wallets"
+            body: "*"
+        };
+    }
+
+    rpc DeleteWallet (DeleteWalletRequest) returns (DeleteWalletResponse) {
+        option (google.api.http) = {
+            delete: "/v1/wallets/{wallet_id}"
+        };
+    }
+
+    rpc UpdateWallet (UpdateWalletRequest) returns (UpdateWalletResponse) {
+        option (google.api.http) = {
+            patch: "/v1/wallets/{wallet_id}"
+            body: "*"
+        };
+    }
+
+    rpc GetWallet (GetWalletRequest) returns (GetWalletResponse) {
+        option (google.api.http) = {
+            get: "/v1/wallets/{wallet_id}"
+        };
+    }
+}
