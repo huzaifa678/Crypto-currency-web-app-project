@@ -7,11 +7,12 @@ import (
 )
 
 type Config struct {
-	ServerAddr string `mapstructure:"SERVER_ADDR"`
-	Dbsource string `mapstructure:"DB_SOURCE"`
-	Dbdriver string `mapstructure:"DB_DRIVER"`
-	PasetoSymmetricKey string `mapstructure:"TOKEN_SYMMETRIC_KEY"`
-	AccessTokenDuration time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
+	HTTPServerAddr 		 string `mapstructure:"HTTP_SERVER_ADDR"`
+	GRPCServerAddr 		 string `mapstructure:"GRPC_SERVER_ADDR"`
+	Dbsource 	   		 string `mapstructure:"DB_SOURCE"`
+	Dbdriver 	   	     string `mapstructure:"DB_DRIVER"`
+	PasetoSymmetricKey   string `mapstructure:"TOKEN_SYMMETRIC_KEY"`
+	AccessTokenDuration  time.Duration `mapstructure:"ACCESS_TOKEN_DURATION"`
 	RefreshTokenDuration time.Duration `mapstructure:"REFRESH_TOKEN_DURATION"`
 }
 

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package pb;
+
+import "user.proto";
+
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+
+message CreateUserRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  UserRole role = 4;
+}
+
+
+message CreateUserResponse {
+  string user_id = 1;
+}

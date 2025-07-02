@@ -7,6 +7,7 @@ import (
 	"time"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 
 	"github.com/gin-gonic/gin"
@@ -30,7 +31,7 @@ type UserRequest struct {
 }
 
 type UserLoginRequest struct {
-	Email string 	`json:"email" binding:"required,email"`
+	Email 	 string `json:"email" binding:"required,email"`
 	Password string `json:"password_hash" binding:"required"`
 }
 
@@ -56,8 +57,13 @@ func (server *server) loginUser(ctx *gin.Context) {
 	user, err := server.store.GetUserByEmail(ctx, req.Email)
 
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "email not found"})
-		return
+		if err == sql.ErrNoRows {
+			log.Println("error", err)
+			ctx.JSON(http.StatusNotFound, gin.H{"Email not found": "Username not found with the given email"})
+			return
+		}
+		log.Println("Error in getting user by email", err)
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
 
 	log.Println("user_email args", user)
@@ -73,23 +79,13 @@ func (server *server) loginUser(ctx *gin.Context) {
 
 	log.Println("User", user)
 
-	if err != nil {
-		if err == sql.ErrNoRows {
-			log.Println("error", err)
-			ctx.JSON(http.StatusNotFound, gin.H{"Email not found": "Username not found with the given email"})
-			return
-		}
-		log.Println("Error in getting user by email", err)
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-	}
-
-	accessToken, accessTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration)
+	accessToken, accessTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration, token.TokenTypeAccessToken,)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	refreshToken, refreshTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration)
+	refreshToken, refreshTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration, token.TokenTypeAccessToken,)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}

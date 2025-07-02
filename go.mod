@@ -1,19 +1,31 @@
 module github.com/huzaifa678/Crypto-currency-web-app-project
 
-go 1.23.4
+go 1.24.3
 
 require github.com/google/uuid v1.6.0
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.10.9
 	github.com/spf13/viper v1.19.0
 	golang.org/x/crypto v0.35.0
 )
 
-require github.com/gorilla/websocket v1.5.3
+require (
+	github.com/gorilla/websocket v1.5.3
+	google.golang.org/grpc v1.70.0
+)
+
+require (
+	github.com/golang-jwt/jwt/v5 v5.2.2
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.26.3
+	github.com/jackc/pgx/v5 v5.7.4
+	google.golang.org/genproto/googleapis/api v0.0.0-20250303144028-a0af3efb3deb
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb
+)
+
+require google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1 // indirect
 
 require (
 	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
@@ -60,7 +72,7 @@ require (
 	golang.org/x/net v0.35.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/text v0.22.0 // indirect
-	google.golang.org/protobuf v1.36.5 // indirect
+	google.golang.org/protobuf v1.36.6
 	gopkg.in/ini.v1 v1.67.0 // indirect
 )
 
@@ -71,4 +83,11 @@ require (
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/exp v0.0.0-20250218142911-aa4b98e5adaa
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+)
+
+tool (
+	github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-grpc-gateway
+	github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc
+	google.golang.org/protobuf/cmd/protoc-gen-go
 )

@@ -14,7 +14,7 @@ import (
 
 
 func addAuthMiddleware(t *testing.T, request *http.Request, tokenMaker token.Maker, authorizationType string, username string, duration time.Duration) {
-	token, payload, err := tokenMaker.CreateToken(username, duration)
+	token, payload, err := tokenMaker.CreateToken(username, duration, token.TokenTypeAccessToken)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, payload)

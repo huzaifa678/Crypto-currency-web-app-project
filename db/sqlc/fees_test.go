@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
-	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -69,7 +69,7 @@ func createRandomMarketForFee(t *testing.T) CreateMarketRow {
 	ctx := context.Background()
 
     userArgs := CreateUserParams{
-        Username:     utils.RandomUser(),
+        Username:     fmt.Sprintf("testuser_%d", time.Now().UnixNano()),
         Email:        fmt.Sprintf("market-%s@example.com", uuid.New().String()),
         PasswordHash: "randompassword",
         Role:         "user",

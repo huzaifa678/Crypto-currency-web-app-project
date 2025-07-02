@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package pb;
+
+import "order.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message GetOrderResponse {
+    Order order = 1;
+}

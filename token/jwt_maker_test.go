@@ -1,6 +1,7 @@
 package token
 
 import (
+	"log"
 	"testing"
 	"time"
 
@@ -20,7 +21,7 @@ func TestJWTMaker(t *testing.T) {
 	username := utils.RandomString(12)
 	duration := time.Minute
 
-	token, payload, err := maker.CreateToken(username, duration)
+	token, payload, err := maker.CreateToken(username, duration, TokenTypeAccessToken)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
@@ -29,8 +30,10 @@ func TestJWTMaker(t *testing.T) {
 	issuedAt := time.Now()
 	expiredAt := issuedAt.Add(duration)
 
-	payload, err = maker.VerifyToken(token)
+	payload, err = maker.VerifyToken(token, TokenTypeAccessToken)
+	log.Println("error", err)
 	require.NoError(t, err)
+	require.NotEmpty(t, token)
 
 	require.NotEmpty(t, payload)
 	require.NotZero(t, payload.ID)
@@ -46,12 +49,12 @@ func TestJWTTokenExpired(t *testing.T) {
 	require.NoError(t, err)
 	username := utils.RandomString(12)
 
-	token, payload, err := maker.CreateToken(username, -time.Minute)
+	token, payload, err := maker.CreateToken(username, -time.Minute, TokenTypeAccessToken)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)
 	require.NotEmpty(t, payload)
 
-	payload, err = maker.VerifyToken(token)
+	payload, err = maker.VerifyToken(token, TokenTypeAccessToken)
 	require.Error(t, err)
 	require.EqualError(t, err, ErrExpiredToken.Error())
 	require.Nil(t, payload)
@@ -62,7 +65,7 @@ func TestInvalidSecret(t *testing.T) {
 	invalidSecret := utils.RandomString(10)
 	_, err := NewJWTMaker(invalidSecret)
 
-	require.EqualError(t, err, "Invalid key size: The secret key size is not equal to minimum of 32 size")
+	require.EqualError(t, err, "invalid key size: The secret key size is not equal to minimum of 32 size")
 }
 
 func TestInvalidJWTToken(t *testing.T) {
@@ -72,7 +75,7 @@ func TestInvalidJWTToken(t *testing.T) {
 
 	invalidToken := utils.RandomString(20)
 
-	payload, err := maker.VerifyToken(invalidToken)
+	payload, err := maker.VerifyToken(invalidToken, TokenTypeAccessToken)
 	require.Error(t, err)
 	require.EqualError(t, err, ErrInvalidToken.Error())
 	require.Nil(t, payload)

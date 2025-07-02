@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package pb;
+
+import "market.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message MarketListResponse {
+  repeated ListMarket markets = 1;
+}

@@ -5,9 +5,9 @@ import (
 	"database/sql"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
-	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,12 +17,13 @@ func TestCreateAuditLog(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
-		Username: utils.RandomUser(),
+		Username: fmt.Sprintf("testuser_%d", time.Now().UnixNano()),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
 		IsVerified: sql.NullBool{Bool: false, Valid: true},
 	}
+
 
 	user, err := testQueries.CreateUser(context.Background(), userArgs)
 	require.NoError(t, err, "Failed to create user")
@@ -44,7 +45,7 @@ func TestDeleteAuditLog(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
-		Username: utils.RandomUser(),
+		Username: fmt.Sprintf("testuser_%d", time.Now().UnixNano()),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
@@ -72,7 +73,7 @@ func TestGetAuditLogByUserId(t *testing.T) {
 	email := createRandomEmailForAudits()
 
 	userArgs := CreateUserParams {
-		Username: utils.RandomUser(),
+		Username: fmt.Sprintf("testuser_%d", time.Now().UnixNano()),
 		Email: email,
 		PasswordHash: "9009909",
 		Role: "user",
