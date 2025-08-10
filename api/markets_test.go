@@ -479,7 +479,7 @@ func requireBodyMatchMarketsForLists(t *testing.T, body *bytes.Buffer, markets [
         require.Equal(t, markets[i].QuoteCurrency, gotMarkets[i].QuoteCurrency)
         require.Equal(t, markets[i].MinOrderAmount, gotMarkets[i].MinOrderAmount)
         require.Equal(t, markets[i].PricePrecision, gotMarkets[i].PricePrecision)
-        require.WithinDuration(t, markets[i].CreatedAt.Time, gotMarkets[i].CreatedAt.Time, time.Second)
+        require.WithinDuration(t, markets[i].CreatedAt, gotMarkets[i].CreatedAt, time.Second)
     }
 }
 
@@ -496,14 +496,8 @@ func createRandomMarket() (db.CreateMarketParams, db.Market, db.CreateMarketRow)
     marketArgs := db.CreateMarketParams{
         BaseCurrency:  baseCurrency,
         QuoteCurrency: quoteCurrency,
-        MinOrderAmount: sql.NullString{
-            String: "0.1",
-            Valid:  true,
-        },
-        PricePrecision: sql.NullInt32{
-            Int32: 8,
-            Valid: true,
-        },
+        MinOrderAmount: "0.1",
+        PricePrecision: 8,
     }
 
     market := db.Market{
@@ -512,7 +506,7 @@ func createRandomMarket() (db.CreateMarketParams, db.Market, db.CreateMarketRow)
         QuoteCurrency: marketArgs.QuoteCurrency,
         MinOrderAmount: marketArgs.MinOrderAmount,
         PricePrecision: marketArgs.PricePrecision,
-        CreatedAt:     sql.NullTime{Time: time.Now(), Valid: true},
+        CreatedAt:     time.Now(),
     }
 
 	marketRow := db.CreateMarketRow {

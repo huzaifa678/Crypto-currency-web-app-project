@@ -18,7 +18,7 @@ import (
 )
 
 func TestLoginUserRPC(t *testing.T) {
-	userArgs, user, _, _, GetUserByEmailRow, _ := createRandomUser()
+	userArgs, user, _, _, GetUserByEmailRow, password := createRandomUser()
 
 	testCases := []struct {
 		name          string
@@ -30,7 +30,7 @@ func TestLoginUserRPC(t *testing.T) {
 			name: "OK",
 			req: &pb.LoginUserRequest{
 				Email:    userArgs.Email,
-				Password: userArgs.PasswordHash,
+				Password: password,
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
@@ -176,7 +176,7 @@ func TestLoginUserRPC(t *testing.T) {
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-			server := NewTestServer(t, store)
+			server := NewTestServer(t, store, nil)
 			res, err := server.LoginUser(context.Background(), tc.req)
 			tc.checkResponse(t, res, err)
 		})

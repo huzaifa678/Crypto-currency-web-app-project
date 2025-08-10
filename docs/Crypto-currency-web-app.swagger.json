@@ -23,6 +23,8 @@
   "paths": {
     "/v1/create_user": {
       "post": {
+        "summary": "Create user",
+        "description": "Create a new user with the specified details",
         "operationId": "CryptoWebApp_CreateUser",
         "responses": {
           "200": {
@@ -55,6 +57,8 @@
     },
     "/v1/login": {
       "post": {
+        "summary": "Login user",
+        "description": "Login with your user credentials and get access token and refresh token",
         "operationId": "CryptoWebApp_LoginUser",
         "responses": {
           "200": {
@@ -87,6 +91,8 @@
     },
     "/v1/markets": {
       "get": {
+        "summary": "List markets",
+        "description": "List all markets",
         "operationId": "CryptoWebApp_MarketList",
         "responses": {
           "200": {
@@ -107,6 +113,8 @@
         ]
       },
       "post": {
+        "summary": "Create market",
+        "description": "Create a new market with the specified details",
         "operationId": "CryptoWebApp_CreateMarket",
         "responses": {
           "200": {
@@ -139,6 +147,8 @@
     },
     "/v1/markets/{marketId}": {
       "get": {
+        "summary": "Get market",
+        "description": "Get market details by market ID",
         "operationId": "CryptoWebApp_GetMarket",
         "responses": {
           "200": {
@@ -167,6 +177,8 @@
         ]
       },
       "delete": {
+        "summary": "Delete market",
+        "description": "Delete market by market ID",
         "operationId": "CryptoWebApp_DeleteMarket",
         "responses": {
           "200": {
@@ -197,6 +209,8 @@
     },
     "/v1/orders": {
       "post": {
+        "summary": "Create order",
+        "description": "Create a new order with the specified details",
         "operationId": "CryptoWebApp_CreateOrder",
         "responses": {
           "200": {
@@ -229,6 +243,8 @@
     },
     "/v1/orders/{orderId}": {
       "get": {
+        "summary": "Get order",
+        "description": "Get order details by order ID",
         "operationId": "CryptoWebApp_GetOrder",
         "responses": {
           "200": {
@@ -257,6 +273,8 @@
         ]
       },
       "delete": {
+        "summary": "Delete order",
+        "description": "Delete order by order ID",
         "operationId": "CryptoWebApp_DeleteOrder",
         "responses": {
           "200": {
@@ -285,8 +303,55 @@
         ]
       }
     },
+    "/v1/stream_trades": {
+      "get": {
+        "summary": "Server stream",
+        "description": "Stream binance live data to the client",
+        "operationId": "CryptoWebApp_StreamTrades",
+        "responses": {
+          "200": {
+            "description": "A successful response.(streaming responses)",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "result": {
+                  "$ref": "#/definitions/pbTrade"
+                },
+                "error": {
+                  "$ref": "#/definitions/googlerpcStatus"
+                }
+              },
+              "title": "Stream result of pbTrade"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "symbols",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
     "/v1/users/{userId}": {
       "get": {
+        "summary": "Get user",
+        "description": "Get user details by user ID",
         "operationId": "CryptoWebApp_GetUser",
         "responses": {
           "200": {
@@ -315,6 +380,8 @@
         ]
       },
       "delete": {
+        "summary": "Delete user",
+        "description": "Delete user by user ID",
         "operationId": "CryptoWebApp_DeleteUser",
         "responses": {
           "200": {
@@ -343,6 +410,8 @@
         ]
       },
       "patch": {
+        "summary": "Update user",
+        "description": "Update user details by user ID",
         "operationId": "CryptoWebApp_UpdateUser",
         "responses": {
           "200": {
@@ -379,8 +448,55 @@
         ]
       }
     },
+    "/v1/verify_email": {
+      "get": {
+        "summary": "Verify email",
+        "description": "Verify user email with the provided secret code",
+        "operationId": "CryptoWebApp_VerifyEmail",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbVerifyEmailResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "emailId",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "int64"
+          },
+          {
+            "name": "secretCode",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
     "/v1/wallets": {
       "post": {
+        "summary": "Create wallet",
+        "description": "Create a new wallet for a user with the specified currency",
         "operationId": "CryptoWebApp_CreateWallet",
         "responses": {
           "200": {
@@ -413,6 +529,8 @@
     },
     "/v1/wallets/{walletId}": {
       "get": {
+        "summary": "Get wallet",
+        "description": "Get wallet details by wallet ID",
         "operationId": "CryptoWebApp_GetWallet",
         "responses": {
           "200": {
@@ -441,6 +559,8 @@
         ]
       },
       "delete": {
+        "summary": "Delete wallet",
+        "description": "Delete wallet by wallet ID",
         "operationId": "CryptoWebApp_DeleteWallet",
         "responses": {
           "200": {
@@ -469,6 +589,8 @@
         ]
       },
       "patch": {
+        "summary": "Update wallet",
+        "description": "Update wallet details by wallet ID",
         "operationId": "CryptoWebApp_UpdateWallet",
         "responses": {
           "200": {
@@ -869,6 +991,40 @@
       ],
       "default": "OPEN"
     },
+    "pbTrade": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number",
+          "format": "double"
+        },
+        "quantity": {
+          "type": "number",
+          "format": "double"
+        },
+        "tradeId": {
+          "type": "string",
+          "format": "int64"
+        },
+        "eventTime": {
+          "type": "string",
+          "format": "int64"
+        },
+        "tradeTime": {
+          "type": "string",
+          "format": "int64"
+        },
+        "isBuyerMaker": {
+          "type": "boolean"
+        },
+        "rawJson": {
+          "type": "string"
+        }
+      }
+    },
     "pbUpdateUserResponse": {
       "type": "object",
       "properties": {
@@ -920,6 +1076,14 @@
         "USER_ROLE_USER"
       ],
       "default": "USER_ROLE_ADMIN"
+    },
+    "pbVerifyEmailResponse": {
+      "type": "object",
+      "properties": {
+        "isVerified": {
+          "type": "boolean"
+        }
+      }
     },
     "pbWallet": {
       "type": "object",

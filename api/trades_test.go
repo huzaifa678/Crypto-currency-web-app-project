@@ -38,7 +38,7 @@ func TestCreateTradeAPI(t *testing.T) {
 				"market_id":     createTradeParams.MarketID,
 				"price":         createTradeParams.Price,
 				"amount":        createTradeParams.Amount,
-				"fee":           createTradeParams.Fee.String,
+				"fee":           createTradeParams.Fee,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
                 addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
@@ -62,7 +62,7 @@ func TestCreateTradeAPI(t *testing.T) {
 				"market_id":     trade.MarketID,
 				"price":         trade.Price,
 				"amount":        trade.Amount,
-				"fee":           trade.Fee.String,
+				"fee":           trade.Fee,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
                 addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
@@ -451,7 +451,7 @@ func requireBodyMatchTradeForGet(t *testing.T, body *bytes.Buffer, trade db.Trad
 	require.Equal(t, trade.Price, gotTrade.Price)
 	require.Equal(t, trade.Amount, gotTrade.Amount)
 	require.Equal(t, trade.Fee, gotTrade.Fee)
-	require.WithinDuration(t, trade.CreatedAt.Time, gotTrade.CreatedAt.Time, time.Second)
+	require.WithinDuration(t, trade.CreatedAt, gotTrade.CreatedAt, time.Second)
 }
 
 func requireBodyMatchTradesList(t *testing.T, body *bytes.Buffer, trades []db.Trade) {
@@ -471,7 +471,7 @@ func requireBodyMatchTradesList(t *testing.T, body *bytes.Buffer, trades []db.Tr
 		require.Equal(t, trades[i].Price, gotTrades[i].Price)
 		require.Equal(t, trades[i].Amount, gotTrades[i].Amount)
 		require.Equal(t, trades[i].Fee, gotTrades[i].Fee)
-		require.WithinDuration(t, trades[i].CreatedAt.Time, gotTrades[i].CreatedAt.Time, time.Second)
+		require.WithinDuration(t, trades[i].CreatedAt, gotTrades[i].CreatedAt, time.Second)
 	}
 }
 
@@ -487,7 +487,7 @@ func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams
     	MarketID:    market.ID,      
     	Price:       "0.0",   
     	Amount:      "0.0",         
-    	Fee:         sql.NullString{String: "5", Valid: true},
+    	Fee:         "5",
 	}
 
 	Trade := db.Trade {
@@ -498,7 +498,7 @@ func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams
     	Price:       createTradeParams.Price,   
     	Amount:      createTradeParams.Amount,         
     	Fee:         createTradeParams.Fee,
-		CreatedAt:   sql.NullTime{Time: time.Now(), Valid: true},
+		CreatedAt:   time.Now(),
 	}
 
 	return Trade, createTradeParams

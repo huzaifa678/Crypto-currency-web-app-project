@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"log"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
@@ -29,7 +28,7 @@ func (server *server) CreateWallet(ctx context.Context, req *pb.CreateWalletRequ
 		Username:  authPayload.Username,
 		UserEmail: req.GetUserEmail(),
 		Currency:  req.GetCurrency(),
-		Balance:   sql.NullString{String: "0", Valid: true},
+		Balance:   "0",
 	}
 
 	wallet, err := server.store.CreateWallet(ctx, arg)

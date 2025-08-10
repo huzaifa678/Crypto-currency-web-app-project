@@ -47,8 +47,8 @@ func (server *server) createTransaction(ctx *gin.Context) {
 		Type: db.TransactionType(req.Type),
 		Currency: req.Currency,
 		Amount: req.Amount,
-		Address: sql.NullString{String: req.Address, Valid: req.Address != ""},
-		TxHash: sql.NullString{String: req.TxHash, Valid: req.TxHash != ""},
+		Address: req.Address,
+		TxHash: req.TxHash,
 	}
 
 	transaction, err := server.store.CreateTransaction(ctx, arg)

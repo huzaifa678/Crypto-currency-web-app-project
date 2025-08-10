@@ -161,3 +161,14 @@ func ValidateUpdateWalletRequest(walletID, balance, lockedBalance string) error 
 	}
 	return ValidateString(lockedBalance, 1, 20)
 }
+
+func ValidateEmailId(value int64) error {
+	if value <= 0 {
+		return fmt.Errorf("must be a positive integer")
+	}
+	return nil
+}
+
+func ValidateSecretCode(value string) error {
+	return ValidateString(value, 32, 128)
+}

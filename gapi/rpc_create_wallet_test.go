@@ -40,7 +40,7 @@ func TestCreateWalletRPC(t *testing.T) {
 					Username:  user.Username,
 					UserEmail: user.Email,
 					Currency:  "BTC",
-					Balance:   sql.NullString{String: "0", Valid: true},
+					Balance:   "0",
 				}
 				store.EXPECT().
 					CreateWallet(gomock.Any(), gomock.Eq(arg)).
@@ -50,7 +50,7 @@ func TestCreateWalletRPC(t *testing.T) {
 						Username:  user.Username,
 						UserEmail: user.Email,
 						Currency:  "BTC",
-						Balance:   sql.NullString{String: "0", Valid: true},
+						Balance:   "0",
 					}, nil)
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
@@ -140,7 +140,7 @@ func TestCreateWalletRPC(t *testing.T) {
 					Username:  user.Username,
 					UserEmail: user.Email,
 					Currency:  "BTC",
-					Balance:   sql.NullString{String: "0", Valid: true},
+					Balance:   "0",
 				}
 				store.EXPECT().
 					CreateWallet(gomock.Any(), gomock.Eq(arg)).
@@ -167,7 +167,7 @@ func TestCreateWalletRPC(t *testing.T) {
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-			server := NewTestServer(t, store)
+			server := NewTestServer(t, store, nil)
 			ctx := tc.setupAuth(t, server.tokenMaker)
 
 			res, err := server.CreateWallet(ctx, tc.req)

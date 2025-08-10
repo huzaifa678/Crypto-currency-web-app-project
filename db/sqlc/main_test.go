@@ -1,30 +1,31 @@
 package db
 
 import (
-	"database/sql"
+	"context"
 	"log"
 	"os"
 	"testing"
 
+	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
+	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 )
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://root:secret@localhost:5432/crypto_db?sslmode=disable"
-)
-
-var testQueries *Queries
-var testDB *sql.DB
+var testStore Store_interface
 
 func TestMain(m *testing.M) {
+
+	config, err := utils.LoadConfig("../..")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
+	}
 	
-	var err error
-	testDB, err = sql.Open(dbDriver, dbSource)
+	connPool, err := pgxpool.New(context.Background(), config.Dbsource)
 	if err != nil {
 		log.Fatal("Failed to connect to the database:", err)
 	}
-	testQueries = New(testDB)
+	
+	testStore = NewStore(connPool)
 
 	os.Exit(m.Run())
 }

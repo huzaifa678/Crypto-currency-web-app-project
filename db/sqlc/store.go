@@ -2,90 +2,72 @@ package db
 
 import (
 	"context"
-	"database/sql"
+
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Store_interface interface {
 	Querier
 	CreateTransactionTx(ctx context.Context, arg TransactionsParams, feeArgs FeeParams) error
 	UpdatedOrderTx(ctx context.Context, UpdatedOrderArgs UpdatedOrderParams) (ReturnAmountParams, error)
+	CreateUserTx(ctx context.Context, arg CreateUserTxParams) (CreateUserTxResult, error)
+	VerifyEmailTx(ctx context.Context, arg VerifyEmailTxParams) (VerifyEmailTxResult, error)
 }
 
-type Store struct {
+type SQLStore struct {
 	*Queries
-	db *sql.DB
+	connPool *pgxpool.Pool
 }
 
-func (store *Store) UpdateOrderTx(context context.Context, param any) any {
-	panic("unimplemented")
-}
+// func (store *SQLStore) UpdateOrderTx(context context.Context, param any) any {
+// 	panic("unimplemented")
+// }
 
-func NewStore(db *sql.DB) *Store {
-	return &Store{
-		db:      db,
-		Queries: New(db),
+func NewStore(connPool *pgxpool.Pool) Store_interface {
+	return &SQLStore{
+		Queries:  New(connPool),
+		connPool: connPool,
 	}
-}
-
-func (store *Store) execTx(ctx context.Context, fn func(*Queries) error) error {
-	tx, err := store.db.BeginTx(ctx, nil)
-	if err != nil {
-		return err
-	}
-
-	q := New(tx)
-	err = fn(q)
-
-	if err != nil {
-		if rbErr := tx.Rollback(); rbErr != nil {
-			return rbErr
-		}
-		return err
-	}
-
-	return tx.Commit()
-
 }
 
 type TransactionsParams struct {
-	Username  string 		 `json:"username"`
-	UserEmail string 		 `json:"user_email"`  
+	Username  string          `json:"username"`
+	UserEmail string          `json:"user_email"`
 	Type      TransactionType `json:"type"`
 	Currency  string          `json:"currency"`
 	Amount    string          `json:"amount"`
 	Status    string          `json:"status"`
-	Address   sql.NullString  `json:"address"`
-	TxHash    sql.NullString  `json:"tx_hash"`
+	Address   string          `json:"address"`
+	TxHash    string          `json:"tx_hash"`
 }
 
 type FeeParams struct {
-	MarketID uuid.UUID      `json:"market_id"`
-	Amount   sql.NullString `json:"amount"`
-	TakerFee sql.NullString `json:"taker_fee"`
+	MarketID uuid.UUID `json:"market_id"`
+	Amount   string    `json:"amount"`
+	TakerFee string    `json:"taker_fee"`
 }
 
 type UpdatedOrderParams struct {
-	Status       OrderStatus    `json:"status"`
-	FilledAmount sql.NullString `json:"filled_amount"`
-	ID           uuid.UUID      `json:"id"`
+	Status       OrderStatus `json:"status"`
+	FilledAmount string      `json:"filled_amount"`
+	ID           uuid.UUID   `json:"id"`
 }
 
 type ReturnAmountParams struct {
-	Amount sql.NullString `json:"amount"`
+	Amount string `json:"amount"`
 }
 
-
-func (store *Store) CreateTransactionTx(ctx context.Context, arg TransactionsParams, feeArgs FeeParams) error {
+func (store *SQLStore) CreateTransactionTx(ctx context.Context, arg TransactionsParams, feeArgs FeeParams) error {
 	return store.execTx(ctx, func(q *Queries) error {
 		_, err := q.CreateTransaction(ctx, CreateTransactionParams{
-			Username: arg.Username,
-			UserEmail:   arg.UserEmail,
-			Type:     arg.Type,
-			Currency: arg.Currency,
-			Amount:   arg.Amount,
-			Address:  arg.Address,
-			TxHash:   arg.TxHash,
+			Username:  arg.Username,
+			UserEmail: arg.UserEmail,
+			Type:      arg.Type,
+			Currency:  arg.Currency,
+			Amount:    arg.Amount,
+			Address:   arg.Address,
+			TxHash:    arg.TxHash,
 		})
 		if err != nil {
 			return err
@@ -106,7 +88,7 @@ func (store *Store) CreateTransactionTx(ctx context.Context, arg TransactionsPar
 	})
 }
 
-func (store *Store) UpdatedOrderTx(ctx context.Context, UpdatedOrderArgs UpdatedOrderParams) (ReturnAmountParams, error) {
+func (store *SQLStore) UpdatedOrderTx(ctx context.Context, UpdatedOrderArgs UpdatedOrderParams) (ReturnAmountParams, error) {
 	var returnAmount ReturnAmountParams
 	var err error
 	err = store.execTx(ctx, func(q *Queries) error {

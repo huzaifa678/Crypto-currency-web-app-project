@@ -28,8 +28,8 @@ func createRandomFee() (db.CreateFeeParams, db.Fee, db.CreateFeeRow) {
     feeArgs := db.CreateFeeParams{
         Username: utils.RandomUser(),
         MarketID: marketID,
-        MakerFee: sql.NullString{String: "0.01", Valid: true},
-        TakerFee: sql.NullString{String: "0.02", Valid: true},
+        MakerFee: "0.01",
+        TakerFee: "0.02",
     }
 
     fee := db.Fee{
@@ -38,7 +38,7 @@ func createRandomFee() (db.CreateFeeParams, db.Fee, db.CreateFeeRow) {
         MarketID:  marketID,
         MakerFee:  feeArgs.MakerFee,
         TakerFee:  feeArgs.TakerFee,
-        CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
+        CreatedAt: time.Now(),
     }
 
     feeRow := db.CreateFeeRow {
@@ -46,7 +46,7 @@ func createRandomFee() (db.CreateFeeParams, db.Fee, db.CreateFeeRow) {
         MarketID:  marketID,
         MakerFee:  feeArgs.MakerFee,
         TakerFee:  feeArgs.TakerFee,
-        CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
+        CreatedAt: time.Now(),
     }
 
     return feeArgs, fee, feeRow
@@ -66,8 +66,8 @@ func TestCreateFeeAPI(t *testing.T) {
             name: "OK",
             body: gin.H{
                 "market_id": feeArgs.MarketID,
-                "maker_fee": feeArgs.MakerFee.String,
-                "taker_fee": feeArgs.TakerFee.String,
+                "maker_fee": feeArgs.MakerFee,
+                "taker_fee": feeArgs.TakerFee,
             },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
@@ -87,8 +87,8 @@ func TestCreateFeeAPI(t *testing.T) {
             name: "InternalError",
             body: gin.H{
                 "market_id": feeArgs.MarketID,
-                "maker_fee": feeArgs.MakerFee.String,
-                "taker_fee": feeArgs.TakerFee.String,
+                "maker_fee": feeArgs.MakerFee,
+                "taker_fee": feeArgs.TakerFee,
             },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
@@ -354,5 +354,5 @@ func requireBodyMatchFeeForGet(t *testing.T, body *bytes.Buffer, fee db.Fee) {
     require.Equal(t, fee.MarketID, gotFee.MarketID)
     require.Equal(t, fee.MakerFee, gotFee.MakerFee)
     require.Equal(t, fee.TakerFee, gotFee.TakerFee)
-    require.WithinDuration(t, fee.CreatedAt.Time, gotFee.CreatedAt.Time, time.Second)
+    require.WithinDuration(t, fee.CreatedAt, gotFee.CreatedAt, time.Second)
 }

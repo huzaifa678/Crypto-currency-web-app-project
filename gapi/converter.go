@@ -11,22 +11,23 @@ func convertCreateUser(user db.CreateUserRow) *pb.User {
 		Id:        user.ID.String(),
 		Username:  user.Username,
 		Email:     user.Email,
-		CreatedAt: timestamppb.New(user.CreatedAt.Time),
-		UpdatedAt: timestamppb.New(user.UpdatedAt.Time),
+		CreatedAt: timestamppb.New(user.CreatedAt),
+		UpdatedAt: timestamppb.New(user.UpdatedAt),
 		Role:      convertUserRole(user.Role),
-		IsVerified: user.IsVerified.Bool,
+		IsVerified: user.IsVerified,
 	}
 }
+
 
 func convertGetByEmailUser(user db.GetUserByEmailRow) *pb.User {
 	return &pb.User{
 		Id:        user.ID.String(),
 		Username:  user.Username,
 		Email:     user.Email,
-		CreatedAt: timestamppb.New(user.CreatedAt.Time),
-		UpdatedAt: timestamppb.New(user.UpdatedAt.Time),
+		CreatedAt: timestamppb.New(user.CreatedAt),
+		UpdatedAt: timestamppb.New(user.UpdatedAt),
 		Role:      convertUserRole(user.Role),
-		IsVerified: user.IsVerified.Bool,
+		IsVerified: user.IsVerified,
 	}
 }
 
@@ -35,10 +36,10 @@ func convertGetUser(user db.GetUserByIDRow) *pb.User {
 		Id:        user.ID.String(),
 		Username:  user.Username,
 		Email:     user.Email,
-		CreatedAt: timestamppb.New(user.CreatedAt.Time),
-		UpdatedAt: timestamppb.New(user.UpdatedAt.Time),
+		CreatedAt: timestamppb.New(user.CreatedAt),
+		UpdatedAt: timestamppb.New(user.UpdatedAt),
 		Role:      convertUserRole(user.Role),
-		IsVerified: user.IsVerified.Bool,
+		IsVerified: user.IsVerified,
 	}
 }
 
@@ -48,9 +49,9 @@ func convertMarket(market db.Market) *pb.Market {
 		UserName:     market.Username,
 		BaseCurrency: market.BaseCurrency,
 		QuoteCurrency: market.QuoteCurrency,
-		MinOrderAmount: market.MinOrderAmount.String,
-		PricePrecision: int32(market.PricePrecision.Int32),
-		CreatedAt:     timestamppb.New(market.CreatedAt.Time),
+		MinOrderAmount: market.MinOrderAmount,
+		PricePrecision: int32(market.PricePrecision),
+		CreatedAt:     timestamppb.New(market.CreatedAt),
 	}
 }
 
@@ -62,9 +63,9 @@ func convertListMarkets(markets []db.ListMarketsRow) *pb.MarketListResponse {
 			MarketId:      market.ID.String(),
 			BaseCurrency:  market.BaseCurrency,
 			QuoteCurrency: market.QuoteCurrency,
-			MinOrderAmount: market.MinOrderAmount.String,
-			PricePrecision: int32(market.PricePrecision.Int32),
-			CreatedAt:      timestamppb.New(market.CreatedAt.Time),
+			MinOrderAmount: market.MinOrderAmount,
+			PricePrecision: int32(market.PricePrecision),
+			CreatedAt:      timestamppb.New(market.CreatedAt),
 		}
 	}
 
@@ -81,11 +82,11 @@ func convertOrder(order db.Order) *pb.Order {
 		MarketId:     order.MarketID.String(),
 		Type:         convertOrderType(order.Type),
 		Status:       convertOrderStatus(order.Status),
-		Price:        order.Price.String,
+		Price:        order.Price,
 		Amount:       order.Amount,
-		FilledAmount: order.FilledAmount.String,
-		CreatedAt:    timestamppb.New(order.CreatedAt.Time),
-		UpdatedAt:    timestamppb.New(order.UpdatedAt.Time),
+		FilledAmount: order.FilledAmount,
+		CreatedAt:    timestamppb.New(order.CreatedAt),
+		UpdatedAt:    timestamppb.New(order.UpdatedAt),
 	}
 }
 
@@ -94,9 +95,9 @@ func convertWallet(wallet db.Wallet) *pb.Wallet {
 		Id:            wallet.ID.String(),
 		UserEmail:     wallet.UserEmail,
 		Currency:      wallet.Currency,
-		Balance:       wallet.Balance.String,
-		LockedBalance: wallet.LockedBalance.String,
-		CreatedAt:     timestamppb.New(wallet.CreatedAt.Time),
+		Balance:       wallet.Balance,
+		LockedBalance: wallet.LockedBalance,
+		CreatedAt:     timestamppb.New(wallet.CreatedAt),
 	}
 }
 

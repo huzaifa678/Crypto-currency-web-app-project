@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"math/rand"
 	"testing"
 	"time"
@@ -33,8 +32,8 @@ func TestCreateMarketRPC(t *testing.T) {
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   market.BaseCurrency,
 				QuoteCurrency:  market.QuoteCurrency,
-				MinOrderAmount: market.MinOrderAmount.String,
-				PricePrecision: market.PricePrecision.Int32,
+				MinOrderAmount: market.MinOrderAmount,
+				PricePrecision: market.PricePrecision,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
@@ -58,8 +57,8 @@ func TestCreateMarketRPC(t *testing.T) {
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   market.BaseCurrency,
 				QuoteCurrency:  market.QuoteCurrency,
-				MinOrderAmount: market.MinOrderAmount.String,
-				PricePrecision: market.PricePrecision.Int32,
+				MinOrderAmount: market.MinOrderAmount,
+				PricePrecision: market.PricePrecision,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
 				return context.Background()
@@ -81,8 +80,8 @@ func TestCreateMarketRPC(t *testing.T) {
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   "", 
 				QuoteCurrency:  market.QuoteCurrency,
-				MinOrderAmount: market.MinOrderAmount.String,
-				PricePrecision: market.PricePrecision.Int32,
+				MinOrderAmount: market.MinOrderAmount,
+				PricePrecision: market.PricePrecision,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
@@ -104,8 +103,8 @@ func TestCreateMarketRPC(t *testing.T) {
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   market.BaseCurrency,
 				QuoteCurrency:  "", 
-				MinOrderAmount: market.MinOrderAmount.String,
-				PricePrecision: market.PricePrecision.Int32,
+				MinOrderAmount: market.MinOrderAmount,
+				PricePrecision: market.PricePrecision,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
@@ -127,8 +126,8 @@ func TestCreateMarketRPC(t *testing.T) {
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   market.BaseCurrency,
 				QuoteCurrency:  market.QuoteCurrency,
-				MinOrderAmount: market.MinOrderAmount.String,
-				PricePrecision: market.PricePrecision.Int32,
+				MinOrderAmount: market.MinOrderAmount,
+				PricePrecision: market.PricePrecision,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
@@ -160,7 +159,7 @@ func TestCreateMarketRPC(t *testing.T) {
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-			server := NewTestServer(t, store)
+			server := NewTestServer(t, store, nil)
 			ctx := tc.setupAuth(t, server.tokenMaker)
 
 			res, err := server.CreateMarket(ctx, tc.req)
@@ -179,18 +178,12 @@ func createRandomMarket() (db.CreateMarketParams, db.Market, db.CreateMarketRow)
         quoteCurrency = currencies[rand.Intn(len(currencies))]
     }
 
-    marketArgs := db.CreateMarketParams{
-        BaseCurrency:  baseCurrency,
-        QuoteCurrency: quoteCurrency,
-        MinOrderAmount: sql.NullString{
-            String: "0.1",
-            Valid:  true,
-        },
-        PricePrecision: sql.NullInt32{
-            Int32: 8,
-            Valid: true,
-        },
-    }
+	marketArgs := db.CreateMarketParams{
+		BaseCurrency:  baseCurrency,
+		QuoteCurrency: quoteCurrency,
+		MinOrderAmount: "0.1",
+		PricePrecision: 8,
+	}
 
     market := db.Market{
         ID:            uuid.New(),
@@ -198,7 +191,7 @@ func createRandomMarket() (db.CreateMarketParams, db.Market, db.CreateMarketRow)
         QuoteCurrency: marketArgs.QuoteCurrency,
         MinOrderAmount: marketArgs.MinOrderAmount,
         PricePrecision: marketArgs.PricePrecision,
-        CreatedAt:     sql.NullTime{Time: time.Now(), Valid: true},
+		CreatedAt:     time.Now(),
     }
 
 	marketRow := db.CreateMarketRow {

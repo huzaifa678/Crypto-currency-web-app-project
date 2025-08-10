@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/google/uuid"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
@@ -36,7 +35,7 @@ func (server *server) CreateOrder(ctx context.Context, req *pb.CreateOrderReques
 		MarketID:  marketID,
 		Type:      db.OrderType(req.GetType()),
 		Status:    db.OrderStatus(req.GetStatus()),
-		Price:     sql.NullString{String: req.GetPrice(), Valid: req.GetPrice() != ""},
+		Price:     req.GetPrice(),
 		Amount:    req.GetAmount(),
 	}
 

@@ -19,6 +19,8 @@ import "rpc_create_wallet.proto";
 import "rpc_delete_wallet.proto";
 import "rpc_update_wallet.proto";
 import "rpc_get_wallet.proto";
+import "rpc_verify_email.proto";
+import "rpc_binance_stream.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -42,10 +44,20 @@ service CryptoWebApp {
             post: "/v1/create_user"
             body: "*"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Create a new user with the specified details";
+            summary: "Create user";
+        };
     }
     rpc DeleteUser (DeleteUserRequest) returns (DeleteUserResponse) {
         option (google.api.http) = {
             delete: "/v1/users/{user_id}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Delete user by user ID";
+            summary: "Delete user";
         };
     }
 
@@ -54,11 +66,21 @@ service CryptoWebApp {
             patch: "/v1/users/{user_id}"
             body: "*"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Update user details by user ID";
+            summary: "Update user";
+        };
     }
 
     rpc GetUser (GetUserRequest) returns (GetUserResponse) {
         option (google.api.http) = {
             get: "/v1/users/{user_id}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Get user details by user ID";
+            summary: "Get user";
         };
     }
 
@@ -67,6 +89,11 @@ service CryptoWebApp {
             post: "/v1/login"
             body: "*"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Login with your user credentials and get access token and refresh token";
+            summary: "Login user";
+        };
     }
 
     rpc CreateMarket (CreateMarketRequest) returns (CreateMarketResponse) {
@@ -74,11 +101,21 @@ service CryptoWebApp {
             post: "/v1/markets"
             body: "*"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Create a new market with the specified details";
+            summary: "Create market";
+        };
     }
 
     rpc DeleteMarket (DeleteMarketRequest) returns (DeleteMarketResponse) {
         option (google.api.http) = {
             delete: "/v1/markets/{market_id}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Delete market by market ID";
+            summary: "Delete market";
         };
     }
 
@@ -86,11 +123,21 @@ service CryptoWebApp {
         option (google.api.http) = {
             get: "/v1/markets/{market_id}"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Get market details by market ID";
+            summary: "Get market";
+        };
     }
 
     rpc MarketList (google.protobuf.Empty) returns (MarketListResponse) {
         option (google.api.http) = {
             get: "/v1/markets"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "List all markets";
+            summary: "List markets";
         };
     }
 
@@ -99,17 +146,32 @@ service CryptoWebApp {
             post: "/v1/orders"
             body: "*"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Create a new order with the specified details";
+            summary: "Create order";
+        };
     }
 
     rpc DeleteOrder (DeleteOrderRequest) returns (DeleteOrderResponse) {
         option (google.api.http) = {
             delete: "/v1/orders/{order_id}"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Delete order by order ID";
+            summary: "Delete order";
+        };
     }
 
     rpc GetOrder (GetOrderRequest) returns (GetOrderResponse) {
         option (google.api.http) = {
             get: "/v1/orders/{order_id}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Get order details by order ID";
+            summary: "Get order";
         };
     }
 
@@ -118,11 +180,21 @@ service CryptoWebApp {
             post: "/v1/wallets"
             body: "*"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Create a new wallet for a user with the specified currency";
+            summary: "Create wallet";
+        };
     }
 
     rpc DeleteWallet (DeleteWalletRequest) returns (DeleteWalletResponse) {
         option (google.api.http) = {
             delete: "/v1/wallets/{wallet_id}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Delete wallet by wallet ID";
+            summary: "Delete wallet";
         };
     }
 
@@ -131,11 +203,43 @@ service CryptoWebApp {
             patch: "/v1/wallets/{wallet_id}"
             body: "*"
         };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Update wallet details by wallet ID";
+            summary: "Update wallet";
+        };
     }
 
     rpc GetWallet (GetWalletRequest) returns (GetWalletResponse) {
         option (google.api.http) = {
             get: "/v1/wallets/{wallet_id}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Get wallet details by wallet ID";
+            summary: "Get wallet";
+        };
+    }
+
+    rpc VerifyEmail (VerifyEmailRequest) returns (VerifyEmailResponse) {
+        option (google.api.http) = {
+            get: "/v1/verify_email"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Verify user email with the provided secret code";
+            summary: "Verify email";
+        };
+    }
+
+    rpc StreamTrades(TradeStreamRequest) returns (stream Trade) {
+
+        option (google.api.http) = {
+            get: "/v1/stream_trades"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Stream binance live data to the client";
+            summary: "Server stream"
         };
     }
 }

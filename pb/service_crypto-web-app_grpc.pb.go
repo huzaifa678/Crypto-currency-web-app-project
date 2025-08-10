@@ -36,6 +36,8 @@ const (
 	CryptoWebApp_DeleteWallet_FullMethodName = "/pb.CryptoWebApp/DeleteWallet"
 	CryptoWebApp_UpdateWallet_FullMethodName = "/pb.CryptoWebApp/UpdateWallet"
 	CryptoWebApp_GetWallet_FullMethodName    = "/pb.CryptoWebApp/GetWallet"
+	CryptoWebApp_VerifyEmail_FullMethodName  = "/pb.CryptoWebApp/VerifyEmail"
+	CryptoWebApp_StreamTrades_FullMethodName = "/pb.CryptoWebApp/StreamTrades"
 )
 
 // CryptoWebAppClient is the client API for CryptoWebApp service.
@@ -58,6 +60,8 @@ type CryptoWebAppClient interface {
 	DeleteWallet(ctx context.Context, in *DeleteWalletRequest, opts ...grpc.CallOption) (*DeleteWalletResponse, error)
 	UpdateWallet(ctx context.Context, in *UpdateWalletRequest, opts ...grpc.CallOption) (*UpdateWalletResponse, error)
 	GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
+	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
+	StreamTrades(ctx context.Context, in *TradeStreamRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Trade], error)
 }
 
 type cryptoWebAppClient struct {
@@ -228,6 +232,35 @@ func (c *cryptoWebAppClient) GetWallet(ctx context.Context, in *GetWalletRequest
 	return out, nil
 }
 
+func (c *cryptoWebAppClient) VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(VerifyEmailResponse)
+	err := c.cc.Invoke(ctx, CryptoWebApp_VerifyEmail_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cryptoWebAppClient) StreamTrades(ctx context.Context, in *TradeStreamRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Trade], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &CryptoWebApp_ServiceDesc.Streams[0], CryptoWebApp_StreamTrades_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[TradeStreamRequest, Trade]{ClientStream: stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CryptoWebApp_StreamTradesClient = grpc.ServerStreamingClient[Trade]
+
 // CryptoWebAppServer is the server API for CryptoWebApp service.
 // All implementations must embed UnimplementedCryptoWebAppServer
 // for forward compatibility.
@@ -248,6 +281,8 @@ type CryptoWebAppServer interface {
 	DeleteWallet(context.Context, *DeleteWalletRequest) (*DeleteWalletResponse, error)
 	UpdateWallet(context.Context, *UpdateWalletRequest) (*UpdateWalletResponse, error)
 	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
+	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
+	StreamTrades(*TradeStreamRequest, grpc.ServerStreamingServer[Trade]) error
 	mustEmbedUnimplementedCryptoWebAppServer()
 }
 
@@ -305,6 +340,12 @@ func (UnimplementedCryptoWebAppServer) UpdateWallet(context.Context, *UpdateWall
 }
 func (UnimplementedCryptoWebAppServer) GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWallet not implemented")
+}
+func (UnimplementedCryptoWebAppServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
+}
+func (UnimplementedCryptoWebAppServer) StreamTrades(*TradeStreamRequest, grpc.ServerStreamingServer[Trade]) error {
+	return status.Errorf(codes.Unimplemented, "method StreamTrades not implemented")
 }
 func (UnimplementedCryptoWebAppServer) mustEmbedUnimplementedCryptoWebAppServer() {}
 func (UnimplementedCryptoWebAppServer) testEmbeddedByValue()                      {}
@@ -615,6 +656,35 @@ func _CryptoWebApp_GetWallet_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CryptoWebApp_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyEmailRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CryptoWebAppServer).VerifyEmail(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CryptoWebApp_VerifyEmail_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CryptoWebAppServer).VerifyEmail(ctx, req.(*VerifyEmailRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CryptoWebApp_StreamTrades_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(TradeStreamRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(CryptoWebAppServer).StreamTrades(m, &grpc.GenericServerStream[TradeStreamRequest, Trade]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type CryptoWebApp_StreamTradesServer = grpc.ServerStreamingServer[Trade]
+
 // CryptoWebApp_ServiceDesc is the grpc.ServiceDesc for CryptoWebApp service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -686,7 +756,17 @@ var CryptoWebApp_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "GetWallet",
 			Handler:    _CryptoWebApp_GetWallet_Handler,
 		},
+		{
+			MethodName: "VerifyEmail",
+			Handler:    _CryptoWebApp_VerifyEmail_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamTrades",
+			Handler:       _CryptoWebApp_StreamTrades_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "service_crypto-web-app.proto",
 }

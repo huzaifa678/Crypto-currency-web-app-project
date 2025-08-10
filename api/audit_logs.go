@@ -33,7 +33,7 @@ func (server *server) createAuditLog(ctx *gin.Context) {
         Username: authPayload.Username,
         UserEmail: req.UserEmail,
         Action:    req.Action,
-        IpAddress: sql.NullString{String: req.IPAddress, Valid: req.IPAddress != ""},
+        IpAddress: req.IPAddress,
     }
 
     auditLog, err := server.store.CreateAuditLog(ctx, arg)

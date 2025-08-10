@@ -2,8 +2,6 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
-
 	"github.com/google/uuid"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
@@ -34,7 +32,7 @@ func (server *server) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest)
 
 	arg := db.UpdateUserParams{
 		PasswordHash: hashedPassword,
-		IsVerified:   sql.NullBool{Bool: false, Valid: true},
+		IsVerified:   false,
 		ID:           id,
 	}
 

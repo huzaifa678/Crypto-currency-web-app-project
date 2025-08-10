@@ -17,8 +17,8 @@ type WalletRequest struct {
 }
 
 type UpdateWalletRequest struct {
-	Balance       sql.NullString `json:"balance"`
-	LockedBalance sql.NullString `json:"locked_balance"`
+	Balance       string `json:"balance"`
+	LockedBalance string `json:"locked_balance"`
 	UserEmail     string         `json:"user_email"`
 	Currency      string         `json:"currency"`
 }
@@ -37,7 +37,7 @@ func (server *server) createWallet(ctx *gin.Context) {
         Username:  authPayload.Username,
         UserEmail: req.UserEmail,
         Currency:  req.Currency,
-        Balance:   sql.NullString{String: "0", Valid: true},
+        Balance:   "0",
     }
 
     wallet, err := server.store.CreateWallet(ctx, arg)

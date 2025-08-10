@@ -153,7 +153,7 @@ func (server *server) createUser(ctx *gin.Context) {
 		Email: req.Email,
 		PasswordHash: hashedPassword,
 		Role: db.UserRole(req.Role),
-		IsVerified: sql.NullBool{Bool: true, Valid: true},
+		IsVerified: true,
 	}
 
 
@@ -221,7 +221,7 @@ func (server *server) updateUser(ctx *gin.Context) {
 
 	arg := db.UpdateUserParams {
 		PasswordHash: hashedPassword,
-		IsVerified: sql.NullBool{Bool: true, Valid: true},
+		IsVerified: true,
 		ID: parsedID,
 	}
 
