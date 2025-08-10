@@ -38,7 +38,7 @@ func (server *server) createOrder(ctx *gin.Context) {
         MarketID:  req.MarketID,
         Type:      req.Type,
         Status:    req.Status,
-        Price:     sql.NullString{String: req.Price, Valid: req.Price != ""},
+        Price:     req.Price,
         Amount:    req.Amount,
     }
 

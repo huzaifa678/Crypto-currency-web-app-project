@@ -69,7 +69,9 @@ func (server *server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 		IsBlocked:    false,
 		ExpiresAt:    refreshPayload.ExpiredAt,
 	})
+	
 	if err != nil {
+		log.Println("ERROR: ", err)
 		return nil, status.Errorf(codes.Internal, "failed to create session")
 	}
 

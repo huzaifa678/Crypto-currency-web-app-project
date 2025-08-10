@@ -21,6 +21,7 @@ server:
 
 mock:
 	mockgen -destination db/mock/store.go github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc Store_interface
+	mockgen -package mockwk -destination worker/mock/distributor.go github.com/huzaifa678/Crypto-currency-web-app-project/worker TaskDistributor
 
 test:
 	go test -v -cover -short ./...
@@ -46,4 +47,7 @@ go-tools:
 	go get -tool google.golang.org/protobuf/cmd/protoc-gen-go
 	go get -tool google.golang.org/grpc/cmd/protoc-gen-go-grpc
 
-.PHONY: createdb dropdb postgres migrateup migratedown sqlc server mock test go-backend-compose proto evans
+redis:
+	docker run --name redis -p 6379:6379 -d redis:7.2-alpine
+
+.PHONY: createdb dropdb postgres migrateup migratedown sqlc server mock test go-backend-compose proto evans go-tools redis

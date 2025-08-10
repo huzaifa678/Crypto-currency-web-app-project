@@ -148,7 +148,7 @@ import (
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-			server := NewTestServer(t, store)
+			server := NewTestServer(t, store, nil)
 			ctx := tc.setupAuth(t, server.tokenMaker)
 
 			res, err := server.GetWallet(ctx, tc.req)
@@ -168,7 +168,7 @@ func createRandomWallet() (db.CreateWalletParams, db.Wallet, db.UpdateWalletBala
         Username: utils.RandomUser(),
 		UserEmail: randomEmail,
 		Currency: randomCurrency,
-		Balance: sql.NullString{String: "0", Valid: true},
+		Balance: "0",
 	}
 
 	createWalletRows := db.Wallet {
@@ -177,13 +177,13 @@ func createRandomWallet() (db.CreateWalletParams, db.Wallet, db.UpdateWalletBala
 		UserEmail: walletArgs.UserEmail,
 		Currency: walletArgs.Currency,
 		Balance: walletArgs.Balance,
-		LockedBalance: sql.NullString{String: "0", Valid: true},
-		CreatedAt: sql.NullTime{Time: time.Now(), Valid: true},
+		LockedBalance: "0",
+		CreatedAt: time.Now(),
 	}
 
 	updateWalletParams := db.UpdateWalletBalanceParams {
-		Balance: sql.NullString{String: "100", Valid: true},
-		LockedBalance: sql.NullString{String: "0", Valid: true},
+		Balance: "100",
+		LockedBalance: "0",
 	}
 
 	return walletArgs, createWalletRows, updateWalletParams

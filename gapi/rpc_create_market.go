@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
@@ -27,8 +26,8 @@ func (server *server) CreateMarket(ctx context.Context, req *pb.CreateMarketRequ
 		Username: authPayload.Username,
 		BaseCurrency:  req.GetBaseCurrency(),
 		QuoteCurrency: req.GetQuoteCurrency(),
-		MinOrderAmount: sql.NullString{String: req.GetMinOrderAmount(), Valid: req.GetMinOrderAmount() != ""},
-		PricePrecision: sql.NullInt32{Int32: req.GetPricePrecision(), Valid: req.GetPricePrecision() != 0},
+		MinOrderAmount: req.GetMinOrderAmount(),
+		PricePrecision: req.GetPricePrecision(),
 	}
 
 	market, err := server.store.CreateMarket(ctx, arg)

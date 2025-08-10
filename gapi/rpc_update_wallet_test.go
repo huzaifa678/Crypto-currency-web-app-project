@@ -39,8 +39,8 @@ func TestUpdateWalletRPC(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				arg := db.UpdateWalletBalanceParams{
 					ID:            wallet.ID,
-					Balance:       sql.NullString{String: "100", Valid: true},
-					LockedBalance: sql.NullString{String: "50", Valid: true},
+					Balance:       "100",
+					LockedBalance: "50",
 				}
 				store.EXPECT().
 					UpdateWalletBalance(gomock.Any(), gomock.Eq(arg)).
@@ -115,8 +115,8 @@ func TestUpdateWalletRPC(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				arg := db.UpdateWalletBalanceParams{
 					ID:            wallet.ID,
-					Balance:       sql.NullString{String: "100", Valid: true},
-					LockedBalance: sql.NullString{String: "50", Valid: true},
+					Balance:       "100",
+					LockedBalance: "50",
 				}
 				store.EXPECT().
 					UpdateWalletBalance(gomock.Any(), gomock.Eq(arg)).
@@ -142,7 +142,7 @@ func TestUpdateWalletRPC(t *testing.T) {
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-			server := NewTestServer(t, store)
+			server := NewTestServer(t, store, nil)
 			ctx := tc.setupAuth(t, server.tokenMaker)
 
 			res, err := server.UpdateWallet(ctx, tc.req)

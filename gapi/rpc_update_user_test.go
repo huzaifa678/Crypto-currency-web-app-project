@@ -109,7 +109,7 @@ func TestUpdateUserRPC(t *testing.T) {
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-            server := NewTestServer(t, store)
+            server := NewTestServer(t, store, nil)
 
 			res, err := server.UpdateUser(context.Background(), tc.req)
 			tc.checkResponse(t, res, err)

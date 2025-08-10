@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"testing"
 	"time"
@@ -16,15 +15,15 @@ func TestCreateUser(t *testing.T) {
 
 	email := createRandomEmail()
 
-	arg := CreateUserParams {
-		Username: utils.RandomString(10),
-		Email: email,
+	arg := CreateUserParams{
+		Username:     utils.RandomString(10),
+		Email:        email,
 		PasswordHash: "rhfcjndwd3344ndd",
-		Role: "user",
-		IsVerified: sql.NullBool{Bool: false, Valid: true},
+		Role:         "user",
+		IsVerified:   false,
 	}
 
-	users, err := testQueries.CreateUser(context.Background(), arg)
+	users, err := testStore.CreateUser(context.Background(), arg)
 
 	require.NoError(t, err)
 	require.NotEmpty(t, users)
@@ -32,7 +31,7 @@ func TestCreateUser(t *testing.T) {
 	require.Equal(t, arg.Email, users.Email)
 	require.Equal(t, arg.Role, users.Role)
 	require.Equal(t, arg.IsVerified, users.IsVerified)
-	require.WithinDuration(t, time.Now(), users.CreatedAt.Time, time.Second)
+	require.WithinDuration(t, time.Now(), users.CreatedAt, time.Second)
 }
 
 func TestDeleteUser(t *testing.T) {
@@ -40,21 +39,21 @@ func TestDeleteUser(t *testing.T) {
 	email := createRandomEmail()
 
 	arg := CreateUserParams{
-		Username: utils.RandomString(30),
+		Username:     fmt.Sprintf("testuser_%d", time.Now().UnixNano()),
 		Email:        email,
 		PasswordHash: "hashedpassword",
 		Role:         "user",
-		IsVerified:   sql.NullBool{Bool: true, Valid: true},
+		IsVerified:   false,
 	}
-	user, err := testQueries.CreateUser(context.Background(), arg)
+	user, err := testStore.CreateUser(context.Background(), arg)
 	require.NoError(t, err)
 
-	err = testQueries.DeleteUser(context.Background(), user.ID)
+	err = testStore.DeleteUser(context.Background(), user.ID)
 	require.NoError(t, err)
 
-	_, err = testQueries.GetUserByID(context.Background(), user.ID)
+	_, err = testStore.GetUserByID(context.Background(), user.ID)
 	require.Error(t, err)
-	require.EqualError(t, err, sql.ErrNoRows.Error())
+	require.EqualError(t, err, ErrRecordNotFound.Error())
 }
 
 func TestGetUserByEmail(t *testing.T) {
@@ -62,21 +61,21 @@ func TestGetUserByEmail(t *testing.T) {
 	email := createRandomEmail()
 
 	arg := CreateUserParams{
-		Username: utils.RandomString(31),
+		Username:     utils.RandomString(31),
 		Email:        email,
 		PasswordHash: "3535554frff",
 		Role:         "admin",
-		IsVerified:   sql.NullBool{Bool: true, Valid: true},
+		IsVerified:   false,
 	}
-	createdUser, err := testQueries.CreateUser(context.Background(), arg)
+	createdUser, err := testStore.CreateUser(context.Background(), arg)
 	require.NoError(t, err)
 
-	fetchedUser, err := testQueries.GetUserByEmail(context.Background(), arg.Email)
+	fetchedUser, err := testStore.GetUserByEmail(context.Background(), arg.Email)
 	require.NoError(t, err)
 	require.Equal(t, createdUser.ID, fetchedUser.ID)
 	require.Equal(t, arg.Email, fetchedUser.Email)
 	require.Equal(t, arg.Role, fetchedUser.Role)
-	require.Equal(t, arg.IsVerified.Bool, fetchedUser.IsVerified.Bool)
+	require.Equal(t, arg.IsVerified, fetchedUser.IsVerified)
 }
 
 func TestUpdateUser(t *testing.T) {
@@ -84,33 +83,29 @@ func TestUpdateUser(t *testing.T) {
 	email := createRandomEmail()
 
 	arg := CreateUserParams{
-		Username: utils.RandomString(28),
+		Username:     utils.RandomString(28),
 		Email:        email,
 		PasswordHash: "54ffv895tnng",
 		Role:         "user",
-		IsVerified:   sql.NullBool{Bool: false, Valid: true},
+		IsVerified:   false,
 	}
-	user, err := testQueries.CreateUser(context.Background(), arg)
+	user, err := testStore.CreateUser(context.Background(), arg)
 	require.NoError(t, err)
 
 	updateArg := UpdateUserParams{
 		PasswordHash: "newpasswordhash",
-		IsVerified:   sql.NullBool{Bool: true, Valid: true},
+		IsVerified:   true,
 		ID:           user.ID,
 	}
-	err = testQueries.UpdateUser(context.Background(), updateArg)
+	err = testStore.UpdateUser(context.Background(), updateArg)
 	require.NoError(t, err)
 
-	updatedUser, err := testQueries.GetUserByID(context.Background(), user.ID)
+	updatedUser, err := testStore.GetUserByID(context.Background(), user.ID)
 	require.NoError(t, err)
 	require.Equal(t, updateArg.PasswordHash, updatedUser.PasswordHash)
-	require.Equal(t, updateArg.IsVerified.Bool, updatedUser.IsVerified.Bool)
+	require.Equal(t, updateArg.IsVerified, updatedUser.IsVerified)
 }
-
 
 func createRandomEmail() string {
 	return fmt.Sprintf("testing-%s@example.com", uuid.New().String())
 }
-
-
-

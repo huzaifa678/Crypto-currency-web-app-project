@@ -2,8 +2,6 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
-
 	"github.com/google/uuid"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
@@ -30,8 +28,8 @@ func (server *server) UpdateWallet(ctx context.Context, req *pb.UpdateWalletRequ
 	}
 
 	arg := db.UpdateWalletBalanceParams{
-		Balance:       sql.NullString{String: req.GetBalance(), Valid: req.GetBalance() != ""},
-		LockedBalance: sql.NullString{String: req.GetLockedBalance(), Valid: req.GetLockedBalance() != ""},
+		Balance:       req.GetBalance(),
+		LockedBalance: req.GetLockedBalance(),
 		ID:            walletID,
 	}
 

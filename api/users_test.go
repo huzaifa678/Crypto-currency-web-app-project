@@ -636,7 +636,7 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 		Email:        randomEmail,
 		PasswordHash: randomPassword,
 		Role:         db.UserRole("user"),
-		IsVerified:   sql.NullBool{Bool: true, Valid: true},
+		IsVerified:   true,
 	}
 
 	user := db.User{
@@ -652,8 +652,8 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 		ID:         user.ID,
 		Username: 	user.Username,
 		Email:      user.Email,
-		CreatedAt:  sql.NullTime{Time: time.Now(), Valid: true},
-		UpdatedAt:  sql.NullTime{Time: time.Now(), Valid: true},
+		CreatedAt:  time.Now(),
+		UpdatedAt:  time.Now(),
 		Role:       userArgs.Role,
 		IsVerified: userArgs.IsVerified,
 	}
@@ -663,8 +663,8 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 		Username: 	  user.Username,	
 		Email:        user.Email,
 		PasswordHash: hashedPassword,
-		CreatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
-		UpdatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 		Role:         userArgs.Role,
 		IsVerified:   userArgs.IsVerified,
 	}
@@ -674,8 +674,8 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 		Username: 	  user.Username,	
 		Email:        user.Email,
 		PasswordHash: hashedPassword,
-		CreatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
-		UpdatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 		Role:         userArgs.Role,
 		IsVerified:   userArgs.IsVerified,
 	}

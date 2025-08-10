@@ -162,7 +162,7 @@ func TestDeleteMarketRPC(t *testing.T) {
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-			server := NewTestServer(t, store)
+			server := NewTestServer(t, store, nil)
 			ctx := tc.setupAuth(t, server.tokenMaker)
 
 			res, err := server.DeleteMarket(ctx, tc.req)

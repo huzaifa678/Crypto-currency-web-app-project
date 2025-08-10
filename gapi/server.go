@@ -2,10 +2,12 @@ package gapi
 
 import (
 	"fmt"
+
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
+	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
-	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/worker"
 )
 
 
@@ -14,9 +16,10 @@ type server struct {
 	tokenMaker  token.Maker
 	config 	    utils.Config
 	pb.UnimplementedCryptoWebAppServer
+	taskDistributor worker.TaskDistributor
 }
 
-func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
+func NewServer(store db.Store_interface, config utils.Config, taskDistributor worker.TaskDistributor) (*server, error) {
 
 	tokenMaker, err := token.NewPasetoMaker(config.PasetoSymmetricKey)
 	if err != nil {
@@ -27,6 +30,7 @@ func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
 		store:      store,
 		tokenMaker: tokenMaker,
 		config:     config,
+		taskDistributor: taskDistributor,
 	}
 
 	return server, nil

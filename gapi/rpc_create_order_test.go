@@ -38,7 +38,7 @@ func TestCreateOrderRPC(t *testing.T) {
 				MarketId:  order.MarketID.String(),
 				Type:      pb.OrderType_BUY,
 				Status:    pb.Status_OPEN,
-				Price:     order.Price.String,
+				Price:     order.Price,
 				Amount:    order.Amount,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
@@ -174,7 +174,7 @@ func TestCreateOrderRPC(t *testing.T) {
 			store := mockdb.NewMockStore_interface(ctrl)
 			tc.buildStubs(store)
 
-			server := NewTestServer(t, store)
+			server := NewTestServer(t, store, nil)
 			ctx := tc.setupAuth(t, server.tokenMaker)
 
 			res, err := server.CreateOrder(ctx, tc.req)
@@ -190,7 +190,7 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 	marketID := uuid.New()
 	orderType := db.OrderType(pb.OrderType_BUY) 
 	orderStatus := db.OrderStatus(pb.Status_OPEN) 
-	price := sql.NullString{String: "100.50", Valid: true}
+	price := "100.50"
 	amount := "10"
 
 	createOrderParams = db.CreateOrderParams{
@@ -213,14 +213,14 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: sql.NullString{String: "5", Valid: true}, 
-		CreatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
-		UpdatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
+		FilledAmount: "5", 
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	updatedOrderParams = db.UpdateOrderStatusAndFilledAmountParams{
 		Status:       db.OrderStatus(fmt.Sprint(1)), 
-		FilledAmount: sql.NullString{String: "10", Valid: true}, 
+		FilledAmount: "10", 
 		ID:           createdOrder.ID,
 	}
 
@@ -232,9 +232,9 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: sql.NullString{String: "5", Valid: true}, 
-		CreatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
-		UpdatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
+		FilledAmount: "5", 
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	return createOrderParams, createdOrder, updatedOrderParams, createOrderRow

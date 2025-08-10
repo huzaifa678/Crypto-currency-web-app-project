@@ -1,6 +1,6 @@
 CREATE TABLE sessions (
     id UUID PRIMARY KEY,
-    username VARCHAR UNIQUE NOT NULL,
+    username VARCHAR NOT NULL,
     refresh_token VARCHAR NOT NULL,
     user_agent VARCHAR NOT NULL,
     client_ip VARCHAR NOT NULL,

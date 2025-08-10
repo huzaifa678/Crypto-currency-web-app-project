@@ -25,3 +25,14 @@ replicas:
 
 image:
   533267178572.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:latest
+
+server:
+  https://acme-v02.api.letsencrypt.org/directory
+
+email:
+  huzaifagill411@gmail.com
+
+tlsSecretName: 
+  crypto-app-api-tls-secret
+
+ingressClass: nginx

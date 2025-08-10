@@ -2,7 +2,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"testing"
 
@@ -15,69 +14,70 @@ import (
 func TestCreateTrade(t *testing.T) {
 
 	email := createRandomEmailForTrade()
-	
-	buyerUsersArgs := CreateUserParams {
-		Username: utils.RandomString(23),
-		Email: email,
+
+	buyerUsersArgs := CreateUserParams{
+		Username:     fmt.Sprintf("buyer_%s", uuid.New().String()),
+		Email:        email,
 		PasswordHash: "kddeoovpds",
-		Role: "user",
-		IsVerified: sql.NullBool{Bool: false, Valid: true},
+		Role:         "user",
+		IsVerified:   true,
 	}
 
-	buyer, err := testQueries.CreateUser(context.Background(), buyerUsersArgs)
+	buyer, err := testStore.CreateUser(context.Background(), buyerUsersArgs)
 	require.NoError(t, err, "Failed to create user")
 
 	market := createRandomMarketForTrade(t)
 
-	buyOrderArgs := CreateOrderParams {
-		Username: buyer.Username,
+	buyOrderArgs := CreateOrderParams{
+		Username:  buyer.Username,
 		UserEmail: buyer.Email,
-		MarketID: market.ID,
-		Type: OrderType("buy"),
-		Status: OrderStatus("open"),
-		Price: sql.NullString{String: "100.50000000", Valid: true},
-		Amount: "1000.00000000",
+		MarketID:  market.ID,
+		Type:      OrderType("buy"),
+		Status:    OrderStatus("open"),
+		Price:     "100.50000000",
+		Amount:    "1000.00000000",
 	}
 
-	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
+	buyOrder, err := testStore.CreateOrder(context.Background(), buyOrderArgs)
 	require.NoError(t, err, "Failed to create order for the buyer")
 
 	email2 := createRandomEmailForTrade()
 
-	sellerUsersArgs := CreateUserParams {
-		Username: utils.RandomString(19),
-		Email: email2,
+	sellerUsersArgs := CreateUserParams{
+		Username:     fmt.Sprintf("buyer_%s", uuid.New().String()),
+		Email:        email2,
 		PasswordHash: "fvfdvrrgtg",
-		Role: "user",
-		IsVerified: sql.NullBool{Bool: false, Valid: true},
+		Role:         "user",
+		IsVerified:   true,
 	}
 
-	seller, err := testQueries.CreateUser(context.Background(), sellerUsersArgs)
+	seller, err := testStore.CreateUser(context.Background(), sellerUsersArgs)
 	require.NoError(t, err, "Failed to create user")
 
-	sellOrderArgs := CreateOrderParams {
-		Username: seller.Username,
+	sellOrderArgs := CreateOrderParams{
+		Username:  seller.Username,
 		UserEmail: seller.Email,
-		MarketID: market.ID,
-		Type: OrderType("buy"),
-		Status: OrderStatus("open"),
-		Price: sql.NullString{String: "110.50000000", Valid: true},
-		Amount: "1000.00000000",
+		MarketID:  market.ID,
+		Type:      OrderType("buy"),
+		Status:    OrderStatus("open"),
+		Price:     "110.50000000",
+		Amount:    "1000.00000000",
 	}
 
-	sellOrder, err := testQueries.CreateOrder(context.Background(), sellOrderArgs)
+	sellOrder, err := testStore.CreateOrder(context.Background(), sellOrderArgs)
 	require.NoError(t, err, "Failed to create order for the seller")
 
-	tradeArgs := CreateTradeParams {
-		Username: market.Username,
-		BuyOrderID: buyOrder.ID,
+	tradeArgs := CreateTradeParams{
+		Username:    market.Username,
+		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
-		MarketID: market.ID,
-		Price: "105.50000000",
-		Amount: "10.00000000",
+		MarketID:    market.ID,
+		Price:       "105.50000000",
+		Amount:      "10.00000000",
+		Fee:         "0.01",
 	}
 
-	trade, err := testQueries.CreateTrade(context.Background(), tradeArgs)
+	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
 	require.NoError(t, err, "Failed to create trade")
 
 	require.NotEmpty(t, trade.ID, "Trade ID should not be empty")
@@ -93,73 +93,73 @@ func TestDeleteTrade(t *testing.T) {
 
 	email := createRandomEmailForTrade()
 
-	buyerUsersArgs := CreateUserParams {
-		Username: utils.RandomUser(),
-		Email: email,
+	buyerUsersArgs := CreateUserParams{
+		Username:     fmt.Sprintf("buyer_%s", uuid.New().String()),
+		Email:        email,
 		PasswordHash: "kddeoovpds",
-		Role: "user",
-		IsVerified: sql.NullBool{Bool: false, Valid: true},
+		Role:         "user",
+		IsVerified:   true,
 	}
 
-	buyer, err := testQueries.CreateUser(context.Background(), buyerUsersArgs)
+	buyer, err := testStore.CreateUser(context.Background(), buyerUsersArgs)
 	require.NoError(t, err, "Failed to create user")
 
-
-	buyOrderArgs := CreateOrderParams {
-		Username: buyer.Username,
+	buyOrderArgs := CreateOrderParams{
+		Username:  buyer.Username,
 		UserEmail: buyer.Email,
-		MarketID: market.ID,
-		Type: OrderType("buy"),
-		Status: OrderStatus("open"),
-		Price: sql.NullString{String: "100.50000000", Valid: true},
-		Amount: "1000.00000000",
+		MarketID:  market.ID,
+		Type:      OrderType("buy"),
+		Status:    OrderStatus("open"),
+		Price:     "100.50000000",
+		Amount:    "1000.00000000",
 	}
 
-	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
+	buyOrder, err := testStore.CreateOrder(context.Background(), buyOrderArgs)
 	require.NoError(t, err, "Failed to create order for the buyer")
 
 	email2 := createRandomEmailForTrade()
 
-	sellerUsersArgs := CreateUserParams {
-		Username: utils.RandomUser(),
-		Email: email2,
+	sellerUsersArgs := CreateUserParams{
+		Username:     fmt.Sprintf("buyer_%s", uuid.New().String()),
+		Email:        email2,
 		PasswordHash: "fvfdvrrgtg",
-		Role: "user",
-		IsVerified: sql.NullBool{Bool: false, Valid: true},
+		Role:         "user",
+		IsVerified:   true,
 	}
 
-	seller, err := testQueries.CreateUser(context.Background(), sellerUsersArgs)
+	seller, err := testStore.CreateUser(context.Background(), sellerUsersArgs)
 	require.NoError(t, err, "Failed to create user")
 
-	sellOrderArgs := CreateOrderParams {
-		Username: seller.Username,
+	sellOrderArgs := CreateOrderParams{
+		Username:  seller.Username,
 		UserEmail: seller.Email,
-		MarketID: market.ID,
-		Type: OrderType("buy"),
-		Status: OrderStatus("open"),
-		Price: sql.NullString{String: "110.50000000", Valid: true},
-		Amount: "1000.00000000",
+		MarketID:  market.ID,
+		Type:      OrderType("buy"),
+		Status:    OrderStatus("open"),
+		Price:     "110.50000000",
+		Amount:    "1000.00000000",
 	}
 
-	sellOrder, err := testQueries.CreateOrder(context.Background(), sellOrderArgs)
+	sellOrder, err := testStore.CreateOrder(context.Background(), sellOrderArgs)
 	require.NoError(t, err, "Failed to create order for the seller")
 
-	tradeArgs := CreateTradeParams {
-		Username: market.Username,
-		BuyOrderID: buyOrder.ID,
+	tradeArgs := CreateTradeParams{
+		Username:    market.Username,
+		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
-		MarketID: market.ID,
-		Price: "105.50000000",
-		Amount: "10.00000000",
+		MarketID:    market.ID,
+		Price:       "105.50000000",
+		Amount:      "10.00000000",
+		Fee:         "0.01",
 	}
 
-	trade, err := testQueries.CreateTrade(context.Background(), tradeArgs)
+	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
 	require.NoError(t, err, "Failed to create trade")
-	err = testQueries.DeleteTrade(context.Background(), trade.ID)
+	err = testStore.DeleteTrade(context.Background(), trade.ID)
 	require.NoError(t, err, "Failed to delete trade")
-	_, err = testQueries.GetTradeByID(context.Background(), trade.ID)
+	_, err = testStore.GetTradeByID(context.Background(), trade.ID)
 	require.Error(t, err, "Expected error when fetching deleted trade")
-	require.Equal(t, sql.ErrNoRows, err, "Error should be no rows found")
+	require.Equal(t, ErrRecordNotFound, err, "Error should be no rows found")
 }
 
 func TestGetTradeById(t *testing.T) {
@@ -167,69 +167,69 @@ func TestGetTradeById(t *testing.T) {
 
 	email := createRandomEmailForTrade()
 
-	buyerUsersArgs := CreateUserParams {
-		Username: utils.RandomString(6),
-		Email: email,
+	buyerUsersArgs := CreateUserParams{
+		Username:     fmt.Sprintf("buyer_%s", uuid.New().String()),
+		Email:        email,
 		PasswordHash: "kddeoovpds",
-		Role: "user",
-		IsVerified: sql.NullBool{Bool: false, Valid: true},
+		Role:         "user",
+		IsVerified:   true,
 	}
 
-	buyer, err := testQueries.CreateUser(context.Background(), buyerUsersArgs)
+	buyer, err := testStore.CreateUser(context.Background(), buyerUsersArgs)
 	require.NoError(t, err, "Failed to create user")
 
-
-	buyOrderArgs := CreateOrderParams {
-		Username: buyer.Username,
+	buyOrderArgs := CreateOrderParams{
+		Username:  buyer.Username,
 		UserEmail: buyer.Email,
-		MarketID: market.ID,
-		Type: OrderType("buy"),
-		Status: OrderStatus("open"),
-		Price: sql.NullString{String: "100.50000000", Valid: true},
-		Amount: "1000.00000000",
+		MarketID:  market.ID,
+		Type:      OrderType("buy"),
+		Status:    OrderStatus("open"),
+		Price:     "100.50000000",
+		Amount:    "1000.00000000",
 	}
 
-	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
+	buyOrder, err := testStore.CreateOrder(context.Background(), buyOrderArgs)
 	require.NoError(t, err, "Failed to create order for the buyer")
 
 	email2 := createRandomEmailForTrade()
 
-	sellerUsersArgs := CreateUserParams {
-		Username: utils.RandomUser(),
-		Email: email2,
+	sellerUsersArgs := CreateUserParams{
+		Username:     fmt.Sprintf("buyer_%s", uuid.New().String()),
+		Email:        email2,
 		PasswordHash: "fvfdvrrgtg",
-		Role: "user",
-		IsVerified: sql.NullBool{Bool: false, Valid: true},
+		Role:         "user",
+		IsVerified:   true,
 	}
 
-	seller, err := testQueries.CreateUser(context.Background(), sellerUsersArgs)
+	seller, err := testStore.CreateUser(context.Background(), sellerUsersArgs)
 	require.NoError(t, err, "Failed to create user")
 
-	sellOrderArgs := CreateOrderParams {
-		Username: seller.Username,
+	sellOrderArgs := CreateOrderParams{
+		Username:  seller.Username,
 		UserEmail: seller.Email,
-		MarketID: market.ID,
-		Type: OrderType("buy"),
-		Status: OrderStatus("open"),
-		Price: sql.NullString{String: "110.50000000", Valid: true},
-		Amount: "1000.00000000",
+		MarketID:  market.ID,
+		Type:      OrderType("buy"),
+		Status:    OrderStatus("open"),
+		Price:     "110.50000000",
+		Amount:    "1000.00000000",
 	}
 
-	sellOrder, err := testQueries.CreateOrder(context.Background(), sellOrderArgs)
+	sellOrder, err := testStore.CreateOrder(context.Background(), sellOrderArgs)
 	require.NoError(t, err, "Failed to create order for the seller")
 
-	tradeArgs := CreateTradeParams {
-		Username: market.Username,
-		BuyOrderID: buyOrder.ID,
+	tradeArgs := CreateTradeParams{
+		Username:    market.Username,
+		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
-		MarketID: market.ID,
-		Price: "105.50000000",
-		Amount: "10.00000000",
+		MarketID:    market.ID,
+		Price:       "105.50000000",
+		Amount:      "10.00000000",
+		Fee:         "0.01",
 	}
 
-	trade, err := testQueries.CreateTrade(context.Background(), tradeArgs)
+	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
 	require.NoError(t, err, "Failed to create trade")
-	fetchedTrade, err := testQueries.GetTradeByID(context.Background(), trade.ID)
+	fetchedTrade, err := testStore.GetTradeByID(context.Background(), trade.ID)
 	require.NoError(t, err, "failed to get the trade by ID")
 	require.Equal(t, trade.ID, fetchedTrade.ID, "The Trade ID is matched")
 	require.Equal(t, trade.BuyOrderID, fetchedTrade.BuyOrderID, "The BuyOrderID is matched")
@@ -239,141 +239,133 @@ func TestGetTradeById(t *testing.T) {
 	require.Equal(t, trade.Amount, fetchedTrade.Amount, "The Amount is matched")
 }
 
-
 func TestGetTradeByMarketID(t *testing.T) {
 	market := createRandomMarketForTrade(t)
 
 	email := createRandomEmailForTrade()
-	
-	buyerUsersArgs := CreateUserParams {
-		Username: utils.RandomString(10),
-		Email: email,
+
+	buyerUsersArgs := CreateUserParams{
+		Username:     fmt.Sprintf("buyer_%s", uuid.New().String()),
+		Email:        email,
 		PasswordHash: "kddeoovpds",
-		Role: "user",
-		IsVerified: sql.NullBool{Bool: false, Valid: true},
+		Role:         "user",
+		IsVerified:   true,
 	}
 
-	buyer, err := testQueries.CreateUser(context.Background(), buyerUsersArgs)
+	buyer, err := testStore.CreateUser(context.Background(), buyerUsersArgs)
 	require.NoError(t, err, "Failed to create user")
 
-
-	buyOrderArgs := CreateOrderParams {
-		Username: buyer.Username,
+	buyOrderArgs := CreateOrderParams{
+		Username:  buyer.Username,
 		UserEmail: buyer.Email,
-		MarketID: market.ID,
-		Type: OrderType("buy"),
-		Status: OrderStatus("open"),
-		Price: sql.NullString{String: "100.50000000", Valid: true},
-		Amount: "1000.00000000",
+		MarketID:  market.ID,
+		Type:      OrderType("buy"),
+		Status:    OrderStatus("open"),
+		Price:     "100.50000000",
+		Amount:    "1000.00000000",
 	}
 
-	buyOrder, err := testQueries.CreateOrder(context.Background(), buyOrderArgs)
+	buyOrder, err := testStore.CreateOrder(context.Background(), buyOrderArgs)
 	require.NoError(t, err, "Failed to create order for the buyer")
 
 	email2 := createRandomEmailForTrade()
 
-	sellerUsersArgs := CreateUserParams {
-		Username: utils.RandomUser(),
-		Email: email2,
+	sellerUsersArgs := CreateUserParams{
+		Username:     utils.RandomUser(),
+		Email:        email2,
 		PasswordHash: "fvfdvrrgtg",
-		Role: "user",
-		IsVerified: sql.NullBool{Bool: false, Valid: true},
+		Role:         "user",
+		IsVerified:   true,
 	}
 
-	seller, err := testQueries.CreateUser(context.Background(), sellerUsersArgs)
+	seller, err := testStore.CreateUser(context.Background(), sellerUsersArgs)
 	require.NoError(t, err, "Failed to create user")
 
-	sellOrderArgs := CreateOrderParams {
-		Username: seller.Username,
+	sellOrderArgs := CreateOrderParams{
+		Username:  seller.Username,
 		UserEmail: seller.Email,
-		MarketID: market.ID,
-		Type: OrderType("buy"),
-		Status: OrderStatus("open"),
-		Price: sql.NullString{String: "110.50000000", Valid: true},
-		Amount: "1000.00000000",
+		MarketID:  market.ID,
+		Type:      OrderType("buy"),
+		Status:    OrderStatus("open"),
+		Price:     "110.50000000",
+		Amount:    "1000.00000000",
 	}
 
-	sellOrder, err := testQueries.CreateOrder(context.Background(), sellOrderArgs)
+	sellOrder, err := testStore.CreateOrder(context.Background(), sellOrderArgs)
 	require.NoError(t, err, "Failed to create order for the seller")
 
-	tradeArgs := CreateTradeParams {
-		Username: market.Username,
-		BuyOrderID: buyOrder.ID,
+	tradeArgs := CreateTradeParams{
+		Username:    market.Username,
+		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
-		MarketID: market.ID,
-		Price: "105.50000000",
-		Amount: "10.00000000",
+		MarketID:    market.ID,
+		Price:       "105.50000000",
+		Amount:      "10.00000000",
+		Fee:         "0.01",
 	}
 
-	trade, err := testQueries.CreateTrade(context.Background(), tradeArgs)
+	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
 	require.NoError(t, err, "Failed to create trade")
-	tradeByMarketID, err := testQueries.GetTradesByMarketID(context.Background(), trade.MarketID)
+	tradeByMarketID, err := testStore.GetTradesByMarketID(context.Background(), trade.MarketID)
 	require.NoError(t, err, "failed to get the trade by Market ID")
 	require.NotEmpty(t, trade, "Trade should not be empty")
 	require.Equal(t, trade.MarketID, tradeByMarketID[0].MarketID, "The MarketID is matched")
 }
 
-
 func createRandomMarketForTrade(t *testing.T) CreateMarketRow {
-    ctx := context.Background()
+	ctx := context.Background()
 
-    userArgs := CreateUserParams{
-        Username:     utils.RandomUser(),
-        Email:        fmt.Sprintf("market-%s@example.com", uuid.New().String()),
-        PasswordHash: "randompassword",
-        Role:         "user",
-        IsVerified:   sql.NullBool{Bool: true, Valid: true},
-    }
+	userArgs := CreateUserParams{
+		Username:     fmt.Sprintf("buyer_%s", uuid.New().String()),
+		Email:        fmt.Sprintf("market-%s@example.com", uuid.New().String()),
+		PasswordHash: "randompassword",
+		Role:         "user",
+		IsVerified:   true,
+	}
 
-    user, err := testQueries.CreateUser(ctx, userArgs)
-    require.NoError(t, err, "Failed to create user for market")
+	user, err := testStore.CreateUser(ctx, userArgs)
+	require.NoError(t, err, "Failed to create user for market")
 
-    currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
-    baseCurrency := currencies[rand.Intn(len(currencies))]
-    quoteCurrency := currencies[rand.Intn(len(currencies))]
+	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
+	baseCurrency := currencies[rand.Intn(len(currencies))]
+	quoteCurrency := currencies[rand.Intn(len(currencies))]
 
-    for baseCurrency == quoteCurrency {
-        quoteCurrency = currencies[rand.Intn(len(currencies))]
-    }
+	for baseCurrency == quoteCurrency {
+		quoteCurrency = currencies[rand.Intn(len(currencies))]
+	}
 
-    existingMarket, err := testQueries.GetMarketByCurrencies(ctx, GetMarketByCurrenciesParams{
-        BaseCurrency:  baseCurrency,
-        QuoteCurrency: quoteCurrency,
-    })
+	existingMarket, err := testStore.GetMarketByCurrencies(ctx, GetMarketByCurrenciesParams{
+		BaseCurrency:  baseCurrency,
+		QuoteCurrency: quoteCurrency,
+	})
 
-    if err == nil {
-        return CreateMarketRow{
-            ID:            existingMarket.ID,
-            Username:      existingMarket.Username,
-            BaseCurrency:  existingMarket.BaseCurrency,
-            QuoteCurrency: existingMarket.QuoteCurrency,
-            CreatedAt:     existingMarket.CreatedAt,
-        }
-    }
+	if err == nil {
+		return CreateMarketRow{
+			ID:            existingMarket.ID,
+			Username:      existingMarket.Username,
+			BaseCurrency:  existingMarket.BaseCurrency,
+			QuoteCurrency: existingMarket.QuoteCurrency,
+			CreatedAt:     existingMarket.CreatedAt,
+		}
+	}
 
-    arg := CreateMarketParams{
-        Username:       user.Username, 
-        BaseCurrency:  baseCurrency,
-        QuoteCurrency: quoteCurrency,
-        MinOrderAmount: sql.NullString{
-            String: "0.1",
-            Valid:  true,
-        },
-        PricePrecision: sql.NullInt32{
-            Int32: 6,
-            Valid: true,
-        },
-    }
+	arg := CreateMarketParams{
+		Username:       user.Username,
+		BaseCurrency:   baseCurrency,
+		QuoteCurrency:  quoteCurrency,
+		MinOrderAmount: "0.1",
+		PricePrecision: 6,
+	}
 
-    market, err := testQueries.CreateMarket(ctx, arg)
-    require.NoError(t, err, "Failed to create random market")
-    require.NotEmpty(t, market.ID, "Market ID should not be empty")
-    require.Equal(t, baseCurrency, market.BaseCurrency, "BaseCurrency should match")
-    require.Equal(t, quoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
+	market, err := testStore.CreateMarket(ctx, arg)
+	require.NoError(t, err, "Failed to create random market")
+	require.NotEmpty(t, market.ID, "Market ID should not be empty")
+	require.Equal(t, baseCurrency, market.BaseCurrency, "BaseCurrency should match")
+	require.Equal(t, quoteCurrency, market.QuoteCurrency, "QuoteCurrency should match")
 
-    return market
+	return market
 }
 
 func createRandomEmailForTrade() string {
-    return fmt.Sprintf("trade-%s@example.com", uuid.New().String())
+	return fmt.Sprintf("trade-%s@example.com", uuid.New().String())
 }

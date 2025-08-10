@@ -31,8 +31,8 @@ func (server *server) createFee(ctx *gin.Context) {
     arg := db.CreateFeeParams{
         Username: authPayload.Username,
         MarketID: req.MarketID,
-        MakerFee: sql.NullString{String: req.MakerFee, Valid: req.MakerFee != ""},
-        TakerFee: sql.NullString{String: req.TakerFee, Valid: req.TakerFee != ""},
+        MakerFee: req.MakerFee,
+        TakerFee: req.TakerFee,
     }
 
     fee, err := server.store.CreateFee(ctx, arg)

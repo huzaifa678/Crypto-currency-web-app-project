@@ -27,19 +27,19 @@ func createRandomAuditLog() (db.CreateAuditLogParams, db.AuditLog) {
     email := "user@example.com"
     action := "login"
     ipAddress := "192.168.1.1"
-    createdAt := sql.NullTime{Time: time.Now(), Valid: true}
+    createdAt := time.Now()
 
     auditLogArgs := db.CreateAuditLogParams{
         UserEmail:  email,
         Action:     action,
-        IpAddress:  sql.NullString{String: ipAddress, Valid: true},
+        IpAddress:  ipAddress,
     }
 
     auditLog := db.AuditLog{
         ID:         id,
         UserEmail:  email,
         Action:     action,
-        IpAddress:  sql.NullString{String: ipAddress, Valid: true},
+        IpAddress:  ipAddress,
         CreatedAt:  createdAt,
     }
 
@@ -64,7 +64,7 @@ func TestCreateAuditLogAPI(t *testing.T) {
             body: gin.H{
                 "user_email": auditLogArgs.UserEmail,
                 "action":     auditLogArgs.Action,
-                "ip_address": auditLogArgs.IpAddress.String,
+                "ip_address": auditLogArgs.IpAddress,
             },
             setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
                 addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, auditLog.Username, time.Minute)
@@ -85,7 +85,7 @@ func TestCreateAuditLogAPI(t *testing.T) {
             body: gin.H{
                 "user_email": auditLogArgs.UserEmail,
                 "action":     auditLogArgs.Action,
-                "ip_address": auditLogArgs.IpAddress.String,
+                "ip_address": auditLogArgs.IpAddress,
             },
             setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
                 addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, auditLog.Username, time.Minute)
@@ -472,7 +472,7 @@ func requireBodyMatchAuditLogs(t *testing.T, body *bytes.Buffer, auditLogs []db.
         require.Equal(t, auditLogs[i].UserEmail, gotAuditLogs[i].UserEmail)
         require.Equal(t, auditLogs[i].Action, gotAuditLogs[i].Action)
         require.Equal(t, auditLogs[i].IpAddress, gotAuditLogs[i].IpAddress)
-        require.WithinDuration(t, auditLogs[i].CreatedAt.Time, gotAuditLogs[i].CreatedAt.Time, time.Second)
+        require.WithinDuration(t, auditLogs[i].CreatedAt, gotAuditLogs[i].CreatedAt, time.Second)
     }
 }
 

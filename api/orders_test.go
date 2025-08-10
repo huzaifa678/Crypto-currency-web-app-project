@@ -41,7 +41,7 @@ func TestCreateOrderAPI(t *testing.T) {
                 "market_id":  createOrderParams.MarketID,
                 "type":       createOrderParams.Type,
                 "status":     createOrderParams.Status,
-                "price":      createOrderParams.Price.String,
+                "price":      createOrderParams.Price,
                 "amount":     createOrderParams.Amount,
             },
             setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
@@ -66,7 +66,7 @@ func TestCreateOrderAPI(t *testing.T) {
                 "market_id":  createOrderParams.MarketID,
                 "type":       createOrderParams.Type,
                 "status":     createOrderParams.Status,
-                "price":      createOrderParams.Price.String,
+                "price":      createOrderParams.Price,
                 "amount":     createOrderParams.Amount,
             },
             setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
@@ -90,7 +90,7 @@ func TestCreateOrderAPI(t *testing.T) {
                 "market_id":  "invalid-uuid",
                 "type":       createOrderParams.Type,
                 "status":     createOrderParams.Status,
-                "price":      createOrderParams.Price.String,
+                "price":      createOrderParams.Price,
                 "amount":     createOrderParams.Amount,
             },
             setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
@@ -360,7 +360,7 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 	marketID := uuid.New()
 	orderType := db.OrderType(fmt.Sprint(rand.Intn(2))) 
 	orderStatus := db.OrderStatus(fmt.Sprint(rand.Intn(3))) 
-	price := sql.NullString{String: "100.50", Valid: true}
+	price := "100.50"
 	amount := "10"
 
 	createOrderParams = db.CreateOrderParams{
@@ -383,14 +383,14 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: sql.NullString{String: "5", Valid: true}, 
-		CreatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
-		UpdatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
+		FilledAmount: "5", 
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	updatedOrderParams = db.UpdateOrderStatusAndFilledAmountParams{
 		Status:       db.OrderStatus(fmt.Sprint(1)), 
-		FilledAmount: sql.NullString{String: "10", Valid: true}, 
+		FilledAmount: "10", 
 		ID:           createdOrder.ID,
 	}
 
@@ -402,9 +402,9 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: sql.NullString{String: "5", Valid: true}, 
-		CreatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
-		UpdatedAt:    sql.NullTime{Time: time.Now(), Valid: true},
+		FilledAmount: "5", 
+		CreatedAt:    time.Now(),
+		UpdatedAt:    time.Now(),
 	}
 
 	return createOrderParams, createdOrder, updatedOrderParams, createOrderRow
@@ -427,7 +427,7 @@ func requireBodyMatchOrderForGet(t *testing.T, body *bytes.Buffer, order db.Orde
     require.Equal(t, order.Price, order.Price)
     require.Equal(t, order.Amount, gotOrder.Amount)
     require.Equal(t, order.FilledAmount, gotOrder.FilledAmount)
-    require.WithinDuration(t, order.CreatedAt.Time, gotOrder.CreatedAt.Time, time.Second)
+    require.WithinDuration(t, order.CreatedAt, gotOrder.CreatedAt, time.Second)
 }
 
 

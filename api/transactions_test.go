@@ -43,8 +43,8 @@ func TestCreateTransactionAPI(t *testing.T) {
                 "type":           transactionArgs.Type,
                 "currency":       transactionArgs.Currency,
                 "amount":         transactionArgs.Amount,
-                "address":        transactionArgs.Address.String,
-                "tx_hash":        transactionArgs.TxHash.String,
+                "address":        transactionArgs.Address,
+                "tx_hash":        transactionArgs.TxHash,
             },
             setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
                 addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
@@ -67,8 +67,8 @@ func TestCreateTransactionAPI(t *testing.T) {
                 "type":           transactionArgs.Type,
                 "currency":       transactionArgs.Currency,
                 "amount":         transactionArgs.Amount,
-                "address":        transactionArgs.Address.String,
-                "tx_hash":        transactionArgs.TxHash.String,
+                "address":        transactionArgs.Address,
+                "tx_hash":        transactionArgs.TxHash,
             },
             setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
                 addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
@@ -90,8 +90,8 @@ func TestCreateTransactionAPI(t *testing.T) {
                 "type":           transactionArgs.Type,
                 "currency":       "INVALID",
                 "amount":         transactionArgs.Amount,
-                "address":        transactionArgs.Address.String,
-                "tx_hash":        transactionArgs.TxHash.String,
+                "address":        transactionArgs.Address,
+                "tx_hash":        transactionArgs.TxHash,
             },
             setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
                 addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, transaction.Username, time.Minute)
@@ -450,7 +450,7 @@ func requireBodyMatchTransactions(t *testing.T, body *bytes.Buffer, transactionA
     require.Equal(t, transactionArgs.Status, gotTransaction.Status)
     require.Equal(t, transactionArgs.Address, gotTransaction.Address)
     require.Equal(t, transactionArgs.TxHash, gotTransaction.TxHash)
-    require.WithinDuration(t, transactionArgs.CreatedAt.Time, gotTransaction.CreatedAt.Time, time.Second)
+    require.WithinDuration(t, transactionArgs.CreatedAt, gotTransaction.CreatedAt, time.Second)
 }
 
 func createRandomTransaction() (transaction db.Transaction, transactionArgs db.CreateTransactionParams, transactionRow db.CreateTransactionRow) {
@@ -476,11 +476,11 @@ func createRandomTransaction() (transaction db.Transaction, transactionArgs db.C
 
 	randomAddress := []string{"x", "y", "z"}
 
-	address := sql.NullString{String: randomAddress[rand.Intn(len(randomAddress))], Valid: true}
+	address := randomAddress[rand.Intn(len(randomAddress))]
 
-	txHash := sql.NullString{String: RandomString(64), Valid: true}
+	txHash := RandomString(64)
 
-	createdAt := sql.NullTime{Time: time.Now(), Valid: true}
+	createdAt := time.Now()
 
 	transactions := db.Transaction{
 		ID: id,
@@ -541,11 +541,11 @@ func createRandomTransactionWithEmail(Email string) (transaction db.Transaction)
 
 	randomAddress := []string{"x", "y", "z"}
 
-	address := sql.NullString{String: randomAddress[rand.Intn(len(randomAddress))], Valid: true}
+	address := randomAddress[rand.Intn(len(randomAddress))]
 
-	txHash := sql.NullString{String: RandomString(64), Valid: true}
+	txHash := RandomString(64)
 
-	createdAt := sql.NullTime{Time: time.Now(), Valid: true}
+	createdAt := time.Now()
 
 	transactions := db.Transaction{
 		ID: id,

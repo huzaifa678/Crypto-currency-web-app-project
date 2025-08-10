@@ -44,9 +44,9 @@ func (server *server) createTrade(ctx *gin.Context) {
 		BuyOrderID:  req.BuyOrderID,
 		SellOrderID: req.SellOrderID,
 		MarketID:    req.MarketID,
-		Price:     req.Price,
-		Amount:    req.Amount,
-		Fee:       sql.NullString{String: req.Fee, Valid: req.Fee != ""},
+		Price:     	 req.Price,
+		Amount:    	 req.Amount,
+		Fee:       	 req.Fee,
 	}
 
 
@@ -131,6 +131,11 @@ func (server *server) deleteTrade(ctx *gin.Context) {
 func (server *server) listTrades(ctx *gin.Context) {
     id := ctx.Param("market_id")
 	marketID, err := uuid.Parse(id)
+
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
     trades, err := server.store.GetTradesByMarketID(ctx, marketID)
 

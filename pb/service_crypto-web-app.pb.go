@@ -27,29 +27,34 @@ var File_service_crypto_web_app_proto protoreflect.FileDescriptor
 
 const file_service_crypto_web_app_proto_rawDesc = "" +
 	"\n" +
-	"\x1cservice_crypto-web-app.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17rpc_create_market.proto\x1a\x17rpc_delete_market.proto\x1a\x14rpc_get_market.proto\x1a\x15rpc_list_market.proto\x1a\x16rpc_create_order.proto\x1a\x16rpc_delete_order.proto\x1a\x13rpc_get_order.proto\x1a\x15rpc_create_user.proto\x1a\x15rpc_delete_user.proto\x1a\x15rpc_update_user.proto\x1a\x12rpc_get_user.proto\x1a\x14rpc_login_user.proto\x1a\x17rpc_create_wallet.proto\x1a\x17rpc_delete_wallet.proto\x1a\x17rpc_update_wallet.proto\x1a\x14rpc_get_wallet.proto\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto2\xb9\v\n" +
-	"\fCryptoWebApp\x12W\n" +
+	"\x1cservice_crypto-web-app.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17rpc_create_market.proto\x1a\x17rpc_delete_market.proto\x1a\x14rpc_get_market.proto\x1a\x15rpc_list_market.proto\x1a\x16rpc_create_order.proto\x1a\x16rpc_delete_order.proto\x1a\x13rpc_get_order.proto\x1a\x15rpc_create_user.proto\x1a\x15rpc_delete_user.proto\x1a\x15rpc_update_user.proto\x1a\x12rpc_get_user.proto\x1a\x14rpc_login_user.proto\x1a\x17rpc_create_wallet.proto\x1a\x17rpc_delete_wallet.proto\x1a\x17rpc_update_wallet.proto\x1a\x14rpc_get_wallet.proto\x1a\x16rpc_verify_email.proto\x1a\x18rpc_binance_stream.proto\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto2\xc4\x14\n" +
+	"\fCryptoWebApp\x12\x95\x01\n" +
 	"\n" +
-	"CreateUser\x12\x15.pb.CreateUserRequest\x1a\x16.pb.CreateUserResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/create_user\x12X\n" +
+	"CreateUser\x12\x15.pb.CreateUserRequest\x1a\x16.pb.CreateUserResponse\"X\x92A;\x12\vCreate user\x1a,Create a new user with the specified details\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/create_user\x12\x80\x01\n" +
 	"\n" +
-	"DeleteUser\x12\x15.pb.DeleteUserRequest\x1a\x16.pb.DeleteUserResponse\"\x1b\x82\xd3\xe4\x93\x02\x15*\x13/v1/users/{user_id}\x12[\n" +
+	"DeleteUser\x12\x15.pb.DeleteUserRequest\x1a\x16.pb.DeleteUserResponse\"C\x92A%\x12\vDelete user\x1a\x16Delete user by user ID\x82\xd3\xe4\x93\x02\x15*\x13/v1/users/{user_id}\x12\x8b\x01\n" +
 	"\n" +
-	"UpdateUser\x12\x15.pb.UpdateUserRequest\x1a\x16.pb.UpdateUserResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*2\x13/v1/users/{user_id}\x12O\n" +
-	"\aGetUser\x12\x12.pb.GetUserRequest\x1a\x13.pb.GetUserResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/users/{user_id}\x12N\n" +
-	"\tLoginUser\x12\x14.pb.LoginUserRequest\x1a\x15.pb.LoginUserResponse\"\x14\x82\xd3\xe4\x93\x02\x0e:\x01*\"\t/v1/login\x12Y\n" +
-	"\fCreateMarket\x12\x17.pb.CreateMarketRequest\x1a\x18.pb.CreateMarketResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/markets\x12b\n" +
-	"\fDeleteMarket\x12\x17.pb.DeleteMarketRequest\x1a\x18.pb.DeleteMarketResponse\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/v1/markets/{market_id}\x12Y\n" +
-	"\tGetMarket\x12\x14.pb.GetMarketRequest\x1a\x15.pb.GetMarketResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/markets/{market_id}\x12Q\n" +
+	"UpdateUser\x12\x15.pb.UpdateUserRequest\x1a\x16.pb.UpdateUserResponse\"N\x92A-\x12\vUpdate user\x1a\x1eUpdate user details by user ID\x82\xd3\xe4\x93\x02\x18:\x01*2\x13/v1/users/{user_id}\x12y\n" +
+	"\aGetUser\x12\x12.pb.GetUserRequest\x1a\x13.pb.GetUserResponse\"E\x92A'\x12\bGet user\x1a\x1bGet user details by user ID\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/users/{user_id}\x12\xa6\x01\n" +
+	"\tLoginUser\x12\x14.pb.LoginUserRequest\x1a\x15.pb.LoginUserResponse\"l\x92AU\x12\n" +
+	"Login user\x1aGLogin with your user credentials and get access token and refresh token\x82\xd3\xe4\x93\x02\x0e:\x01*\"\t/v1/login\x12\x9b\x01\n" +
+	"\fCreateMarket\x12\x17.pb.CreateMarketRequest\x1a\x18.pb.CreateMarketResponse\"X\x92A?\x12\rCreate market\x1a.Create a new market with the specified details\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/markets\x12\x90\x01\n" +
+	"\fDeleteMarket\x12\x17.pb.DeleteMarketRequest\x1a\x18.pb.DeleteMarketResponse\"M\x92A+\x12\rDelete market\x1a\x1aDelete market by market ID\x82\xd3\xe4\x93\x02\x19*\x17/v1/markets/{market_id}\x12\x89\x01\n" +
+	"\tGetMarket\x12\x14.pb.GetMarketRequest\x1a\x15.pb.GetMarketResponse\"O\x92A-\x12\n" +
+	"Get market\x1a\x1fGet market details by market ID\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/markets/{market_id}\x12t\n" +
 	"\n" +
-	"MarketList\x12\x16.google.protobuf.Empty\x1a\x16.pb.MarketListResponse\"\x13\x82\xd3\xe4\x93\x02\r\x12\v/v1/markets\x12U\n" +
-	"\vCreateOrder\x12\x16.pb.CreateOrderRequest\x1a\x17.pb.CreateOrderResponse\"\x15\x82\xd3\xe4\x93\x02\x0f:\x01*\"\n" +
-	"/v1/orders\x12]\n" +
-	"\vDeleteOrder\x12\x16.pb.DeleteOrderRequest\x1a\x17.pb.DeleteOrderResponse\"\x1d\x82\xd3\xe4\x93\x02\x17*\x15/v1/orders/{order_id}\x12T\n" +
-	"\bGetOrder\x12\x13.pb.GetOrderRequest\x1a\x14.pb.GetOrderResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/orders/{order_id}\x12Y\n" +
-	"\fCreateWallet\x12\x17.pb.CreateWalletRequest\x1a\x18.pb.CreateWalletResponse\"\x16\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/wallets\x12b\n" +
-	"\fDeleteWallet\x12\x17.pb.DeleteWalletRequest\x1a\x18.pb.DeleteWalletResponse\"\x1f\x82\xd3\xe4\x93\x02\x19*\x17/v1/wallets/{wallet_id}\x12e\n" +
-	"\fUpdateWallet\x12\x17.pb.UpdateWalletRequest\x1a\x18.pb.UpdateWalletResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*2\x17/v1/wallets/{wallet_id}\x12Y\n" +
-	"\tGetWallet\x12\x14.pb.GetWalletRequest\x1a\x15.pb.GetWalletResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/wallets/{wallet_id}B\xa7\x01\x92Aj\x12h\n" +
+	"MarketList\x12\x16.google.protobuf.Empty\x1a\x16.pb.MarketListResponse\"6\x92A \x12\fList markets\x1a\x10List all markets\x82\xd3\xe4\x93\x02\r\x12\v/v1/markets\x12\x95\x01\n" +
+	"\vCreateOrder\x12\x16.pb.CreateOrderRequest\x1a\x17.pb.CreateOrderResponse\"U\x92A=\x12\fCreate order\x1a-Create a new order with the specified details\x82\xd3\xe4\x93\x02\x0f:\x01*\"\n" +
+	"/v1/orders\x12\x88\x01\n" +
+	"\vDeleteOrder\x12\x16.pb.DeleteOrderRequest\x1a\x17.pb.DeleteOrderResponse\"H\x92A(\x12\fDelete order\x1a\x18Delete order by order ID\x82\xd3\xe4\x93\x02\x17*\x15/v1/orders/{order_id}\x12\x81\x01\n" +
+	"\bGetOrder\x12\x13.pb.GetOrderRequest\x1a\x14.pb.GetOrderResponse\"J\x92A*\x12\tGet order\x1a\x1dGet order details by order ID\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/orders/{order_id}\x12\xa7\x01\n" +
+	"\fCreateWallet\x12\x17.pb.CreateWalletRequest\x1a\x18.pb.CreateWalletResponse\"d\x92AK\x12\rCreate wallet\x1a:Create a new wallet for a user with the specified currency\x82\xd3\xe4\x93\x02\x10:\x01*\"\v/v1/wallets\x12\x90\x01\n" +
+	"\fDeleteWallet\x12\x17.pb.DeleteWalletRequest\x1a\x18.pb.DeleteWalletResponse\"M\x92A+\x12\rDelete wallet\x1a\x1aDelete wallet by wallet ID\x82\xd3\xe4\x93\x02\x19*\x17/v1/wallets/{wallet_id}\x12\x9b\x01\n" +
+	"\fUpdateWallet\x12\x17.pb.UpdateWalletRequest\x1a\x18.pb.UpdateWalletResponse\"X\x92A3\x12\rUpdate wallet\x1a\"Update wallet details by wallet ID\x82\xd3\xe4\x93\x02\x1c:\x01*2\x17/v1/wallets/{wallet_id}\x12\x89\x01\n" +
+	"\tGetWallet\x12\x14.pb.GetWalletRequest\x1a\x15.pb.GetWalletResponse\"O\x92A-\x12\n" +
+	"Get wallet\x1a\x1fGet wallet details by wallet ID\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/wallets/{wallet_id}\x12\x9a\x01\n" +
+	"\vVerifyEmail\x12\x16.pb.VerifyEmailRequest\x1a\x17.pb.VerifyEmailResponse\"Z\x92A?\x12\fVerify email\x1a/Verify user email with the provided secret code\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/verify_email\x12\x88\x01\n" +
+	"\fStreamTrades\x12\x16.pb.TradeStreamRequest\x1a\t.pb.Trade\"S\x92A7\x12\rServer stream\x1a&Stream binance live data to the client\x82\xd3\xe4\x93\x02\x13\x12\x11/v1/stream_trades0\x01B\xa7\x01\x92Aj\x12h\n" +
 	"\x12Crypto web app API\"M\n" +
 	"\x12Huzaifa Ahmad Gill\x12\x1dhttps://github.com/huzaifa678\x1a\x18huzaifagill411@gmail.com2\x031.0Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"
 
@@ -70,22 +75,26 @@ var file_service_crypto_web_app_proto_goTypes = []any{
 	(*DeleteWalletRequest)(nil),  // 13: pb.DeleteWalletRequest
 	(*UpdateWalletRequest)(nil),  // 14: pb.UpdateWalletRequest
 	(*GetWalletRequest)(nil),     // 15: pb.GetWalletRequest
-	(*CreateUserResponse)(nil),   // 16: pb.CreateUserResponse
-	(*DeleteUserResponse)(nil),   // 17: pb.DeleteUserResponse
-	(*UpdateUserResponse)(nil),   // 18: pb.UpdateUserResponse
-	(*GetUserResponse)(nil),      // 19: pb.GetUserResponse
-	(*LoginUserResponse)(nil),    // 20: pb.LoginUserResponse
-	(*CreateMarketResponse)(nil), // 21: pb.CreateMarketResponse
-	(*DeleteMarketResponse)(nil), // 22: pb.DeleteMarketResponse
-	(*GetMarketResponse)(nil),    // 23: pb.GetMarketResponse
-	(*MarketListResponse)(nil),   // 24: pb.MarketListResponse
-	(*CreateOrderResponse)(nil),  // 25: pb.CreateOrderResponse
-	(*DeleteOrderResponse)(nil),  // 26: pb.DeleteOrderResponse
-	(*GetOrderResponse)(nil),     // 27: pb.GetOrderResponse
-	(*CreateWalletResponse)(nil), // 28: pb.CreateWalletResponse
-	(*DeleteWalletResponse)(nil), // 29: pb.DeleteWalletResponse
-	(*UpdateWalletResponse)(nil), // 30: pb.UpdateWalletResponse
-	(*GetWalletResponse)(nil),    // 31: pb.GetWalletResponse
+	(*VerifyEmailRequest)(nil),   // 16: pb.VerifyEmailRequest
+	(*TradeStreamRequest)(nil),   // 17: pb.TradeStreamRequest
+	(*CreateUserResponse)(nil),   // 18: pb.CreateUserResponse
+	(*DeleteUserResponse)(nil),   // 19: pb.DeleteUserResponse
+	(*UpdateUserResponse)(nil),   // 20: pb.UpdateUserResponse
+	(*GetUserResponse)(nil),      // 21: pb.GetUserResponse
+	(*LoginUserResponse)(nil),    // 22: pb.LoginUserResponse
+	(*CreateMarketResponse)(nil), // 23: pb.CreateMarketResponse
+	(*DeleteMarketResponse)(nil), // 24: pb.DeleteMarketResponse
+	(*GetMarketResponse)(nil),    // 25: pb.GetMarketResponse
+	(*MarketListResponse)(nil),   // 26: pb.MarketListResponse
+	(*CreateOrderResponse)(nil),  // 27: pb.CreateOrderResponse
+	(*DeleteOrderResponse)(nil),  // 28: pb.DeleteOrderResponse
+	(*GetOrderResponse)(nil),     // 29: pb.GetOrderResponse
+	(*CreateWalletResponse)(nil), // 30: pb.CreateWalletResponse
+	(*DeleteWalletResponse)(nil), // 31: pb.DeleteWalletResponse
+	(*UpdateWalletResponse)(nil), // 32: pb.UpdateWalletResponse
+	(*GetWalletResponse)(nil),    // 33: pb.GetWalletResponse
+	(*VerifyEmailResponse)(nil),  // 34: pb.VerifyEmailResponse
+	(*Trade)(nil),                // 35: pb.Trade
 }
 var file_service_crypto_web_app_proto_depIdxs = []int32{
 	0,  // 0: pb.CryptoWebApp.CreateUser:input_type -> pb.CreateUserRequest
@@ -104,24 +113,28 @@ var file_service_crypto_web_app_proto_depIdxs = []int32{
 	13, // 13: pb.CryptoWebApp.DeleteWallet:input_type -> pb.DeleteWalletRequest
 	14, // 14: pb.CryptoWebApp.UpdateWallet:input_type -> pb.UpdateWalletRequest
 	15, // 15: pb.CryptoWebApp.GetWallet:input_type -> pb.GetWalletRequest
-	16, // 16: pb.CryptoWebApp.CreateUser:output_type -> pb.CreateUserResponse
-	17, // 17: pb.CryptoWebApp.DeleteUser:output_type -> pb.DeleteUserResponse
-	18, // 18: pb.CryptoWebApp.UpdateUser:output_type -> pb.UpdateUserResponse
-	19, // 19: pb.CryptoWebApp.GetUser:output_type -> pb.GetUserResponse
-	20, // 20: pb.CryptoWebApp.LoginUser:output_type -> pb.LoginUserResponse
-	21, // 21: pb.CryptoWebApp.CreateMarket:output_type -> pb.CreateMarketResponse
-	22, // 22: pb.CryptoWebApp.DeleteMarket:output_type -> pb.DeleteMarketResponse
-	23, // 23: pb.CryptoWebApp.GetMarket:output_type -> pb.GetMarketResponse
-	24, // 24: pb.CryptoWebApp.MarketList:output_type -> pb.MarketListResponse
-	25, // 25: pb.CryptoWebApp.CreateOrder:output_type -> pb.CreateOrderResponse
-	26, // 26: pb.CryptoWebApp.DeleteOrder:output_type -> pb.DeleteOrderResponse
-	27, // 27: pb.CryptoWebApp.GetOrder:output_type -> pb.GetOrderResponse
-	28, // 28: pb.CryptoWebApp.CreateWallet:output_type -> pb.CreateWalletResponse
-	29, // 29: pb.CryptoWebApp.DeleteWallet:output_type -> pb.DeleteWalletResponse
-	30, // 30: pb.CryptoWebApp.UpdateWallet:output_type -> pb.UpdateWalletResponse
-	31, // 31: pb.CryptoWebApp.GetWallet:output_type -> pb.GetWalletResponse
-	16, // [16:32] is the sub-list for method output_type
-	0,  // [0:16] is the sub-list for method input_type
+	16, // 16: pb.CryptoWebApp.VerifyEmail:input_type -> pb.VerifyEmailRequest
+	17, // 17: pb.CryptoWebApp.StreamTrades:input_type -> pb.TradeStreamRequest
+	18, // 18: pb.CryptoWebApp.CreateUser:output_type -> pb.CreateUserResponse
+	19, // 19: pb.CryptoWebApp.DeleteUser:output_type -> pb.DeleteUserResponse
+	20, // 20: pb.CryptoWebApp.UpdateUser:output_type -> pb.UpdateUserResponse
+	21, // 21: pb.CryptoWebApp.GetUser:output_type -> pb.GetUserResponse
+	22, // 22: pb.CryptoWebApp.LoginUser:output_type -> pb.LoginUserResponse
+	23, // 23: pb.CryptoWebApp.CreateMarket:output_type -> pb.CreateMarketResponse
+	24, // 24: pb.CryptoWebApp.DeleteMarket:output_type -> pb.DeleteMarketResponse
+	25, // 25: pb.CryptoWebApp.GetMarket:output_type -> pb.GetMarketResponse
+	26, // 26: pb.CryptoWebApp.MarketList:output_type -> pb.MarketListResponse
+	27, // 27: pb.CryptoWebApp.CreateOrder:output_type -> pb.CreateOrderResponse
+	28, // 28: pb.CryptoWebApp.DeleteOrder:output_type -> pb.DeleteOrderResponse
+	29, // 29: pb.CryptoWebApp.GetOrder:output_type -> pb.GetOrderResponse
+	30, // 30: pb.CryptoWebApp.CreateWallet:output_type -> pb.CreateWalletResponse
+	31, // 31: pb.CryptoWebApp.DeleteWallet:output_type -> pb.DeleteWalletResponse
+	32, // 32: pb.CryptoWebApp.UpdateWallet:output_type -> pb.UpdateWalletResponse
+	33, // 33: pb.CryptoWebApp.GetWallet:output_type -> pb.GetWalletResponse
+	34, // 34: pb.CryptoWebApp.VerifyEmail:output_type -> pb.VerifyEmailResponse
+	35, // 35: pb.CryptoWebApp.StreamTrades:output_type -> pb.Trade
+	18, // [18:36] is the sub-list for method output_type
+	0,  // [0:18] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -148,6 +161,8 @@ func file_service_crypto_web_app_proto_init() {
 	file_rpc_delete_wallet_proto_init()
 	file_rpc_update_wallet_proto_init()
 	file_rpc_get_wallet_proto_init()
+	file_rpc_verify_email_proto_init()
+	file_rpc_binance_stream_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

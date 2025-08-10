@@ -16,46 +16,54 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/worker"
+	mockwk "github.com/huzaifa678/Crypto-currency-web-app-project/worker/mock"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-type eqCreateUserParamsMatcher struct {
-	arg      db.CreateUserParams
+type eqCreateUserTxParamsMatcher struct {
+	arg      db.CreateUserTxParams
+	password string
+	user db.CreateUserRow
 }
 
-func (e eqCreateUserParamsMatcher) Matches(x interface{}) bool {
-	arg, ok := x.(db.CreateUserParams)
+func (expected eqCreateUserTxParamsMatcher) Matches(x interface{}) bool {
+	actualArg, ok := x.(db.CreateUserTxParams)
 	if !ok {
 		return false
 	}
 
-	log.Println("PASSWORD", e.arg.PasswordHash)
-	log.Println("ARGS", arg)
-
-	
-
-	if err := utils.ComparePasswords(arg.PasswordHash, e.arg.PasswordHash); err != nil {
-		log.Println("password mismatch:", err)
+	if err := utils.ComparePasswords(actualArg.PasswordHash, expected.password); err != nil {
+		log.Printf("error in comparing crypto/bcrypt: %v", err)
 		return false
 	}
 
-	e.arg.PasswordHash = arg.PasswordHash
-	return reflect.DeepEqual(e.arg, arg)
+	expected.arg.PasswordHash = actualArg.PasswordHash
+
+	log.Println("expected.arg: ", expected.arg.CreateUserParams)
+	log.Println("actualArg: ", actualArg.CreateUserParams)
+
+	if !reflect.DeepEqual(expected.arg.CreateUserParams, actualArg.CreateUserParams) {
+		return false
+	}
+
+	err := actualArg.AfterCreate(expected.user)
+	return err == nil
 }
 
-func (e eqCreateUserParamsMatcher) String() string {
-	return fmt.Sprintf("matches arg %v", e.arg)
+func (e eqCreateUserTxParamsMatcher) String() string {
+	return fmt.Sprintf("matches arg %v and password %v", e.arg, e.password)
 }
 
-func EqCreateUserParams(arg db.CreateUserParams) gomock.Matcher {
-	return eqCreateUserParamsMatcher{arg}
+func EqCreateUserTxParams(arg db.CreateUserTxParams, password string, user db.CreateUserRow) gomock.Matcher {
+	return eqCreateUserTxParamsMatcher{arg, password, user}
 }
 
 func TestCreateUserAPI(t *testing.T) {
-	userArgs, user, userRows, _, userEmailGetArgs, password := createRandomUser()
+	userArgs, user, userRows, _, _, password := createRandomUser()
 
 	log.Println("userArgs.email: ", userArgs.Email)
 	log.Println("password: ", password)
@@ -64,7 +72,7 @@ func TestCreateUserAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          *pb.CreateUserRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor)
 		checkResponse func(t *testing.T, res *pb.CreateUserResponse, err error)
 	}{
 		{
@@ -75,22 +83,34 @@ func TestCreateUserAPI(t *testing.T) {
 				Password: 	   password,
 				Role:          pb.UserRole_USER_ROLE_USER,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor) {
+				arg := db.CreateUserTxParams{
+					CreateUserParams: db.CreateUserParams{
+						Username: user.Username,
+						Email:    user.Email,
+						PasswordHash: password,
+						Role:     db.UserRole(pb.UserRole_USER_ROLE_USER.String()),
+						IsVerified: userArgs.IsVerified,
+					},
+				}
 				store.EXPECT().
-                    GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
-                    Times(1).
-                    Return(userEmailGetArgs, db.ErrRecordNotFound)
-
-				store.EXPECT().
-					CreateUser(gomock.Any(), EqCreateUserParams(userArgs)).
+					CreateUserTx(gomock.Any(), EqCreateUserTxParams(arg, password, userRows)).
 					Times(1).
-					Return(userRows, nil)
+					Return(db.CreateUserTxResult{CreateUserRow: userRows}, nil)
+
+				taskPayload := &worker.PayloadSendVerifyEmail{
+					Email: userRows.Email,
+				}
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), taskPayload, gomock.Any()).
+					Times(1).
+					Return(nil)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
-				log.Println("ERROR: ", err)
 				require.NoError(t, err)
 				require.NotNil(t, res)
-				require.Equal(t, user.ID.String(), res.UserId)
+				createdUserId := res.GetUserId()
+				require.NotEmpty(t, createdUserId)
 			},
 		},
 		{
@@ -101,16 +121,17 @@ func TestCreateUserAPI(t *testing.T) {
 				Password:      password,
 				Role:          pb.UserRole_USER_ROLE_USER,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
-				store.EXPECT().
-                    GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
-                    Times(1).
-                    Return(userEmailGetArgs, db.ErrRecordNotFound)
+			buildStubs: func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor) {
+				
 
 				store.EXPECT().
-					CreateUser(gomock.Any(), EqCreateUserParams(userArgs)).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(userRows, db.ErrRecordNotFound)
+					Return(db.CreateUserTxResult{}, sql.ErrConnDone)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(0)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
 				log.Println("ERROR: ", err)
@@ -128,16 +149,15 @@ func TestCreateUserAPI(t *testing.T) {
 				Password:      password,
 				Role:          pb.UserRole_USER_ROLE_USER,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor) {		
 				store.EXPECT().
-                    GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
-                    Times(1).
-                    Return(userEmailGetArgs, db.ErrRecordNotFound)
-
-				store.EXPECT().
-					CreateUser(gomock.Any(), EqCreateUserParams(userArgs)).
+					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(userRows, &pq.Error{Code: "23505"})
+					Return(db.CreateUserTxResult{}, &pq.Error{Code: "23505"})
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
+					Times(0)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
 				log.Println("ERROR: ", err)
@@ -155,9 +175,13 @@ func TestCreateUserAPI(t *testing.T) {
 				Password:    userArgs.PasswordHash,
 				Role:        pb.UserRole_USER_ROLE_USER,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
@@ -176,9 +200,13 @@ func TestCreateUserAPI(t *testing.T) {
 				Password:    "123",
 				Role:        pb.UserRole_USER_ROLE_USER,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
-					CreateUser(gomock.Any(), gomock.Any()).
+					CreateUserTx(gomock.Any(), gomock.Any()).
+					Times(0)
+
+				taskDistributor.EXPECT().
+					DistributeTaskSendVerifyEmail(gomock.Any(), gomock.Any(), gomock.Any()).
 					Times(0)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateUserResponse, err error) {
@@ -195,13 +223,16 @@ func TestCreateUserAPI(t *testing.T) {
 		tc := testCases[i]
 
 		t.Run(tc.name, func(t *testing.T) {
-			ctrl := gomock.NewController(t)
-			defer ctrl.Finish()
+			storeCtrl := gomock.NewController(t)
+			defer storeCtrl.Finish()
+			store := mockdb.NewMockStore_interface(storeCtrl)
 
-			store := mockdb.NewMockStore_interface(ctrl)
-			tc.buildStubs(store)
+			taskCtrl := gomock.NewController(t)
+			defer taskCtrl.Finish()
+			taskDistributor := mockwk.NewMockTaskDistributor(taskCtrl)
 
-            server := NewTestServer(t, store)
+			tc.buildStubs(store, taskDistributor)
+			server := NewTestServer(t, store, taskDistributor)
 
 			res, err := server.CreateUser(context.Background(), tc.body)
 			tc.checkResponse(t, res, err)
@@ -214,17 +245,17 @@ func createRandomUser() (
 	db.GetUserByIDRow, db.GetUserByEmailRow, string, 
 ) {
 	randomEmail := fmt.Sprintf("testing%d@example.com", rand.Intn(1000))
-	password := utils.RandomString(20)
+	password := fmt.Sprintf("password%d", rand.Intn(20))
 	hashedPassword, _ := utils.HashPassword(password)
 
-	username := RandomUsername(10)
+	username := fmt.Sprintf("usertesting%d", rand.Intn(100))
 
 	userArgs := db.CreateUserParams{
 		Username:    username,
 		Email:       randomEmail,
-		PasswordHash: password,
+		PasswordHash: hashedPassword, 
 		Role:        db.UserRole(pb.UserRole_USER_ROLE_USER.String()),
-		IsVerified:  sql.NullBool{Bool: true, Valid: true},
+		IsVerified:  true,
 	}
 
 	user := db.User{
@@ -232,7 +263,7 @@ func createRandomUser() (
 		Username:     username,
 		Email:        randomEmail,
 		PasswordHash: hashedPassword,
-		Role:         db.UserRole("user"),
+		Role:         db.UserRole(pb.UserRole_USER_ROLE_USER.String()), 
 		IsVerified:   userArgs.IsVerified,
 	}
 
@@ -242,8 +273,8 @@ func createRandomUser() (
 		ID:         user.ID,
 		Username:   user.Username,
 		Email:      user.Email,
-		CreatedAt:  sql.NullTime{Time: now, Valid: true},
-		UpdatedAt:  sql.NullTime{Time: now, Valid: true},
+		CreatedAt:  now,
+		UpdatedAt:  now,
 		Role:       user.Role,
 		IsVerified: user.IsVerified,
 	}
@@ -253,8 +284,8 @@ func createRandomUser() (
 		Username:     user.Username,
 		Email:        user.Email,
 		PasswordHash: hashedPassword,
-		CreatedAt:    sql.NullTime{Time: now, Valid: true},
-		UpdatedAt:    sql.NullTime{Time: now, Valid: true},
+		CreatedAt:    now,
+		UpdatedAt:    now,
 		Role:         user.Role,
 		IsVerified:   user.IsVerified,
 	}
@@ -264,8 +295,8 @@ func createRandomUser() (
 		Username:     user.Username,
 		Email:        user.Email,
 		PasswordHash: hashedPassword,
-		CreatedAt:    sql.NullTime{Time: now, Valid: true},
-		UpdatedAt:    sql.NullTime{Time: now, Valid: true},
+		CreatedAt:    now,
+		UpdatedAt:    now,
 		Role:         user.Role,
 		IsVerified:   user.IsVerified,
 	}
