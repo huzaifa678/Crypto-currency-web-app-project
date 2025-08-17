@@ -614,6 +614,244 @@ func request_CryptoWebApp_StreamTrades_0(ctx context.Context, marshaler runtime.
 	return stream, metadata, nil
 }
 
+func request_CryptoWebApp_CreateTrade_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoWebAppClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq CreateTradeRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.CreateTrade(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CryptoWebApp_CreateTrade_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoWebAppServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq CreateTradeRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.CreateTrade(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_CryptoWebApp_GetTrade_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoWebAppClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetTradeByIDRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	io.Copy(io.Discard, req.Body)
+	val, ok := pathParams["trade_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trade_id")
+	}
+	protoReq.TradeId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trade_id", err)
+	}
+	msg, err := client.GetTrade(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CryptoWebApp_GetTrade_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoWebAppServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetTradeByIDRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["trade_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trade_id")
+	}
+	protoReq.TradeId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trade_id", err)
+	}
+	msg, err := server.GetTrade(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_CryptoWebApp_DeleteTrade_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoWebAppClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DeleteTradeRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	io.Copy(io.Discard, req.Body)
+	val, ok := pathParams["trade_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trade_id")
+	}
+	protoReq.TradeId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trade_id", err)
+	}
+	msg, err := client.DeleteTrade(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CryptoWebApp_DeleteTrade_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoWebAppServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DeleteTradeRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["trade_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "trade_id")
+	}
+	protoReq.TradeId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "trade_id", err)
+	}
+	msg, err := server.DeleteTrade(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_CryptoWebApp_CreateTransaction_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoWebAppClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq CreateTransactionRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.CreateTransaction(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CryptoWebApp_CreateTransaction_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoWebAppServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq CreateTransactionRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.CreateTransaction(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_CryptoWebApp_GetTransaction_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoWebAppClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetTransactionByIDRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	io.Copy(io.Discard, req.Body)
+	val, ok := pathParams["transaction_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "transaction_id")
+	}
+	protoReq.TransactionId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "transaction_id", err)
+	}
+	msg, err := client.GetTransaction(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CryptoWebApp_GetTransaction_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoWebAppServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetTransactionByIDRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["transaction_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "transaction_id")
+	}
+	protoReq.TransactionId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "transaction_id", err)
+	}
+	msg, err := server.GetTransaction(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_CryptoWebApp_UpdateTransactionStatus_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoWebAppClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq UpdateTransactionStatusRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["transaction_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "transaction_id")
+	}
+	protoReq.TransactionId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "transaction_id", err)
+	}
+	msg, err := client.UpdateTransactionStatus(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CryptoWebApp_UpdateTransactionStatus_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoWebAppServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq UpdateTransactionStatusRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil && !errors.Is(err, io.EOF) {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	val, ok := pathParams["transaction_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "transaction_id")
+	}
+	protoReq.TransactionId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "transaction_id", err)
+	}
+	msg, err := server.UpdateTransactionStatus(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_CryptoWebApp_DeleteTransaction_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoWebAppClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DeleteTransactionRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	io.Copy(io.Discard, req.Body)
+	val, ok := pathParams["transaction_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "transaction_id")
+	}
+	protoReq.TransactionId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "transaction_id", err)
+	}
+	msg, err := client.DeleteTransaction(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CryptoWebApp_DeleteTransaction_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoWebAppServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq DeleteTransactionRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["transaction_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "transaction_id")
+	}
+	protoReq.TransactionId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "transaction_id", err)
+	}
+	msg, err := server.DeleteTransaction(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 // RegisterCryptoWebAppHandlerServer registers the http handlers for service CryptoWebApp to "mux".
 // UnaryRPC     :call CryptoWebAppServer directly.
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
@@ -967,6 +1205,146 @@ func RegisterCryptoWebAppHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 		return
 	})
+	mux.Handle(http.MethodPost, pattern_CryptoWebApp_CreateTrade_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/CreateTrade", runtime.WithHTTPPathPattern("/v1/trades"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoWebApp_CreateTrade_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_CreateTrade_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_CryptoWebApp_GetTrade_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/GetTrade", runtime.WithHTTPPathPattern("/v1/trades/{trade_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoWebApp_GetTrade_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_GetTrade_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodDelete, pattern_CryptoWebApp_DeleteTrade_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/DeleteTrade", runtime.WithHTTPPathPattern("/v1/trades/{trade_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoWebApp_DeleteTrade_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_DeleteTrade_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_CryptoWebApp_CreateTransaction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/CreateTransaction", runtime.WithHTTPPathPattern("/v1/transactions"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoWebApp_CreateTransaction_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_CreateTransaction_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_CryptoWebApp_GetTransaction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/GetTransaction", runtime.WithHTTPPathPattern("/v1/transactions/{transaction_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoWebApp_GetTransaction_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_GetTransaction_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPatch, pattern_CryptoWebApp_UpdateTransactionStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/UpdateTransactionStatus", runtime.WithHTTPPathPattern("/v1/transactions/{transaction_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoWebApp_UpdateTransactionStatus_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_UpdateTransactionStatus_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodDelete, pattern_CryptoWebApp_DeleteTransaction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/DeleteTransaction", runtime.WithHTTPPathPattern("/v1/transactions/{transaction_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoWebApp_DeleteTransaction_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_DeleteTransaction_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 
 	return nil
 }
@@ -1313,47 +1691,180 @@ func RegisterCryptoWebAppHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		}
 		forward_CryptoWebApp_StreamTrades_0(annotatedContext, mux, outboundMarshaler, w, req, func() (proto.Message, error) { return resp.Recv() }, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodPost, pattern_CryptoWebApp_CreateTrade_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/CreateTrade", runtime.WithHTTPPathPattern("/v1/trades"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoWebApp_CreateTrade_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_CreateTrade_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_CryptoWebApp_GetTrade_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/GetTrade", runtime.WithHTTPPathPattern("/v1/trades/{trade_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoWebApp_GetTrade_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_GetTrade_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodDelete, pattern_CryptoWebApp_DeleteTrade_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/DeleteTrade", runtime.WithHTTPPathPattern("/v1/trades/{trade_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoWebApp_DeleteTrade_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_DeleteTrade_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPost, pattern_CryptoWebApp_CreateTransaction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/CreateTransaction", runtime.WithHTTPPathPattern("/v1/transactions"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoWebApp_CreateTransaction_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_CreateTransaction_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_CryptoWebApp_GetTransaction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/GetTransaction", runtime.WithHTTPPathPattern("/v1/transactions/{transaction_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoWebApp_GetTransaction_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_GetTransaction_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodPatch, pattern_CryptoWebApp_UpdateTransactionStatus_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/UpdateTransactionStatus", runtime.WithHTTPPathPattern("/v1/transactions/{transaction_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoWebApp_UpdateTransactionStatus_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_UpdateTransactionStatus_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodDelete, pattern_CryptoWebApp_DeleteTransaction_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/DeleteTransaction", runtime.WithHTTPPathPattern("/v1/transactions/{transaction_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoWebApp_DeleteTransaction_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_DeleteTransaction_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	return nil
 }
 
 var (
-	pattern_CryptoWebApp_CreateUser_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "create_user"}, ""))
-	pattern_CryptoWebApp_DeleteUser_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "users", "user_id"}, ""))
-	pattern_CryptoWebApp_UpdateUser_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "users", "user_id"}, ""))
-	pattern_CryptoWebApp_GetUser_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "users", "user_id"}, ""))
-	pattern_CryptoWebApp_LoginUser_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "login"}, ""))
-	pattern_CryptoWebApp_CreateMarket_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "markets"}, ""))
-	pattern_CryptoWebApp_DeleteMarket_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "markets", "market_id"}, ""))
-	pattern_CryptoWebApp_GetMarket_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "markets", "market_id"}, ""))
-	pattern_CryptoWebApp_MarketList_0   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "markets"}, ""))
-	pattern_CryptoWebApp_CreateOrder_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "orders"}, ""))
-	pattern_CryptoWebApp_DeleteOrder_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "orders", "order_id"}, ""))
-	pattern_CryptoWebApp_GetOrder_0     = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "orders", "order_id"}, ""))
-	pattern_CryptoWebApp_CreateWallet_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "wallets"}, ""))
-	pattern_CryptoWebApp_DeleteWallet_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "wallets", "wallet_id"}, ""))
-	pattern_CryptoWebApp_UpdateWallet_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "wallets", "wallet_id"}, ""))
-	pattern_CryptoWebApp_GetWallet_0    = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "wallets", "wallet_id"}, ""))
-	pattern_CryptoWebApp_VerifyEmail_0  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "verify_email"}, ""))
-	pattern_CryptoWebApp_StreamTrades_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "stream_trades"}, ""))
+	pattern_CryptoWebApp_CreateUser_0              = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "create_user"}, ""))
+	pattern_CryptoWebApp_DeleteUser_0              = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "users", "user_id"}, ""))
+	pattern_CryptoWebApp_UpdateUser_0              = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "users", "user_id"}, ""))
+	pattern_CryptoWebApp_GetUser_0                 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "users", "user_id"}, ""))
+	pattern_CryptoWebApp_LoginUser_0               = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "login"}, ""))
+	pattern_CryptoWebApp_CreateMarket_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "markets"}, ""))
+	pattern_CryptoWebApp_DeleteMarket_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "markets", "market_id"}, ""))
+	pattern_CryptoWebApp_GetMarket_0               = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "markets", "market_id"}, ""))
+	pattern_CryptoWebApp_MarketList_0              = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "markets"}, ""))
+	pattern_CryptoWebApp_CreateOrder_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "orders"}, ""))
+	pattern_CryptoWebApp_DeleteOrder_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "orders", "order_id"}, ""))
+	pattern_CryptoWebApp_GetOrder_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "orders", "order_id"}, ""))
+	pattern_CryptoWebApp_CreateWallet_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "wallets"}, ""))
+	pattern_CryptoWebApp_DeleteWallet_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "wallets", "wallet_id"}, ""))
+	pattern_CryptoWebApp_UpdateWallet_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "wallets", "wallet_id"}, ""))
+	pattern_CryptoWebApp_GetWallet_0               = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "wallets", "wallet_id"}, ""))
+	pattern_CryptoWebApp_VerifyEmail_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "verify_email"}, ""))
+	pattern_CryptoWebApp_StreamTrades_0            = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "stream_trades"}, ""))
+	pattern_CryptoWebApp_CreateTrade_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "trades"}, ""))
+	pattern_CryptoWebApp_GetTrade_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "trades", "trade_id"}, ""))
+	pattern_CryptoWebApp_DeleteTrade_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "trades", "trade_id"}, ""))
+	pattern_CryptoWebApp_CreateTransaction_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "transactions"}, ""))
+	pattern_CryptoWebApp_GetTransaction_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "transactions", "transaction_id"}, ""))
+	pattern_CryptoWebApp_UpdateTransactionStatus_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "transactions", "transaction_id"}, ""))
+	pattern_CryptoWebApp_DeleteTransaction_0       = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "transactions", "transaction_id"}, ""))
 )
 
 var (
-	forward_CryptoWebApp_CreateUser_0   = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_DeleteUser_0   = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_UpdateUser_0   = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_GetUser_0      = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_LoginUser_0    = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_CreateMarket_0 = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_DeleteMarket_0 = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_GetMarket_0    = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_MarketList_0   = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_CreateOrder_0  = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_DeleteOrder_0  = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_GetOrder_0     = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_CreateWallet_0 = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_DeleteWallet_0 = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_UpdateWallet_0 = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_GetWallet_0    = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_VerifyEmail_0  = runtime.ForwardResponseMessage
-	forward_CryptoWebApp_StreamTrades_0 = runtime.ForwardResponseStream
+	forward_CryptoWebApp_CreateUser_0              = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_DeleteUser_0              = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_UpdateUser_0              = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_GetUser_0                 = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_LoginUser_0               = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_CreateMarket_0            = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_DeleteMarket_0            = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_GetMarket_0               = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_MarketList_0              = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_CreateOrder_0             = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_DeleteOrder_0             = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_GetOrder_0                = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_CreateWallet_0            = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_DeleteWallet_0            = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_UpdateWallet_0            = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_GetWallet_0               = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_VerifyEmail_0             = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_StreamTrades_0            = runtime.ForwardResponseStream
+	forward_CryptoWebApp_CreateTrade_0             = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_GetTrade_0                = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_DeleteTrade_0             = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_CreateTransaction_0       = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_GetTransaction_0          = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_UpdateTransactionStatus_0 = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_DeleteTransaction_0       = runtime.ForwardResponseMessage
 )

@@ -21,6 +21,13 @@ import "rpc_update_wallet.proto";
 import "rpc_get_wallet.proto";
 import "rpc_verify_email.proto";
 import "rpc_binance_stream.proto";
+import "rpc_create_trade.proto";
+import "rpc_get_trade.proto";
+import "rpc_delete_trade.proto";
+import "rpc_create_transaction.proto";
+import "rpc_get_transaction.proto";
+import "rpc_update_transaction.proto";
+import "rpc_delete_transaction.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -242,4 +249,85 @@ service CryptoWebApp {
             summary: "Server stream"
         };
     }
+
+    rpc CreateTrade(CreateTradeRequest) returns (CreateTradeResponse) {
+
+        option (google.api.http) = {
+            post: "/v1/trades"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Create a new trade for the user";
+            summary: "Create Trade"
+        };
+    }
+
+    rpc GetTrade(GetTradeByIDRequest) returns (GetTradeByIDResponse) {
+
+        option (google.api.http) = {
+            get: "/v1/trades/{trade_id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Get the trade details by the trade id"
+            summary: "Get Trade"
+        };
+    }
+    
+    rpc DeleteTrade(DeleteTradeRequest) returns (DeleteTradeResponse) {
+
+        option (google.api.http) = {
+            delete: "/v1/trades/{trade_id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Delete trade by the trade id"
+            summary: "Delete trade"
+        };
+    }
+
+    rpc CreateTransaction(CreateTransactionRequest) returns (CreateTransactionResponse) {
+        
+        option (google.api.http) = {
+            post: "/v1/transactions"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Create the transaction for the user"
+            summary: "Create Transaction"
+        };
+    }
+
+
+    rpc GetTransaction(GetTransactionByIDRequest) returns (GetTransactionByIDResponse) {
+        
+        option (google.api.http) = {
+            get: "/v1/transactions/{transaction_id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Get the transaction for the user"
+            summary: "Get Transaction"
+        };
+    }
+
+    rpc UpdateTransactionStatus(UpdateTransactionStatusRequest) returns (UpdateTransactionStatusResponse) {
+
+        option (google.api.http) = {
+            patch: "/v1/transactions/{transaction_id}"
+            body: "*"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Update the transaction status for the user"
+            summary: "Update Transaction status"
+        };
+    }
+    rpc DeleteTransaction(DeleteTransactionRequest) returns (DeleteTransactionResponse) {
+
+        option (google.api.http) = {
+            delete: "/v1/transactions/{transaction_id}"
+        };
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Delete the transaction for the user"
+            summary: "Delete Transaction"
+        };
+    }
+
 }

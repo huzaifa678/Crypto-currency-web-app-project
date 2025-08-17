@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";   
+
+message DeleteTradeRequest {
+  string trade_id = 1;
+}
+
+message DeleteTradeResponse {
+  string success = 1;
+}

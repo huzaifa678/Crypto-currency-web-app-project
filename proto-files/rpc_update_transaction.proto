@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+import "transaction.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+
+message UpdateTransactionStatusRequest {
+  string transaction_id = 1;
+  TransactionStatus status = 2;
+}
+
+message UpdateTransactionStatusResponse {
+    string success = 1;
+}

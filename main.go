@@ -52,7 +52,7 @@ func main() {
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), interruptSignals...)
-	defer stop()
+	defer stop() 
 
 	connPool, err := pgxpool.New(ctx, config.Dbsource)
 	if err != nil {
@@ -66,6 +66,7 @@ func main() {
 	redisOpt := asynq.RedisClientOpt{
 		Addr: config.RedisAddr,
 	}
+
 
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
 
@@ -148,6 +149,7 @@ func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, config utils.
 
 		return nil
 	})
+
 
 	waitGroup.Go(func() error {
 		<-ctx.Done()

@@ -53,7 +53,7 @@ func (server *server) DeleteOrder(ctx context.Context, req *pb.DeleteOrderReques
 		if errors.Is(err, db.ErrRecordNotFound) {
 			return nil, status.Errorf(codes.NotFound, "order not found")
 		}
-		return nil, status.Errorf(codes.Internal, "failed to find the order for the user")
+		return nil, status.Errorf(codes.Internal, "failed to delete the order for the user")
 	}
 
 	res := &pb.DeleteOrderResponse {

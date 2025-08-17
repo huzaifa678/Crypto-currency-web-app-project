@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message Trades {
+  string trade_id = 1;
+  string username = 2;
+  string buy_order_id = 3;
+  string sell_order_id = 4;
+  string market_id = 5;
+  string price = 6;
+  string amount = 7;
+  string fee = 8;
+  google.protobuf.Timestamp created_at = 9;
+}

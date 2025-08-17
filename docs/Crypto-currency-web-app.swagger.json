@@ -348,6 +348,236 @@
         ]
       }
     },
+    "/v1/trades": {
+      "post": {
+        "summary": "Create Trade",
+        "description": "Create a new trade for the user",
+        "operationId": "CryptoWebApp_CreateTrade",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateTradeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateTradeRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
+    "/v1/trades/{tradeId}": {
+      "get": {
+        "summary": "Get Trade",
+        "description": "Get the trade details by the trade id",
+        "operationId": "CryptoWebApp_GetTrade",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetTradeByIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tradeId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      },
+      "delete": {
+        "summary": "Delete trade",
+        "description": "Delete trade by the trade id",
+        "operationId": "CryptoWebApp_DeleteTrade",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbDeleteTradeResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tradeId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
+    "/v1/transactions": {
+      "post": {
+        "summary": "Create Transaction",
+        "description": "Create the transaction for the user",
+        "operationId": "CryptoWebApp_CreateTransaction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbCreateTransactionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbCreateTransactionRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
+    "/v1/transactions/{transactionId}": {
+      "get": {
+        "summary": "Get Transaction",
+        "description": "Get the transaction for the user",
+        "operationId": "CryptoWebApp_GetTransaction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetTransactionByIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      },
+      "delete": {
+        "summary": "Delete Transaction",
+        "description": "Delete the transaction for the user",
+        "operationId": "CryptoWebApp_DeleteTransaction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbDeleteTransactionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      },
+      "patch": {
+        "summary": "Update Transaction status",
+        "description": "Update the transaction status for the user",
+        "operationId": "CryptoWebApp_UpdateTransactionStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbUpdateTransactionStatusResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/CryptoWebAppUpdateTransactionStatusBody"
+            }
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
     "/v1/users/{userId}": {
       "get": {
         "summary": "Get user",
@@ -629,6 +859,14 @@
     }
   },
   "definitions": {
+    "CryptoWebAppUpdateTransactionStatusBody": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/pbTransactionStatus"
+        }
+      }
+    },
     "CryptoWebAppUpdateUserBody": {
       "type": "object",
       "properties": {
@@ -724,6 +962,74 @@
         }
       }
     },
+    "pbCreateTradeRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "buyOrderId": {
+          "type": "string"
+        },
+        "sellOrderId": {
+          "type": "string"
+        },
+        "marketId": {
+          "type": "string"
+        },
+        "price": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "fee": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreateTradeResponse": {
+      "type": "object",
+      "properties": {
+        "trade": {
+          "$ref": "#/definitions/pbTrades"
+        }
+      }
+    },
+    "pbCreateTransactionRequest": {
+      "type": "object",
+      "properties": {
+        "username": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/pbTransactionType"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "txHash": {
+          "type": "string"
+        }
+      }
+    },
+    "pbCreateTransactionResponse": {
+      "type": "object",
+      "properties": {
+        "transaction": {
+          "$ref": "#/definitions/pbTransaction"
+        }
+      }
+    },
     "pbCreateUserRequest": {
       "type": "object",
       "properties": {
@@ -784,6 +1090,22 @@
         }
       }
     },
+    "pbDeleteTradeResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "string"
+        }
+      }
+    },
+    "pbDeleteTransactionResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
+          "type": "string"
+        }
+      }
+    },
     "pbDeleteUserResponse": {
       "type": "object",
       "properties": {
@@ -813,6 +1135,22 @@
       "properties": {
         "order": {
           "$ref": "#/definitions/pbOrder"
+        }
+      }
+    },
+    "pbGetTradeByIDResponse": {
+      "type": "object",
+      "properties": {
+        "trade": {
+          "$ref": "#/definitions/pbTrades"
+        }
+      }
+    },
+    "pbGetTransactionByIDResponse": {
+      "type": "object",
+      "properties": {
+        "transaction": {
+          "$ref": "#/definitions/pbTransaction"
         }
       }
     },
@@ -1021,6 +1359,101 @@
           "type": "boolean"
         },
         "rawJson": {
+          "type": "string"
+        }
+      }
+    },
+    "pbTrades": {
+      "type": "object",
+      "properties": {
+        "tradeId": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "buyOrderId": {
+          "type": "string"
+        },
+        "sellOrderId": {
+          "type": "string"
+        },
+        "marketId": {
+          "type": "string"
+        },
+        "price": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "fee": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbTransaction": {
+      "type": "object",
+      "properties": {
+        "transactionId": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "userEmail": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/pbTransactionType"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/pbTransactionStatus"
+        },
+        "address": {
+          "type": "string"
+        },
+        "txHash": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbTransactionStatus": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "COMPLETED",
+        "FAILED"
+      ],
+      "default": "PENDING"
+    },
+    "pbTransactionType": {
+      "type": "string",
+      "enum": [
+        "DEPOSIT",
+        "WITHDRAWAL",
+        "NONE"
+      ],
+      "default": "DEPOSIT"
+    },
+    "pbUpdateTransactionStatusResponse": {
+      "type": "object",
+      "properties": {
+        "success": {
           "type": "string"
         }
       }
