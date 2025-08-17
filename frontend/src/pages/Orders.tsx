@@ -99,14 +99,14 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className=" fixed px-5 mt-10 pt-0 top-10 space-y-6">
       <div className="bg-white rounded-lg shadow p-6">
         <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
         <p className="text-gray-600 mt-1">Manage your trading orders</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <div>
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>

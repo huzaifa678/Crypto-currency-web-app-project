@@ -24,7 +24,7 @@ const Profile: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="fixed top-20 ml-10 space-y-6 px-5">
       <div className="bg-white rounded-lg shadow p-6">
         <h1 className="text-2xl font-bold text-gray-900">Profile</h1>
         <p className="text-gray-600 mt-1">Manage your account settings</p>

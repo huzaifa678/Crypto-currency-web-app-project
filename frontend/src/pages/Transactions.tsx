@@ -77,13 +77,13 @@ const Transactions: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="bg-white rounded-lg shadow p-6">
+    <div className="fixed top-20 left-1/2 -translate-x-1/2 max-w-4xl px-6 py-10 ml-10">
+      <div className="bg-white rounded-lg shadow py-6 mb-6 ml-10">
         <h1 className="text-2xl font-bold text-gray-900">Transactions</h1>
         <p className="text-gray-600 mt-1">View your transaction history</p>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow overflow-hidden ml-10">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">

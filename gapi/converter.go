@@ -1,6 +1,7 @@
 package gapi
 
 import (
+
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -125,15 +126,84 @@ func convertOrderType(orderType db.OrderType) pb.OrderType {
 
 func convertOrderStatus(status db.OrderStatus) pb.Status {
 	switch status {
-	case db.OrderStatusOpen:
-		return pb.Status_OPEN
-	case db.OrderStatusPartiallyFilled:
-		return pb.Status_PARTIALLY_FILLED
-	case db.OrderStatusFilled:
-		return pb.Status_PARTIALLY_FILLED
-	case db.OrderStatusCancelled:
-		return pb.Status_CANCELLED
-	default:
-		return pb.Status_OPEN
+		case db.OrderStatusOpen:
+			return pb.Status_OPEN
+		case db.OrderStatusPartiallyFilled:
+			return pb.Status_PARTIALLY_FILLED
+		case db.OrderStatusFilled:
+			return pb.Status_PARTIALLY_FILLED
+		case db.OrderStatusCancelled:
+			return pb.Status_CANCELLED
+		default:
+			return pb.Status_OPEN
 	}
 }
+
+func convertTransactionType(TransactionType db.TransactionType) pb.TransactionType {
+	switch TransactionType {
+		case db.TransactionTypeDeposit:
+			return pb.TransactionType_DEPOSIT
+		case db.TransactionTypeWithdrawal:
+			return pb.TransactionType_WITHDRAWAL
+		default:
+			return pb.TransactionType_NONE
+	}
+}
+
+func convertTransactionStatus(TransactionStatus db.TransactionStatus) pb.TransactionStatus {
+	switch TransactionStatus {
+		case db.TransactionStatusPending:
+			return pb.TransactionStatus_PENDING
+		case db.TransactionStatusCompleted:
+			return pb.TransactionStatus_COMPLETED
+		case db.TransactionStatusFailed:
+			return pb.TransactionStatus_FAILED
+		default:
+			return pb.TransactionStatus_PENDING
+	}
+}
+
+func convertTrade(trade db.Trade) (*pb.Trades) {
+	return &pb.Trades{
+		TradeId:     trade.ID.String(),
+		Username:   trade.Username,
+		BuyOrderId: trade.BuyOrderID.String(),
+		SellOrderId: trade.SellOrderID.String(),
+		MarketId:   trade.MarketID.String(),
+		Price:      trade.Price,
+		Amount:     trade.Amount,
+		Fee:        trade.Fee,
+		CreatedAt:  timestamppb.New(trade.CreatedAt), 
+	}
+}
+
+func convertTransaction(transaction db.Transaction) (*pb.Transaction) {
+	return &pb.Transaction{
+		TransactionId: transaction.ID.String(),
+		Username: transaction.Username,
+		UserEmail: transaction.UserEmail,
+		Type: convertTransactionType(transaction.Type),
+		Currency: transaction.Currency,
+		Amount: transaction.Amount,
+		Status: convertTransactionStatus(transaction.Status),
+		Address: transaction.Address,
+		TxHash: transaction.TxHash,
+		CreatedAt: timestamppb.New(transaction.CreatedAt),
+	}
+}
+
+func convertCreateTransaction(userName string, transaction db.CreateTransactionRow) (*pb.Transaction) {
+	return &pb.Transaction{
+		TransactionId: transaction.ID.String(),
+		Username: userName,
+		UserEmail: transaction.UserEmail,
+		Type: convertTransactionType(transaction.Type),
+		Currency: transaction.Currency,
+		Amount: transaction.Amount,
+		Status: convertTransactionStatus(transaction.Status),
+		Address: transaction.Address,
+		TxHash: transaction.TxHash,
+		CreatedAt: timestamppb.New(transaction.CreatedAt),
+	}
+}
+

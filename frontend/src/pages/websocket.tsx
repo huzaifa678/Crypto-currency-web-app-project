@@ -131,31 +131,36 @@ const MarketsTable: React.FC = () => {
   }, []);
 
   return (
-    <div style={{ padding: 20 }}>
-      <h2>📈 Live Markets (HTTP Streaming)</h2>
-      <table border={1} cellPadding={8} style={{ borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th>Pair</th>
-            <th>Price</th>
-          </tr>
-        </thead>
-        <tbody>
-          {markets.map((market) => {
-            const lastPrice = lastPricesRef.current[market.market_id];
-            lastPricesRef.current[market.market_id] = market.current_price;
-            return (
-              <MarketRow
-                key={market.market_id}
-                market={market}
-                lastPrice={lastPrice}
-              />
-            );
-          })}
-        </tbody>
-      </table>
+  <div className="fixed top-20 left-1/2 -translate-x-1/4 max-w-4xl px-6 py-5">
+    <div className="mb-4 px-10">
+      <h1 className="text-xl font-bold">Live Trading Updates</h1>
+      <p className="text-gray-500">Streaming prices directly from server...</p>
     </div>
-  );
+
+    <table className="min-w-full border border-gray-300 rounded-lg overflow-hidden">
+      <thead className="bg-gray-100 sticky top-[3.5rem] z-10">
+        <tr>
+          <th className="px-4 py-2 border-b text-left">Pair</th>
+          <th className="px-4 py-2 border-b text-left">Current Price</th>
+        </tr>
+      </thead>
+      <tbody>
+        {markets.map((market) => {
+          const lastPrice = lastPricesRef.current[market.market_id];
+          lastPricesRef.current[market.market_id] = market.current_price;
+
+          return (
+            <MarketRow
+              key={market.market_id}
+              market={market}
+              lastPrice={lastPrice}
+            />
+          );
+        })}
+      </tbody>
+    </table>
+  </div>
+);
 };
 
 export default MarketsTable;

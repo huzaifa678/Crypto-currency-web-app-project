@@ -129,15 +129,19 @@ func ValidateCreateOrderRequest(userEmail, marketID, price, amount string, order
 	if err := ValidateEmail(userEmail); err != nil {
 		return err
 	}
+
 	if err := ValidateString(marketID, 1, 50); err != nil {
 		return err
 	}
+
 	if err := ValidateString(price, 1, 20); err != nil {
 		return err
 	}
+
 	if err := ValidateString(amount, 1, 20); err != nil {
 		return err
 	}
+
 	if orderType < 0 || orderType > 1 {
 		return fmt.Errorf("order_type must be 0 (BUY) or 1 (SELL)")
 	}
@@ -156,10 +160,68 @@ func ValidateUpdateWalletRequest(walletID, balance, lockedBalance string) error 
 	if err := ValidateString(walletID, 1, 50); err != nil {
 		return err
 	}
+
 	if err := ValidateString(balance, 1, 20); err != nil {
 		return err
 	}
+
 	return ValidateString(lockedBalance, 1, 20)
+}
+
+func ValidateCreateTradeRequest(buyOrderId, sellOrderId, marketID, price, amount, fee string) error {
+	if err := ValidateString(buyOrderId, 1, 50); err != nil {
+		return err
+	}
+
+	if err := ValidateString(sellOrderId, 1, 50); err != nil {
+		return err
+	}
+
+	if err := ValidateString(marketID, 1, 50); err != nil {
+		return err
+	}
+
+	if err := ValidateString(price, 1, 20); err != nil {
+		return err
+	}
+
+	if err := ValidateString(amount, 1, 20); err != nil {
+		return err
+	}
+
+	if err := ValidateString(fee, 1, 20); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ValidateCreateTransactionRequest(userEmail, amount string, transactionType pb.TransactionType) error {
+	if err := ValidateEmail(userEmail); err != nil {
+		return err
+	}
+
+	if err := ValidateString(amount, 1, 20); err != nil {
+		return err
+	}
+
+	if transactionType < 0 || transactionType > 2 {
+		return fmt.Errorf("transaction_type must be 0 (DEPOSIT), 1 (WITHDRAWAL) or 2 (NONE)")
+	}
+
+	return nil
+}
+
+func ValidateUpdateTransactionStatusRequest(transactionID string, transactionStatus pb.TransactionStatus) error {
+	if err := ValidateString(transactionID, 1, 50); err != nil {
+		return err
+	}
+
+	if transactionStatus < 0 || transactionStatus > 2 {
+		return fmt.Errorf("transaction_status must be 0 (PENDING), 1 (COMPLETED) or 2 (FAILED)")
+	}
+
+	return nil
 }
 
 func ValidateEmailId(value int64) error {

@@ -182,9 +182,9 @@ const Markets: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="fixed top-20 bottom-0 right-0 left-64 space-y-6 px-5 overflow-y-auto">
       {/* Header */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow p-6 sticky top-0 z-10">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Markets</h1>
@@ -242,7 +242,7 @@ const Markets: React.FC = () => {
       </div>
 
       {/* Markets Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow top-5 overflow-hidden mt-4">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">

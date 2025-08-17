@@ -13,6 +13,7 @@ import {
   Activity
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { TypeAnimation } from 'react-type-animation';
 
 interface Market {
   id: string;
@@ -140,20 +141,34 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="fixed top-20 left-30 right-30 bottom-0 px-5 py-5 bg-animated-gradient min-h-2 overflow-y-auto h-[calc(100vh-5rem)]">
       {/* Welcome Section */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h1 className="text-2xl font-bold text-gray-900">
-          Welcome back, {user?.username}! 👋
-        </h1>
+      <div className="bg-white rounded-lg sticky shadow p-6">
+        <TypeAnimation sequence={[
+          `Welcome back, ${user?.username}! 👋`,
+          1500,
+          `Your portfolio is up +12.5% today 📈`,
+          1500,
+          `24h profit: $1,250 💰`,
+          1500,
+          () => console.log('Typing loop completed!')
+        ]}
+        wrapper="h1"
+        cursor={true}
+        repeat={Infinity}
+        style={{
+          fontSize: '1.5rem',
+          fontWeight: 'bold',
+          color: '#111827'
+        }} />
         <p className="text-gray-600 mt-2">
-          Here are the recent crypto updates for tof
+          Here are the recent crypto updates for today
         </p>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-lg shadow p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 py-5 px-5">
+        <div className="bg-white rounded-lg shadow p-6 transform transition-all duration-300 hover:scale-105 hover:shadow-2xl hover:-translate-y-1">
           <div className="flex items-center">
             <div className="p-2 bg-green-100 rounded-lg">
               <TrendingUp className="h-6 w-6 text-green-600" />
@@ -235,13 +250,54 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={priceData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="BTC" stroke="#3B82F6" strokeWidth={2} />
-              <Line type="monotone" dataKey="ETH" stroke="#10B981" strokeWidth={2} />
+            <LineChart data={priceData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
+              {/* Background grid */}
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis dataKey="time" tick={{ fill: "#6B7280", fontSize: 12 }} />
+              <YAxis
+                tick={{ fill: "#6B7280", fontSize: 12 }}
+                tickFormatter={(value) => `$${value.toLocaleString()}`}
+              />
+
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: "0.5rem",
+                  fontSize: "0.875rem",
+                }}
+                formatter={(value: number, name) => [`$${value.toLocaleString()}`, name]}
+              />
+              <defs>
+                <linearGradient id="colorBTC" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#3B82F6" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorETH" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10B981" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+
+              <Line
+                type="monotone"
+                dataKey="BTC"
+                stroke="#3B82F6"
+                strokeWidth={3}
+                dot={{ r: 3, strokeWidth: 2, fill: "#fff" }}
+                activeDot={{ r: 6, stroke: "#3B82F6", strokeWidth: 2 }}
+                animationDuration={800}
+              />
+
+              <Line
+                type="monotone"
+                dataKey="ETH"
+                stroke="#10B981"
+                strokeWidth={3}
+                dot={{ r: 3, strokeWidth: 2, fill: "#fff" }}
+                activeDot={{ r: 6, stroke: "#10B981", strokeWidth: 2 }}
+                animationDuration={800}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -287,7 +343,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-10">
         {/* Recent Orders */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between mb-4">
