@@ -42,7 +42,7 @@ func (server *server) GetTransaction(ctx context.Context, req *pb.GetTransaction
 	}
 
 	if authPayload.Username != transaction.Username {
-		return nil, status.Errorf(codes.Unknown, "unknown")
+		return nil, status.Errorf(codes.Unknown, "Not authorized")
 	}
 
 	convertToPb := convertTransaction(transaction)

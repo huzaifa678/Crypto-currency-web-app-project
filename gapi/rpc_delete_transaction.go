@@ -3,6 +3,7 @@ package gapi
 import (
 	"context"
 	"errors"
+	"log"
 
 	"github.com/google/uuid"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
@@ -24,6 +25,7 @@ func (server *server) DeleteTransaction(ctx context.Context, req *pb.DeleteTrans
 	transactionID, err := uuid.Parse(req.GetTransactionId())
 
 	if err != nil {
+		log.Println("ERROR", err)
 		return nil, status.Errorf(codes.InvalidArgument, "ID not parsed")
 	}
 
@@ -41,7 +43,7 @@ func (server *server) DeleteTransaction(ctx context.Context, req *pb.DeleteTrans
 	}
 
 	if authPayload.Username != transaction.Username {
-		return nil, status.Errorf(codes.Unknown, "unknown")
+		return nil, status.Errorf(codes.Unknown, "Not authorized")
 	}
 
 	err = server.store.DeleteTransaction(ctx, transactionID)

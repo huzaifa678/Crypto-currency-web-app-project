@@ -2,6 +2,8 @@ package gapi
 
 import (
 	"context"
+	"log"
+	"strings"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/pb"
@@ -11,9 +13,8 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-
-
 func (server *server) CreateTransaction(ctx context.Context, req *pb.CreateTransactionRequest) (*pb.CreateTransactionResponse, error) {
+	log.Println("req", req)
 	violations := validateCreateTransactionRequest(req)
 
 	if violations != nil {
@@ -25,10 +26,14 @@ func (server *server) CreateTransaction(ctx context.Context, req *pb.CreateTrans
 		return nil, unauthenticatedError(err)
 	}
 
+	pbType := strings.ToLower(req.GetType().String())
+
+	log.Println("TYPE", pbType)
+
 	args := db.CreateTransactionParams {
 		Username: authPayload.Username,
 		UserEmail: req.GetUserEmail(),
-		Type: db.TransactionType(req.GetType()),
+		Type: db.TransactionType(pbType),
 		Currency: req.GetCurrency(),
 		Amount: req.GetAmount(),
 		Address: req.GetAddress(),
@@ -41,9 +46,15 @@ func (server *server) CreateTransaction(ctx context.Context, req *pb.CreateTrans
 		return nil, status.Errorf(codes.Internal, "failed to create transaction: %v", err)
 	}
 
+	transaction.Status = db.TransactionStatus("completed")
+
+	log.Println("STATUS", transaction.Status)
+
 	res := &pb.CreateTransactionResponse{
 		Transaction: convertCreateTransaction(req.GetUsername(), transaction),
 	}
+
+	log.Println("PB STATUS", res.Transaction.Status)
 
 	return res, nil
 }

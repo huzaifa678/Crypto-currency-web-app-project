@@ -44,7 +44,7 @@ func (server *server) DeleteTrade(ctx context.Context, req *pb.DeleteTradeReques
 
 	if authPayload.Username != trade.Username {
 		log.Println(err)
-		return nil, status.Errorf(codes.PermissionDenied, "not authorized to delete this trade")
+		return nil, status.Errorf(codes.PermissionDenied, "Not authorized")
 	}
 
 	err = server.store.DeleteTrade(ctx, tradeID)

@@ -162,77 +162,87 @@ func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, config utils.
 	})
 }
 
-func runGatewayServer(ctx context.Context, waitGroup *errgroup.Group, config utils.Config, store db.Store_interface, taskDistributor worker.TaskDistributor) {
-	_, err := gapi.NewServer(store, config, taskDistributor)
+func runGatewayServer(
+    ctx context.Context,
+    waitGroup *errgroup.Group,
+    config utils.Config,
+    store db.Store_interface,
+    taskDistributor worker.TaskDistributor,
+) {
+    _, err := gapi.NewServer(store, config, taskDistributor)
+    if err != nil {
+        log.Fatal().Err(err).Msg("Failed to create the Gateway handler server")
+    }
 
-	if err != nil {
-		log.Fatal().Err(err).Msg("Failed to create the Gateway handler server")
-	}
+    jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+        MarshalOptions: protojson.MarshalOptions{
+            UseProtoNames:   true,
+            UseEnumNumbers:  false,
+        },
+        UnmarshalOptions: protojson.UnmarshalOptions{
+            DiscardUnknown: true,
+        },
+    })
 
-	jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
-		MarshalOptions: protojson.MarshalOptions{
-			UseProtoNames: true,
-		},
-		UnmarshalOptions: protojson.UnmarshalOptions{
-			DiscardUnknown: true,
-		},
-	})
+    grpcMux := runtime.NewServeMux(jsonOption)
 
-	grpcMux := runtime.NewServeMux(jsonOption)
+    dialOpts := []grpc.DialOption{
+        grpc.WithTransportCredentials(insecure.NewCredentials()),
+    }
 
-	dialOpts := []grpc.DialOption{
-    	grpc.WithTransportCredentials(insecure.NewCredentials()),
-	}
+    err = pb.RegisterCryptoWebAppHandlerFromEndpoint(ctx, grpcMux, config.GRPCServerAddr, dialOpts)
+    if err != nil {
+        log.Fatal().Err(err).Msg("Failed to start grpc-gateway")
+    }
 
-	err = pb.RegisterCryptoWebAppHandlerFromEndpoint(ctx, grpcMux, config.GRPCServerAddr, dialOpts)
-	if err != nil {
-    	log.Fatal().Err(err).Msg("Failed to start grpc-gateway")
-	}
+    mux := http.NewServeMux()
+    mux.Handle("/", grpcMux)
 
-	mux := http.NewServeMux()
+    fs := http.FileServer(http.FS(docsFS))
+    mux.Handle("/docs/", http.StripPrefix("/", fs))
 
-	mux.Handle("/", grpcMux)
+    c := cors.New(cors.Options{
+        AllowedOrigins:   []string{"http://localhost:3000"},
+        AllowedMethods:   []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
+        AllowedHeaders:   []string{"Authorization", "Content-Type"},
+        ExposedHeaders:   []string{"Content-Length"},
+        AllowCredentials: true,
+    })
+    handler := c.Handler(gapi.HttpLogger(mux))
 
-	fs := http.FileServer(http.FS(docsFS))
-	mux.Handle("/docs/", http.StripPrefix("/", fs))
+    httpServer := &http.Server{
+        Handler: handler,
+        Addr:    config.HTTPServerAddr,
+    }
 
+    waitGroup.Go(func() error {
+        log.Info().Msgf("start HTTP gateway server at %s", httpServer.Addr)
+        err = httpServer.ListenAndServe()
+        if err != nil {
+            if errors.Is(err, http.ErrServerClosed) {
+                return nil
+            }
+            log.Error().Err(err).Msg("HTTP gateway server failed to serve")
+            return err
+        }
+        return nil
+    })
 
+    waitGroup.Go(func() error {
+        <-ctx.Done()
+        log.Info().Msg("graceful shutdown HTTP gateway server")
 
-	c := cors.Default()
-	handler := c.Handler(gapi.HttpLogger(mux))
+        err := httpServer.Shutdown(context.Background())
+        if err != nil {
+            log.Error().Err(err).Msg("failed to shutdown HTTP gateway server")
+            return err
+        }
 
-	httpServer := &http.Server{
-		Handler: handler,
-		Addr:    config.HTTPServerAddr,
-	}
-
-	waitGroup.Go(func() error {
-		log.Info().Msgf("start HTTP gateway server at %s", httpServer.Addr)
-		err = httpServer.ListenAndServe()
-		if err != nil {
-			if errors.Is(err, http.ErrServerClosed) {
-				return nil
-			}
-			log.Error().Err(err).Msg("HTTP gateway server failed to serve")
-			return err
-		}
-		return nil
-	})
-
-	waitGroup.Go(func() error {
-		<-ctx.Done()
-		log.Info().Msg("graceful shutdown HTTP gateway server")
-
-		err := httpServer.Shutdown(context.Background())
-		if err != nil {
-			log.Error().Err(err).Msg("failed to shutdown HTTP gateway server")
-			return err
-		}
-
-		log.Info().Msg("HTTP gateway server is stopped")
-		return nil
-	})
+        log.Info().Msg("HTTP gateway server is stopped")
+        return nil
+    })
 }
+
 
 func runGinServer(config utils.Config, store db.Store_interface) {
 	server, err := api.NewServer(store, config)

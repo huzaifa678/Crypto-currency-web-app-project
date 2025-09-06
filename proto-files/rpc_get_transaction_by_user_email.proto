@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+import "transaction.proto";
+
+
+message GetTransactionsByUserEmailRequest {
+    string user_email = 1;
+}
+
+message GetTransactionsByUserEmailResponse {
+  repeated Transaction transactions = 1;
+}
+
+

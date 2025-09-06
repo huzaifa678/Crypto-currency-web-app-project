@@ -1,40 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Market } from "../pages/websocket";
 
-export interface Market {
-  market_id: string;
-  base_currency: string;
-  quote_currency: string;
-  current_price: number;
+interface Trade {
+  symbol: string;
+  price: number;
 }
 
-interface MarketRowProps {
-  market: Market;
-  lastPrice?: number;
-}
-
-const MarketRow: React.FC<MarketRowProps> = ({ market, lastPrice }) => {
-  const isUp = lastPrice !== undefined && market.current_price > lastPrice;
-  const isDown = lastPrice !== undefined && market.current_price < lastPrice;
-
-  return (
-    <tr>
-      <td className="px-4 py-2 align-middle">{market.base_currency}/{market.quote_currency}</td>
-      <td
-        className="px-4 py-2 align-middle font-bold transition-colors"
-        style={{
-          color: isUp ? "green" : isDown ? "red" : "black",
-          fontWeight: "bold",
-          transition: "color 0.3s ease",
-        }}
-      >
-        {market.current_price.toFixed(2)}
-      </td>
-    </tr>
-  );
-};
-
-
-const MarketsTable: React.FC = () => {
+export function useTradeStream() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const lastPricesRef = useRef<Record<string, number>>({});
 
@@ -131,37 +103,5 @@ const MarketsTable: React.FC = () => {
       controller.abort();
     };
   }, []);
-
-  return (
-  <div className="fixed top-20 left-1/2 -translate-x-1/4 max-w-4xl px-6 py-5">
-    <div className="mb-4 px-10">
-      <h1 className="text-xl font-bold">Live Trading Updates</h1>
-      <p className="text-gray-500">Streaming prices directly from server...</p>
-    </div>
-      <table className="min-w-full">
-        <thead className="bg-gray-100 sticky top-[3.5rem] z-10">
-          <tr>
-            <th className="px-4 py-2 border-b text-left">Pair</th>
-            <th className="px-4 py-2 border-b text-left">Current Price</th>
-          </tr>
-        </thead>
-      <tbody>
-        {markets.map((market) => {
-          const lastPrice = lastPricesRef.current[market.market_id];
-          lastPricesRef.current[market.market_id] = market.current_price;
-
-          return (
-            <MarketRow
-              key={market.market_id}
-              market={market}
-              lastPrice={lastPrice}
-            />
-          );
-        })}
-      </tbody>
-    </table>
-  </div>
-);
-};
-
-export default MarketsTable;
+  return markets;
+}

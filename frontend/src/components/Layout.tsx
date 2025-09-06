@@ -38,19 +38,19 @@ const Layout: React.FC = () => {
     {/* Mobile sidebar overlay */}
     {sidebarOpen && (
       <div 
-        className="fixed inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
+        className="inset-0 z-40 bg-gray-600 bg-opacity-75 lg:hidden"
         onClick={() => setSidebarOpen(false)}
       />
     )}
 
     {/* Sidebar */}
     <div
-      className={`fixed inset-y-0 left-0 py-10 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col ${
+      className={`fixed top-12 inset-y-0 left-0 z-50 py-10 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 flex flex-col ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}
     >
       {/* Sidebar header */}
-      <div className="fixed flex items-center justify-between h-16 px-6 border-b border-gray-200">
+      <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
         <button
           onClick={() => setSidebarOpen(false)}
           className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
@@ -129,7 +129,7 @@ const Layout: React.FC = () => {
       </div>
     </header>
 
-    <main className="lg:ml-64 px-5 overflow-y-auto">
+    <main className="lg:ml-64 px-5 pt-14 overflow-y-auto">
       <Outlet />
     </main>
   </div>
