@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { MarketsProvider } from './contexts/MarketContext';
 import Layout from './components/Layout';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -13,9 +12,8 @@ import Orders from './pages/Orders';
 import Wallet from './pages/Wallet';
 import Transactions from './pages/Transactions';
 import Profile from './pages/Profile';
-import MarketsTable from './pages/websocket';
 import './App.css';
-import { OrderProvider } from './contexts/OrderContext';
+import MarketsTable from './pages/websocket';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -61,14 +59,9 @@ function App() {
               <Route index element={<Navigate to="/dashboard" replace />} />
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="websocket" element={<MarketsTable />} />
-              <Route path="markets" element={<MarketsProvider> <Markets /> </MarketsProvider>} />
-              <Route path="trading" element={<OrderProvider> <Trading /> </OrderProvider>} />
-              <Route path="orders" element={
-                <MarketsProvider>
-                 <OrderProvider> 
-                  <Orders /> 
-                 </OrderProvider>
-                </MarketsProvider>} />
+              <Route path="markets" element={<Markets />} />
+              <Route path="trading/:marketId" element={<Trading />} />
+              <Route path="orders" element={<Orders />} />
               <Route path="wallet" element={<Wallet />} />
               <Route path="transactions" element={<Transactions />} />
               <Route path="profile" element={<Profile />} />

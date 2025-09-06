@@ -33,7 +33,7 @@ func (server *server) DeleteWallet(ctx context.Context, req *pb.DeleteWalletRequ
 	wallet, _ := server.store.GetWalletByID(ctx, walletID)
 
 	if authPayload.Username != wallet.Username {
-		return nil, status.Errorf(codes.Unknown, "Not authorized")
+		return nil, status.Errorf(codes.Unknown, "unknown")
 	}
 
 	err = server.store.DeleteWallet(ctx, walletID)

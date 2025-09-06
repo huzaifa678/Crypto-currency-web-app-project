@@ -23,6 +23,16 @@ func (server *server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return nil, invalidArgumentError(violations)
 	}
 
+	// _, err := server.store.GetUserByEmail(ctx, req.GetEmail())
+
+	// if err != nil {
+	// 	if !errors.Is(err, db.ErrRecordNotFound) {
+	// 		return nil, status.Errorf(codes.Internal, "failed to check existing user")
+	// 	}
+	// } else {
+	// 	return nil, status.Errorf(codes.AlreadyExists, "user with this email already exists")
+	// }
+
 
 	hashedPassword, err := utils.HashPassword(req.GetPassword())
 	if err != nil {

@@ -85,7 +85,7 @@ func (server *server) loginUser(ctx *gin.Context) {
 		return
 	}
 
-	refreshToken, refreshTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration, token.TokenTypeRefreshToken,)
+	refreshToken, refreshTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration, token.TokenTypeAccessToken,)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
@@ -175,10 +175,6 @@ func (server *server) getUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	parsedID, err := uuid.Parse(id)
-
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-	}
 
 	user, err := server.store.GetUserByID(ctx, parsedID)
 	if err != nil {

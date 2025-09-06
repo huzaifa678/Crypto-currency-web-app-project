@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 
-export interface Market {
+interface Market {
   market_id: string;
   base_currency: string;
   quote_currency: string;
@@ -18,9 +18,8 @@ const MarketRow: React.FC<MarketRowProps> = ({ market, lastPrice }) => {
 
   return (
     <tr>
-      <td className="px-4 py-2 align-middle">{market.base_currency}/{market.quote_currency}</td>
+      <td>{market.base_currency}/{market.quote_currency}</td>
       <td
-        className="px-4 py-2 align-middle font-bold transition-colors"
         style={{
           color: isUp ? "green" : isDown ? "red" : "black",
           fontWeight: "bold",
@@ -32,7 +31,6 @@ const MarketRow: React.FC<MarketRowProps> = ({ market, lastPrice }) => {
     </tr>
   );
 };
-
 
 const MarketsTable: React.FC = () => {
   const [markets, setMarkets] = useState<Market[]>([]);
@@ -138,13 +136,14 @@ const MarketsTable: React.FC = () => {
       <h1 className="text-xl font-bold">Live Trading Updates</h1>
       <p className="text-gray-500">Streaming prices directly from server...</p>
     </div>
-      <table className="min-w-full">
-        <thead className="bg-gray-100 sticky top-[3.5rem] z-10">
-          <tr>
-            <th className="px-4 py-2 border-b text-left">Pair</th>
-            <th className="px-4 py-2 border-b text-left">Current Price</th>
-          </tr>
-        </thead>
+
+    <table className="min-w-full border border-gray-300 rounded-lg overflow-hidden">
+      <thead className="bg-gray-100 sticky top-[3.5rem] z-10">
+        <tr>
+          <th className="px-4 py-2 border-b text-left">Pair</th>
+          <th className="px-4 py-2 border-b text-left">Current Price</th>
+        </tr>
+      </thead>
       <tbody>
         {markets.map((market) => {
           const lastPrice = lastPricesRef.current[market.market_id];

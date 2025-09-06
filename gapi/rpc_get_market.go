@@ -38,7 +38,7 @@ func (server *server) GetMarket(ctx context.Context, req *pb.GetMarketRequest) (
 	}
 
 	if authPayload.Username != market.Username {
-		return nil, status.Errorf(codes.Unknown, "Not authorized")
+		return nil, status.Errorf(codes.Unknown, "unknown")
 	}
 
 	res := &pb.GetMarketResponse {

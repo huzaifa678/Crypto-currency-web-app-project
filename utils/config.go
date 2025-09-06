@@ -19,9 +19,6 @@ type Config struct {
 	SenderName           string 	   `mapstructure:"SENDER_NAME"`
 	SenderEmail          string 	   `mapstructure:"SENDER_EMAIL"`
 	SenderPassword       string 	   `mapstructure:"SENDER_PASSWORD"`
-	GoogleClientID       string        `mapstructure:"GOOGLE_CLIENT_ID"`
-	GoogleClientSecret   string        `mapstructure:"GOOGLE_CLIENT_SECRET"`
-	GoogleRedirectURL    string        `mapstructure:"REDIRECT_URL"`
 }
 
 func LoadConfig(path string) (config Config, err error) {

@@ -52,7 +52,7 @@ func (server *server) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (
 
 	refreshToken, refreshPayload, err := server.tokenMaker.CreateToken(
 		user.Username,
-		server.config.RefreshTokenDuration,
+		server.config.AccessTokenDuration,
 		token.TokenTypeRefreshToken,
 	)
 	if err != nil {

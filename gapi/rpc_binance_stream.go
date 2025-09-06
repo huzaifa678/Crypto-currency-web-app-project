@@ -1,7 +1,6 @@
 package gapi
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -35,7 +34,7 @@ func parseStringToFloat64(str string) float64 {
 }
 
 func (server *server) StreamTrades(req *pb.TradeStreamRequest, stream pb.CryptoWebApp_StreamTradesServer) error {
-    symbols := req.GetSymbols()
+	symbols := req.GetSymbols()
     if len(symbols) == 0 {
         return fmt.Errorf("no symbols provided")
     }
@@ -58,54 +57,40 @@ func (server *server) StreamTrades(req *pb.TradeStreamRequest, stream pb.CryptoW
     defer c.Close()
 
     for {
-        select {
-        case <-stream.Context().Done(): 
-            log.Println("stream context canceled, closing trade stream")
-            return nil
-        default:
-            _, message, err := c.ReadMessage()
-            if err != nil {
-                if stream.Context().Err() == context.Canceled {
-                    log.Println("client canceled stream")
-                    return nil
-                }
-                return fmt.Errorf("error reading from websocket: %v", err)
-            }
+        _, message, err := c.ReadMessage()
+        if err != nil {
+            return fmt.Errorf("error reading from websocket: %v", err)
+        }
 
-            var wrapped struct {
-                Stream string          `json:"stream"`
-                Data   json.RawMessage `json:"data"`
-            }
-            if err := json.Unmarshal(message, &wrapped); err != nil {
-                log.Printf("failed to unmarshal wrapped message: %v", err)
-                continue
-            }
+        var wrapped struct {
+            Stream string          `json:"stream"`
+            Data   json.RawMessage `json:"data"`
+        }
+        if err := json.Unmarshal(message, &wrapped); err != nil {
+            log.Printf("failed to unmarshal wrapped message: %v", err)
+            continue
+        }
 
-            var event binanceTradeEvent
-            if err := json.Unmarshal(wrapped.Data, &event); err != nil {
-                log.Printf("failed to unmarshal trade event: %v", err)
-                continue
-            }
+        var event binanceTradeEvent
+        if err := json.Unmarshal(wrapped.Data, &event); err != nil {
+            log.Printf("failed to unmarshal trade event: %v", err)
+            continue
+        }
 
-            trade := &pb.Trade{
-                Symbol:       event.Symbol,
-                Price:        parseStringToFloat64(event.Price),
-                Quantity:     parseStringToFloat64(event.Quantity),
-                TradeId:      event.TradeID,
-                EventTime:    event.EventTime,
-                TradeTime:    event.TradeTime,
-                IsBuyerMaker: event.IsBuyerMaker,
-                RawJson:      string(wrapped.Data),
-            }
+        trade := &pb.Trade{
+            Symbol:       event.Symbol,
+            Price:        parseStringToFloat64(event.Price),
+            Quantity:     parseStringToFloat64(event.Quantity),
+            TradeId:      event.TradeID,
+            EventTime:    event.EventTime,
+            TradeTime:    event.TradeTime,
+            IsBuyerMaker: event.IsBuyerMaker,
+            RawJson:      string(wrapped.Data),
+        }
 
-            if err := stream.Send(trade); err != nil {
-                if stream.Context().Err() == context.Canceled {
-                    log.Println("client canceled stream")
-                    return nil
-                }
-                log.Printf("error sending trade: %v", err)
-                return err
-            }
+        if err := stream.Send(trade); err != nil {
+            log.Printf("error sending trade: %v", err)
+            return err
         }
     }
 }

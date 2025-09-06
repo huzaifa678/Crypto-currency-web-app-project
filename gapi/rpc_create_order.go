@@ -2,8 +2,6 @@ package gapi
 
 import (
 	"context"
-	"log"
-	"strings"
 
 	"github.com/google/uuid"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
@@ -16,7 +14,6 @@ import (
 
 
 func (server *server) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
-	log.Println("RECEIVED CreateOrder request:", req)
 	violations := validateCreateOrderRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)
@@ -32,19 +29,12 @@ func (server *server) CreateOrder(ctx context.Context, req *pb.CreateOrderReques
 		return nil, status.Errorf(codes.InvalidArgument, "invalid market ID: %v", err)
 	}
 
-	pbType := strings.ToLower(req.GetType().String())
-
-	log.Printf("UserEmail bytes: %q\n", []byte(req.GetUserEmail()))
-	log.Printf("Price bytes: %q\n", []byte(req.GetPrice()))
-	log.Printf("Amount bytes: %q\n", []byte(req.GetAmount()))
-	log.Printf("Username bytes: %q\n", []byte(authPayload.Username))
-
 	arg := db.CreateOrderParams{
 		Username:  authPayload.Username,
 		UserEmail: req.GetUserEmail(),
 		MarketID:  marketID,
-		Type:      db.OrderType(pbType),
-		Status:    db.OrderStatus("open"), // default status
+		Type:      db.OrderType(req.GetType()),
+		Status:    db.OrderStatus(req.GetStatus()),
 		Price:     req.GetPrice(),
 		Amount:    req.GetAmount(),
 	}
@@ -64,7 +54,6 @@ func (server *server) CreateOrder(ctx context.Context, req *pb.CreateOrderReques
 
 func validateCreateOrderRequest(req *pb.CreateOrderRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateCreateOrderRequest(req.GetUserEmail(), req.GetMarketId(), req.GetPrice(), req.GetAmount(), req.GetType()); err != nil {
-		violations = append(violations, fieldViolation("user_email", err))
 		violations = append(violations, fieldViolation("id", err))
 		violations = append(violations, fieldViolation("price", err))
 		violations = append(violations, fieldViolation("amount", err))

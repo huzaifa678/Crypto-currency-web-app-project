@@ -1,9 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../contexts/AuthContext';
-import { useTradeStream } from '../components/TradeStream';
-
 import { 
   TrendingUp, 
   TrendingDown, 
@@ -51,13 +49,72 @@ const Dashboard: React.FC = () => {
   const [recentOrders, setRecentOrders] = useState<Order[]>([]);
   const [recentTransactions, setRecentTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const trades = useTradeStream();
-  const [priceData, setPriceData] = useState<any[]>([]);
+
+  const priceData = [
+    { time: '00:00', BTC: 45000, ETH: 3200 },
+    { time: '04:00', BTC: 46000, ETH: 3300 },
+    { time: '08:00', BTC: 47000, ETH: 3400 },
+    { time: '12:00', BTC: 46500, ETH: 3350 },
+    { time: '16:00', BTC: 48000, ETH: 3500 },
+    { time: '20:00', BTC: 47500, ETH: 3450 },
+    { time: '24:00', BTC: 48500, ETH: 3600 },
+  ];
 
   useEffect(() => {
-    setLoading(false)
+    const fetchDashboardData = async () => {
+      try {
+        setLoading(true);
+        
+        const marketsResponse = await api.get('/markets');
+        setMarkets(marketsResponse.data.slice(0, 5)); 
+        
+        setRecentOrders([
+          {
+            id: '1',
+            market_id: 'btc-usd',
+            type: 'buy',
+            status: 'completed',
+            price: '48500',
+            amount: '0.1',
+            created_at: '2024-01-15T10:30:00Z'
+          },
+          {
+            id: '2',
+            market_id: 'eth-usd',
+            type: 'sell',
+            status: 'pending',
+            price: '3600',
+            amount: '2.5',
+            created_at: '2024-01-15T09:15:00Z'
+          }
+        ]);
+        
+        setRecentTransactions([
+          {
+            id: '1',
+            type: 'deposit',
+            currency: 'USD',
+            amount: '1000',
+            created_at: '2024-01-15T11:00:00Z'
+          },
+          {
+            id: '2',
+            type: 'withdrawal',
+            currency: 'BTC',
+            amount: '0.05',
+            created_at: '2024-01-15T08:45:00Z'
+          }
+        ]);
+        
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  }, [trades]);
+    fetchDashboardData();
+  }, []);
 
   const formatCurrency = (amount: string, currency: string = 'USD') => {
     return new Intl.NumberFormat('en-US', {
@@ -195,12 +252,52 @@ const Dashboard: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={priceData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
               {/* Background grid */}
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis />
-              <Tooltip />
-              <Line dataKey="BTC" stroke="#3B82F6" dot={false} />
-              <Line dataKey="ETH" stroke="#10B981" dot={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis dataKey="time" tick={{ fill: "#6B7280", fontSize: 12 }} />
+              <YAxis
+                tick={{ fill: "#6B7280", fontSize: 12 }}
+                tickFormatter={(value) => `$${value.toLocaleString()}`}
+              />
+
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  border: "1px solid #E5E7EB",
+                  borderRadius: "0.5rem",
+                  fontSize: "0.875rem",
+                }}
+                formatter={(value: number, name) => [`$${value.toLocaleString()}`, name]}
+              />
+              <defs>
+                <linearGradient id="colorBTC" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#3B82F6" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#3B82F6" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="colorETH" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#10B981" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+
+              <Line
+                type="monotone"
+                dataKey="BTC"
+                stroke="#3B82F6"
+                strokeWidth={3}
+                dot={{ r: 3, strokeWidth: 2, fill: "#fff" }}
+                activeDot={{ r: 6, stroke: "#3B82F6", strokeWidth: 2 }}
+                animationDuration={800}
+              />
+
+              <Line
+                type="monotone"
+                dataKey="ETH"
+                stroke="#10B981"
+                strokeWidth={3}
+                dot={{ r: 3, strokeWidth: 2, fill: "#fff" }}
+                activeDot={{ r: 6, stroke: "#10B981", strokeWidth: 2 }}
+                animationDuration={800}
+              />
             </LineChart>
           </ResponsiveContainer>
         </div>

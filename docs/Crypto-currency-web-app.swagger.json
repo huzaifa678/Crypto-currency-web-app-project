@@ -93,7 +93,7 @@
       "get": {
         "summary": "List markets",
         "description": "List all markets",
-        "operationId": "CryptoWebApp_ListMarkets",
+        "operationId": "CryptoWebApp_MarketList",
         "responses": {
           "200": {
             "description": "A successful response.",
@@ -208,28 +208,6 @@
       }
     },
     "/v1/orders": {
-      "get": {
-        "summary": "List orders",
-        "description": "List all orders",
-        "operationId": "CryptoWebApp_ListOrder",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/pbOrderListResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "CryptoWebApp"
-        ]
-      },
       "post": {
         "summary": "Create order",
         "description": "Create a new order with the specified details",
@@ -318,44 +296,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          }
-        ],
-        "tags": [
-          "CryptoWebApp"
-        ]
-      },
-      "patch": {
-        "summary": "Update order",
-        "description": "Update order details by order ID",
-        "operationId": "CryptoWebApp_UpdateOrder",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/pbUpdateOrderStatusAndFilledAmountResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/CryptoWebAppUpdateOrderBody"
-            }
           }
         ],
         "tags": [
@@ -538,38 +478,6 @@
         ]
       }
     },
-    "/v1/transactions/list/{userEmail}": {
-      "get": {
-        "summary": "Get Transaction By User Email",
-        "description": "Get all the transactions done by user using their email",
-        "operationId": "CryptoWebApp_GetTransactionsByUserEmail",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/pbGetTransactionsByUserEmailResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/googlerpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "userEmail",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "CryptoWebApp"
-        ]
-      }
-    },
     "/v1/transactions/{transactionId}": {
       "get": {
         "summary": "Get Transaction",
@@ -632,7 +540,7 @@
         ]
       },
       "patch": {
-        "summary": "Update Transaction Status",
+        "summary": "Update Transaction status",
         "description": "Update the transaction status for the user",
         "operationId": "CryptoWebApp_UpdateTransactionStatus",
         "responses": {
@@ -951,17 +859,6 @@
     }
   },
   "definitions": {
-    "CryptoWebAppUpdateOrderBody": {
-      "type": "object",
-      "properties": {
-        "orderStatus": {
-          "$ref": "#/definitions/pbStatus"
-        },
-        "filledAmount": {
-          "type": "string"
-        }
-      }
-    },
     "CryptoWebAppUpdateTransactionStatusBody": {
       "type": "object",
       "properties": {
@@ -1257,18 +1154,6 @@
         }
       }
     },
-    "pbGetTransactionsByUserEmailResponse": {
-      "type": "object",
-      "properties": {
-        "transactions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/pbTransaction"
-          }
-        }
-      }
-    },
     "pbGetUserResponse": {
       "type": "object",
       "properties": {
@@ -1426,18 +1311,6 @@
         }
       }
     },
-    "pbOrderListResponse": {
-      "type": "object",
-      "properties": {
-        "orders": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/pbOrder"
-          }
-        }
-      }
-    },
     "pbOrderType": {
       "type": "string",
       "enum": [
@@ -1576,14 +1449,6 @@
         "NONE"
       ],
       "default": "DEPOSIT"
-    },
-    "pbUpdateOrderStatusAndFilledAmountResponse": {
-      "type": "object",
-      "properties": {
-        "success": {
-          "type": "string"
-        }
-      }
     },
     "pbUpdateTransactionStatusResponse": {
       "type": "object",

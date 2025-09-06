@@ -537,21 +537,6 @@ func (mr *MockStore_interfaceMockRecorder) ListMarkets(arg0 interface{}) *gomock
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMarkets", reflect.TypeOf((*MockStore_interface)(nil).ListMarkets), arg0)
 }
 
-// ListOrders mocks base method.
-func (m *MockStore_interface) ListOrders(arg0 context.Context) ([]db.Order, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ListOrders", arg0)
-	ret0, _ := ret[0].([]db.Order)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ListOrders indicates an expected call of ListOrders.
-func (mr *MockStore_interfaceMockRecorder) ListOrders(arg0 interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListOrders", reflect.TypeOf((*MockStore_interface)(nil).ListOrders), arg0)
-}
-
 // UpdateOrderStatusAndFilledAmount mocks base method.
 func (m *MockStore_interface) UpdateOrderStatusAndFilledAmount(arg0 context.Context, arg1 db.UpdateOrderStatusAndFilledAmountParams) error {
 	m.ctrl.T.Helper()

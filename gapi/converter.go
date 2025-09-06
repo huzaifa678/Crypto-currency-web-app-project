@@ -192,26 +192,6 @@ func convertTransaction(transaction db.Transaction) (*pb.Transaction) {
 	}
 }
 
-func convertTransactionList(transactions []db.Transaction) ([] *pb.Transaction) {
-	var pbTransactions []*pb.Transaction
-	for _, tx := range transactions {
-		pbTx := &pb.Transaction{
-			TransactionId: tx.ID.String(),
-			Username:  	   tx.Username,
-			UserEmail: 	   tx.UserEmail,
-			Type: 		   convertTransactionType(tx.Type),
-			Currency: 	   tx.Currency,	
-			Amount:    	   tx.Amount,
-			Status:    	   convertTransactionStatus(tx.Status),
-			Address: 	   tx.Address,	
-			CreatedAt: 	   timestamppb.New(tx.CreatedAt),
-			
-		}
-		pbTransactions = append(pbTransactions, pbTx)
-	}
-	return pbTransactions
-}
-
 func convertCreateTransaction(userName string, transaction db.CreateTransactionRow) (*pb.Transaction) {
 	return &pb.Transaction{
 		TransactionId: transaction.ID.String(),
@@ -226,29 +206,4 @@ func convertCreateTransaction(userName string, transaction db.CreateTransactionR
 		CreatedAt: timestamppb.New(transaction.CreatedAt),
 	}
 }
-
-func convertListOrders(orders []db.Order) *pb.OrderListResponse {
-	listOrders := make([]*pb.Order, len(orders))
-	
-	for i, order := range orders {
-		listOrders[i] = &pb.Order{
-			Id:           order.ID.String(),
-			UserName:     order.Username,
-			UserEmail:    order.UserEmail,
-			MarketId:     order.MarketID.String(),
-			Type:         convertOrderType(order.Type),
-			Status:       convertOrderStatus(order.Status),
-			Price:        order.Price,
-			Amount:       order.Amount,
-			FilledAmount: order.FilledAmount,
-			CreatedAt:    timestamppb.New(order.CreatedAt),
-			UpdatedAt:    timestamppb.New(order.UpdatedAt),
-		}
-	}
-	
-	return &pb.OrderListResponse{
-		Orders: listOrders,
-	}
-}
-
 
