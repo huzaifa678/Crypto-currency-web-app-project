@@ -41,7 +41,7 @@ func (server *server) UpdateWallet(ctx context.Context, req *pb.UpdateWalletRequ
 	wallet, _ := server.store.GetWalletByID(ctx, walletID)
 
 	if authPayload.Username != wallet.Username {
-		return nil, status.Errorf(codes.Unknown, "unknown")
+		return nil, status.Errorf(codes.Unknown, "Not authorized")
 	}
 
 	res := &pb.UpdateWalletResponse {

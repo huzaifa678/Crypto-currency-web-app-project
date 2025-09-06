@@ -3,6 +3,8 @@ package gapi
 import (
 	"context"
 	"errors"
+	"log"
+	"strings"
 
 	"github.com/google/uuid"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
@@ -26,6 +28,8 @@ func (server *server) UpdateTransactionStatus(ctx context.Context, req *pb.Updat
 		return nil, status.Errorf(codes.Unauthenticated, "unauthorized")
 	}
 
+	log.Println("UPDATE REQ", req)
+
 	transactionID, err := uuid.Parse(req.GetTransactionId())
 
 	
@@ -42,11 +46,19 @@ func (server *server) UpdateTransactionStatus(ctx context.Context, req *pb.Updat
 	}
 
 	if authPayload.Username != transaction.Username {
-		return nil, status.Errorf(codes.Unknown, "unknown")
+		return nil, status.Errorf(codes.Unknown, "Not authorized")
 	}
 
+	log.Println("FETCHED TRANSACTION STATUS", transaction.Status)
+	log.Println("STATUS ENUM", req.GetStatus())
+	log.Println("STRINGED STATUS ENUM", req.GetStatus().String())
+
+	pbStatus := strings.ToLower(req.GetStatus().String())
+
+	log.Println("PB STATUS", pbStatus)
+
 	args := db.UpdateTransactionStatusParams {
-		Status: db.TransactionStatus(req.GetStatus()),
+		Status: db.TransactionStatus(pbStatus),
 		ID: 	transactionID,
 	}
 
@@ -66,6 +78,7 @@ func (server *server) UpdateTransactionStatus(ctx context.Context, req *pb.Updat
 func validateUpdateTransactionStatus(req *pb.UpdateTransactionStatusRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateUpdateTransactionStatusRequest(req.GetTransactionId(), req.GetStatus()); err != nil {
 		violations = append(violations, fieldViolation("id", err))
+		violations = append(violations, fieldViolation("status", err))
 	}
 
 	return violations

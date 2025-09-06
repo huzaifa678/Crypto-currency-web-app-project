@@ -28,6 +28,9 @@ import "rpc_create_transaction.proto";
 import "rpc_get_transaction.proto";
 import "rpc_update_transaction.proto";
 import "rpc_delete_transaction.proto";
+import "rpc_get_transaction_by_user_email.proto";
+import "rpc_update_order_status_and_filled_amount.proto";
+import "rpc_list_order.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -137,7 +140,7 @@ service CryptoWebApp {
         };
     }
 
-    rpc MarketList (google.protobuf.Empty) returns (MarketListResponse) {
+    rpc ListMarkets (google.protobuf.Empty) returns (MarketListResponse) {
         option (google.api.http) = {
             get: "/v1/markets"
         };
@@ -179,6 +182,29 @@ service CryptoWebApp {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Get order details by order ID";
             summary: "Get order";
+        };
+    }
+
+    rpc UpdateOrder (UpdateOrderStatusAndFilledAmountRequest) returns (UpdateOrderStatusAndFilledAmountResponse) {
+        option (google.api.http) = {
+            patch: "/v1/orders/{order_id}"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Update order details by order ID";
+            summary: "Update order";
+        };
+    }
+
+    rpc ListOrder (google.protobuf.Empty) returns (OrderListResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "List all orders";
+            summary: "List orders";
         };
     }
 
@@ -244,6 +270,7 @@ service CryptoWebApp {
         option (google.api.http) = {
             get: "/v1/stream_trades"
         };
+
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Stream binance live data to the client";
             summary: "Server stream"
@@ -256,6 +283,7 @@ service CryptoWebApp {
             post: "/v1/trades"
             body: "*"
         };
+
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Create a new trade for the user";
             summary: "Create Trade"
@@ -267,6 +295,7 @@ service CryptoWebApp {
         option (google.api.http) = {
             get: "/v1/trades/{trade_id}"
         };
+
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Get the trade details by the trade id"
             summary: "Get Trade"
@@ -278,6 +307,7 @@ service CryptoWebApp {
         option (google.api.http) = {
             delete: "/v1/trades/{trade_id}"
         };
+
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Delete trade by the trade id"
             summary: "Delete trade"
@@ -290,6 +320,7 @@ service CryptoWebApp {
             post: "/v1/transactions"
             body: "*"
         };
+
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Create the transaction for the user"
             summary: "Create Transaction"
@@ -302,9 +333,22 @@ service CryptoWebApp {
         option (google.api.http) = {
             get: "/v1/transactions/{transaction_id}"
         };
+
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Get the transaction for the user"
             summary: "Get Transaction"
+        };
+    }
+
+    rpc GetTransactionsByUserEmail(GetTransactionsByUserEmailRequest) returns (GetTransactionsByUserEmailResponse) {
+    
+        option (google.api.http) = {
+            get: "/v1/transactions/list/{user_email}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Get all the transactions done by user using their email"
+            summary: "Get Transaction By User Email"
         };
     }
 
@@ -314,20 +358,22 @@ service CryptoWebApp {
             patch: "/v1/transactions/{transaction_id}"
             body: "*"
         };
+
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Update the transaction status for the user"
-            summary: "Update Transaction status"
+            summary: "Update Transaction Status"
         };
     }
+    
     rpc DeleteTransaction(DeleteTransactionRequest) returns (DeleteTransactionResponse) {
 
         option (google.api.http) = {
             delete: "/v1/transactions/{transaction_id}"
         };
+
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Delete the transaction for the user"
             summary: "Delete Transaction"
         };
     }
-
 }
