@@ -37,7 +37,7 @@ func (server *server) DeleteMarket(ctx context.Context, req *pb.DeleteMarketRequ
 	}
 
 	if authPayload.Username != market.Username {
-		return nil, status.Errorf(codes.Unknown, "unknown")
+		return nil, status.Errorf(codes.Unknown, "Not authorized")
 	}
 
 	err = server.store.DeleteMarket(ctx, marketID)

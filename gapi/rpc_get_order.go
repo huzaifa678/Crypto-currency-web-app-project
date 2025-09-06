@@ -40,7 +40,7 @@ func (server *server) GetOrder(ctx context.Context, req *pb.GetOrderRequest) (*p
 	}
 
 	if authPayload.Username != order.Username {
-		return nil, status.Errorf(codes.Unknown, "unknown")
+		return nil, status.Errorf(codes.Unknown, "Not authorized")
 	}
 
 	res := &pb.GetOrderResponse {

@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package pb;
+
+import "order.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message OrderListResponse {
+  repeated Order orders = 1;
+}

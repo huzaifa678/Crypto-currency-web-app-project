@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../contexts/AuthContext';
-import { Search, TrendingUp, TrendingDown, ArrowUpRight } from 'lucide-react';
+import { useMarkets } from '../contexts/MarketContext';
+import { Search, TrendingUp, TrendingDown, ArrowUpRight, Plus } from 'lucide-react';
 
-interface Market {
-  id: string;
+export interface Market {
+  market_id: string;
   name: string;
   base_currency: string;
   quote_currency: string;
@@ -16,81 +17,33 @@ interface Market {
 }
 
 const Markets: React.FC = () => {
+  const { market, setMarket } = useMarkets();
   const [markets, setMarkets] = useState<Market[]>([]);
   const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'name' | 'price' | 'change' | 'volume'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  const [marketId, setMarketId] = useState('');
+
+  const [baseCurrency, setBaseCurrency] = useState('');
+  const [quoteCurrency, setQuoteCurrency] = useState('');
+  const [minOrderAmount, setMinOrderAmount] = useState('');
+  const [pricePrecision, setPricePrecision] = useState(2);
 
   useEffect(() => {
     const fetchMarkets = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/markets');
-        setMarkets(response.data);
-        setFilteredMarkets(response.data);
+        const response = await api.get('/v1/markets');
+        console.log("Markets response:", response.data);
+        setMarket(response.data.markets || []);
+        setMarkets(response.data.markets || []);
+        setFilteredMarkets(response.data.markets || []);
+
+        console.log("market", market);
       } catch (error) {
         console.error('Error fetching markets:', error);
-        const mockMarkets: Market[] = [
-          {
-            id: '1',
-            name: 'Bitcoin',
-            base_currency: 'BTC',
-            quote_currency: 'USD',
-            current_price: '48500.00',
-            price_change_24h: '2.5',
-            volume_24h: '2500000000',
-            high_24h: '49000.00',
-            low_24h: '48000.00'
-          },
-          {
-            id: '2',
-            name: 'Ethereum',
-            base_currency: 'ETH',
-            quote_currency: 'USD',
-            current_price: '3600.00',
-            price_change_24h: '-1.2',
-            volume_24h: '1500000000',
-            high_24h: '3650.00',
-            low_24h: '3550.00'
-          },
-          {
-            id: '3',
-            name: 'Cardano',
-            base_currency: 'ADA',
-            quote_currency: 'USD',
-            current_price: '1.25',
-            price_change_24h: '5.8',
-            volume_24h: '500000000',
-            high_24h: '1.30',
-            low_24h: '1.20'
-          },
-          {
-            id: '4',
-            name: 'Solana',
-            base_currency: 'SOL',
-            quote_currency: 'USD',
-            current_price: '120.00',
-            price_change_24h: '-0.8',
-            volume_24h: '800000000',
-            high_24h: '125.00',
-            low_24h: '118.00'
-          },
-          {
-            id: '5',
-            name: 'Polkadot',
-            base_currency: 'DOT',
-            quote_currency: 'USD',
-            current_price: '25.50',
-            price_change_24h: '3.2',
-            volume_24h: '300000000',
-            high_24h: '26.00',
-            low_24h: '24.80'
-          }
-        ];
-        setMarkets(mockMarkets);
-        setFilteredMarkets(mockMarkets);
       } finally {
         setLoading(false);
       }
@@ -99,12 +52,65 @@ const Markets: React.FC = () => {
     fetchMarkets();
   }, []);
 
+  const fetchMarketById = async (marketId: string) => {
+    try {
+      const response = await api.get(`/v1/markets/${marketId}`); 
+      return response.data.market;
+    } catch (error) {
+      console.error(`Error fetching market ${marketId}:`, error);
+      return null;
+    }
+  };
+
+  const deleteMarket = async (marketId: string) => {
+    try {
+      await api.delete(`/v1/markets/${marketId}`);
+      setMarkets((prev) => prev.filter((m) => m.market_id !== marketId));
+      setFilteredMarkets((prev) => prev.filter((m) => m.market_id !== marketId));
+    } catch (error) {
+      console.error('Error deleting market:', error);
+    }
+  }
+
+  const createMarket = async () => {
+    try {
+      const payload = {
+        base_currency: baseCurrency,
+        quote_currency: quoteCurrency,
+        min_order_amount: minOrderAmount,
+        price_precision: pricePrecision,
+      };
+
+      const response = await api.post('/v1/markets', payload);
+      const newMarketId = response.data.market_id;
+
+      setMarketId(newMarketId);
+
+      const newMarket = await fetchMarketById(newMarketId);
+      if (newMarket) {
+        setMarkets((prev) => [...prev, newMarket]);
+        setFilteredMarkets((prev) => [...prev, newMarket]);
+      }
+
+      setBaseCurrency('');
+      setQuoteCurrency('');
+      setMinOrderAmount('');
+      setPricePrecision(2);
+
+    } catch (error) {
+      console.error('Error creating market:', error);
+    }
+  };
+
   useEffect(() => {
+    const query = (searchTerm ?? "").toLowerCase();
+
     const filtered = markets.filter(market =>
-      market.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      market.base_currency.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      market.quote_currency.toLowerCase().includes(searchTerm.toLowerCase())
+      (market.name ?? "").toLowerCase().includes(query) ||
+      (market.base_currency ?? "").toLowerCase().includes(query) ||
+      (market.quote_currency ?? "").toLowerCase().includes(query)
     );
+
     setFilteredMarkets(filtered);
   }, [searchTerm, markets]);
 
@@ -190,7 +196,7 @@ const Markets: React.FC = () => {
             <h1 className="text-2xl font-bold text-gray-900">Markets</h1>
             <p className="text-gray-600 mt-1">Explore and trade cryptocurrency markets</p>
           </div>
-          <div className="mt-4 sm:mt-0">
+          <div className="mt-4 sm:mt-0 flex space-x-2">
             <Link
               to="/trading/btc-usd"
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
@@ -198,11 +204,50 @@ const Markets: React.FC = () => {
               <ArrowUpRight className="h-4 w-4 mr-2" />
               Start Trading
             </Link>
+            <button
+              onClick={createMarket}
+              className="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Market
+            </button>
           </div>
+        </div>
+
+        {/* Create Market Form */}
+        <div className="mt-6 grid grid-cols-1 sm:grid-cols-4 gap-4">
+          <input
+            type="text"
+            placeholder="Base Currency"
+            value={baseCurrency}
+            onChange={(e) => setBaseCurrency(e.target.value)}
+            className="border rounded p-2"
+          />
+          <input
+            type="text"
+            placeholder="Quote Currency"
+            value={quoteCurrency}
+            onChange={(e) => setQuoteCurrency(e.target.value)}
+            className="border rounded p-2"
+          />
+          <input
+            type="text"
+            placeholder="Min Order Amount"
+            value={minOrderAmount}
+            onChange={(e) => setMinOrderAmount(e.target.value)}
+            className="border rounded p-2"
+          />
+          <input
+            type="number"
+            placeholder="Price Precision"
+            value={pricePrecision}
+            onChange={(e) => setPricePrecision(Number(e.target.value))}
+            className="border rounded p-2"
+          />
         </div>
       </div>
 
-      {/* Search and Filters */}
+      {/* Search + Sort */}
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
           <div className="relative flex-1 max-w-md">
@@ -217,7 +262,6 @@ const Markets: React.FC = () => {
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
-          
           <div className="flex items-center space-x-4">
             <select
               value={`${sortBy}-${sortOrder}`}
@@ -247,38 +291,22 @@ const Markets: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('name')}>
-                  Market
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('price')}>
-                  Price
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('change')}>
-                  24h Change
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100" onClick={() => handleSort('volume')}>
-                  24h Volume
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  24h High
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  24h Low
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Action
-                </th>
+                <th onClick={() => handleSort('name')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">Market</th>
+                <th onClick={() => handleSort('price')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">Price</th>
+                <th onClick={() => handleSort('change')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">24h Change</th>
+                <th onClick={() => handleSort('volume')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">24h Volume</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">24h High</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">24h Low</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {sortMarkets(filteredMarkets).map((market) => (
-                <tr key={market.id} className="hover:bg-gray-50">
+                <tr key={market.market_id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium text-blue-600">
-                          {market.base_currency.charAt(0)}
-                        </span>
+                        <span className="text-sm font-medium text-blue-600">{market.base_currency.charAt(0)}</span>
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900">{market.name}</div>
@@ -286,46 +314,32 @@ const Markets: React.FC = () => {
                       </div>
                     </div>
                   </td>
+                  <td className="px-6 py-4 whitespace-nowrap">{formatCurrency(market.current_price)}</td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {formatCurrency(market.current_price)}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`flex items-center text-sm ${
-                      parseFloat(market.price_change_24h) >= 0 ? 'text-green-600' : 'text-red-600'
-                    }`}>
-                      {parseFloat(market.price_change_24h) >= 0 ? (
-                        <TrendingUp className="h-4 w-4 mr-1" />
-                      ) : (
-                        <TrendingDown className="h-4 w-4 mr-1" />
-                      )}
+                    <div className={`flex items-center text-sm ${parseFloat(market.price_change_24h) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {parseFloat(market.price_change_24h) >= 0 ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
                       {parseFloat(market.price_change_24h) >= 0 ? '+' : ''}{market.price_change_24h}%
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatVolume(market.volume_24h)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(market.high_24h)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(market.low_24h)}
-                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatVolume(market.volume_24h)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatCurrency(market.high_24h)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatCurrency(market.low_24h)}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <Link
-                      to={`/trading/${market.base_currency.toLowerCase()}-${market.quote_currency.toLowerCase()}`}
-                      className="text-blue-600 hover:text-blue-900 font-medium"
+                    <button
+                      className="text-red-600 hover:text-red-900 font-medium"
+                      onClick={async (e) => {
+                        e.preventDefault();
+                        await deleteMarket(market.market_id);
+                      }}
                     >
-                      Trade
-                    </Link>
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        
         {filteredMarkets.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500">No markets found matching your search.</p>
@@ -336,4 +350,4 @@ const Markets: React.FC = () => {
   );
 };
 
-export default Markets; 
+export default Markets;

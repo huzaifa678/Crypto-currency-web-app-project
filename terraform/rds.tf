@@ -10,6 +10,8 @@ resource "aws_db_instance" "postgres" {
   username = local.db_creds.username
   password = local.db_creds.password
 
+  vpc_security_group_ids = [aws_security_group.rds.id]
+
   skip_final_snapshot = true
 
   tags = {
