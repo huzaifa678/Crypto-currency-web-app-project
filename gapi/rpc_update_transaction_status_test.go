@@ -53,7 +53,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 
 				store.EXPECT().
 					UpdateTransactionStatus(gomock.Any(), db.UpdateTransactionStatusParams{
-						Status: db.TransactionStatus(pb.TransactionStatus_PENDING),
+						Status: db.TransactionStatus("pending"),
 						ID: transactionID,
 					}).
 					Times(1).

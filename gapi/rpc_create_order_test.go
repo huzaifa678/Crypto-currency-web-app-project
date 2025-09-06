@@ -188,8 +188,8 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 	username := utils.RandomUser()
 	email := "hello" + fmt.Sprint(rand.Intn(10000)) + "@example.com"
 	marketID := uuid.New()
-	orderType := db.OrderType(pb.OrderType_BUY) 
-	orderStatus := db.OrderStatus(pb.Status_OPEN) 
+	orderType := db.OrderType("buy") 
+	orderStatus := db.OrderStatus("open") 
 	price := "100.50"
 	amount := "10"
 

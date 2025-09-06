@@ -158,8 +158,8 @@ func TestCreateTransactionRPC(t *testing.T) {
 func createRandomTransaction() (db.Transaction, db.CreateTransactionRow, db.CreateTransactionParams) {
 	username := fmt.Sprintf("example-%s", uuid.New().String())
 	email := fmt.Sprintf("example-%s@example.com", uuid.New().String())
-	txType := db.TransactionType(pb.TransactionType_DEPOSIT)
-	txStatus := db.TransactionStatus(pb.TransactionStatus_PENDING)
+	txType := db.TransactionType("deposit")
+	txStatus := db.TransactionStatus("pending")
 	currency := "BTC"
 	amount := "10.5"
 	address := "1BitcoinAddress"
