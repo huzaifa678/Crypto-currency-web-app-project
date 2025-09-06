@@ -4,7 +4,9 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
+	"github.com/huzaifa678/Crypto-currency-web-app-project/oauth2"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"google.golang.org/grpc/metadata"
 )
@@ -37,10 +39,18 @@ func (server *server) authorizeUser(ctx context.Context) (*token.Payload, error)
 	}
 
 	accessToken := fields[1]
-	payload, err := server.tokenMaker.VerifyToken(accessToken, token.TokenTypeAccessToken)
-	if err != nil {
-		return nil, fmt.Errorf("invalid access token: %s", err)
+	// payload, err := server.tokenMaker.VerifyToken(accessToken, token.TokenTypeAccessToken)
+	// if err != nil {
+	// 	return nil, fmt.Errorf("invalid access token: %s", err)
+	// }
+
+	googlePayload, gErr := oauth2.VerifyGoogleIDToken(ctx, accessToken, server.config.GoogleClientID)
+	if gErr != nil {
+		fmt.Println("Google ID Token verification failed:", gErr)
 	}
 
-	return payload, nil
+	return &token.Payload{
+			Username: googlePayload.Claims["email"].(string),
+			IssuedAt: time.Unix(googlePayload.IssuedAt, 0),
+		}, nil
 }

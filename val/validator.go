@@ -224,6 +224,22 @@ func ValidateUpdateTransactionStatusRequest(transactionID string, transactionSta
 	return nil
 }
 
+func ValidateUpdateOrderStatusAndFilledAmount(orderID string, status pb.Status, filledAmount string) error {
+	if err := ValidateString(orderID, 1, 50); err != nil {
+		return err
+	}
+
+	if status < 0 || status > 3 {
+		return fmt.Errorf("status must be 0 (OPEN), 1 (PARTIALLY_FILLED), 2 (FILLED) or 3 (CANCELLED)")
+	}
+
+	if err := ValidateString(filledAmount, 1, 20); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func ValidateEmailId(value int64) error {
 	if value <= 0 {
 		return fmt.Errorf("must be a positive integer")

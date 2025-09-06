@@ -42,7 +42,7 @@ func (server *server) GetTrade(ctx context.Context, req *pb.GetTradeByIDRequest)
 	}
 
 	if authPayload.Username != trade.Username {
-		return nil, status.Errorf(codes.Unknown, "unknown")
+		return nil, status.Errorf(codes.Unknown, "Not authorized")
 	}
 
 	convertToPb := convertTrade(trade)
