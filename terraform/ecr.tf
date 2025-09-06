@@ -14,6 +14,7 @@ resource "aws_ecr_repository" "ecr_repo" {
     Name = var.ecr_repo_name
   }
 
+  
   lifecycle {
    prevent_destroy = true
   }
