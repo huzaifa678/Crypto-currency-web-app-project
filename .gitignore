@@ -12,4 +12,3 @@ vendor/
 Godeps/
 .terraform
 .DS_Store
-app.env
