@@ -48,6 +48,7 @@ const (
 	CryptoWebApp_GetTransactionsByUserEmail_FullMethodName = "/pb.CryptoWebApp/GetTransactionsByUserEmail"
 	CryptoWebApp_UpdateTransactionStatus_FullMethodName    = "/pb.CryptoWebApp/UpdateTransactionStatus"
 	CryptoWebApp_DeleteTransaction_FullMethodName          = "/pb.CryptoWebApp/DeleteTransaction"
+	CryptoWebApp_GoogleLogin_FullMethodName                = "/pb.CryptoWebApp/GoogleLogin"
 )
 
 // CryptoWebAppClient is the client API for CryptoWebApp service.
@@ -82,6 +83,7 @@ type CryptoWebAppClient interface {
 	GetTransactionsByUserEmail(ctx context.Context, in *GetTransactionsByUserEmailRequest, opts ...grpc.CallOption) (*GetTransactionsByUserEmailResponse, error)
 	UpdateTransactionStatus(ctx context.Context, in *UpdateTransactionStatusRequest, opts ...grpc.CallOption) (*UpdateTransactionStatusResponse, error)
 	DeleteTransaction(ctx context.Context, in *DeleteTransactionRequest, opts ...grpc.CallOption) (*DeleteTransactionResponse, error)
+	GoogleLogin(ctx context.Context, in *GoogleLoginRequest, opts ...grpc.CallOption) (*GoogleLoginResponse, error)
 }
 
 type cryptoWebAppClient struct {
@@ -381,6 +383,16 @@ func (c *cryptoWebAppClient) DeleteTransaction(ctx context.Context, in *DeleteTr
 	return out, nil
 }
 
+func (c *cryptoWebAppClient) GoogleLogin(ctx context.Context, in *GoogleLoginRequest, opts ...grpc.CallOption) (*GoogleLoginResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GoogleLoginResponse)
+	err := c.cc.Invoke(ctx, CryptoWebApp_GoogleLogin_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CryptoWebAppServer is the server API for CryptoWebApp service.
 // All implementations must embed UnimplementedCryptoWebAppServer
 // for forward compatibility.
@@ -413,6 +425,7 @@ type CryptoWebAppServer interface {
 	GetTransactionsByUserEmail(context.Context, *GetTransactionsByUserEmailRequest) (*GetTransactionsByUserEmailResponse, error)
 	UpdateTransactionStatus(context.Context, *UpdateTransactionStatusRequest) (*UpdateTransactionStatusResponse, error)
 	DeleteTransaction(context.Context, *DeleteTransactionRequest) (*DeleteTransactionResponse, error)
+	GoogleLogin(context.Context, *GoogleLoginRequest) (*GoogleLoginResponse, error)
 	mustEmbedUnimplementedCryptoWebAppServer()
 }
 
@@ -506,6 +519,9 @@ func (UnimplementedCryptoWebAppServer) UpdateTransactionStatus(context.Context, 
 }
 func (UnimplementedCryptoWebAppServer) DeleteTransaction(context.Context, *DeleteTransactionRequest) (*DeleteTransactionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTransaction not implemented")
+}
+func (UnimplementedCryptoWebAppServer) GoogleLogin(context.Context, *GoogleLoginRequest) (*GoogleLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GoogleLogin not implemented")
 }
 func (UnimplementedCryptoWebAppServer) mustEmbedUnimplementedCryptoWebAppServer() {}
 func (UnimplementedCryptoWebAppServer) testEmbeddedByValue()                      {}
@@ -1025,6 +1041,24 @@ func _CryptoWebApp_DeleteTransaction_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CryptoWebApp_GoogleLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GoogleLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CryptoWebAppServer).GoogleLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CryptoWebApp_GoogleLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CryptoWebAppServer).GoogleLogin(ctx, req.(*GoogleLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CryptoWebApp_ServiceDesc is the grpc.ServiceDesc for CryptoWebApp service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1139,6 +1173,10 @@ var CryptoWebApp_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTransaction",
 			Handler:    _CryptoWebApp_DeleteTransaction_Handler,
+		},
+		{
+			MethodName: "GoogleLogin",
+			Handler:    _CryptoWebApp_GoogleLogin_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

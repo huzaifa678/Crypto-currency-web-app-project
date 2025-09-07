@@ -55,6 +55,40 @@
         ]
       }
     },
+    "/v1/google_login": {
+      "post": {
+        "summary": "Google Login",
+        "description": "Login or register using Google OAuth and get access token and refresh token",
+        "operationId": "CryptoWebApp_GoogleLogin",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGoogleLoginResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbGoogleLoginRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
     "/v1/login": {
       "post": {
         "summary": "Login user",
@@ -1285,6 +1319,36 @@
         }
       }
     },
+    "pbGoogleLoginRequest": {
+      "type": "object",
+      "properties": {
+        "idToken": {
+          "type": "string"
+        }
+      }
+    },
+    "pbGoogleLoginResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "refreshToken": {
+          "type": "string"
+        },
+        "client": {
+          "$ref": "#/definitions/pbLoginClient"
+        },
+        "accessTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "refreshTokenExpiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "pbListMarket": {
       "type": "object",
       "properties": {
@@ -1303,6 +1367,30 @@
         "pricePrecision": {
           "type": "integer",
           "format": "int32"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "pbLoginClient": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "username": {
+          "type": "string"
+        },
+        "role": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string"
         },
         "createdAt": {
           "type": "string",

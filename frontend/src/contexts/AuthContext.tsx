@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import { StringLiteral } from 'typescript';
 
 interface User {
   id: string;
@@ -12,6 +13,16 @@ interface User {
   updated_at: string;
 }
 
+interface Client {
+  id : string;
+  email : string;
+  username : string;
+  role : string;
+  provider : string;
+  created_at : string;
+
+}
+
 interface LoginResponse {
   session_id: string;
   access_token: string;
@@ -21,10 +32,19 @@ interface LoginResponse {
   user: User;
 }
 
+interface GoogleLoginResponse {
+  access_token : string;
+  refresh_token : string;
+  client : Client
+  access_token_expires_at : string;
+  refresh_token_expires_at : string;
+}
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (googleIdToken: string) => Promise<void>;
   register: (username: string, email: string, password: string, role: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
@@ -70,6 +90,7 @@ api.interceptors.response.use(
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [client, setClient] = useState<Client | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -119,6 +140,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const loginWithGoogle = async (googleIdToken: string) => {
+    try {
+      setLoading(true);
+
+      const response = await api.post<GoogleLoginResponse>('/v1/google_login', {
+        id_token: googleIdToken,
+      });
+
+      const {
+        access_token,
+        refresh_token,
+        client,
+        access_token_expires_at,
+        refresh_token_expires_at,
+      } = response.data;
+
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+      localStorage.setItem('user', JSON.stringify(client));
+      localStorage.setItem('access_token_expiration', access_token_expires_at);
+      localStorage.setItem('refresh_token_expiration', refresh_token_expires_at);
+
+      setClient(client);
+      toast.success('login successful!');
+    } catch (error: any) {
+      const message = error.response?.data?.error || 'Google login failed';
+      toast.error(message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const register = async (username: string, email: string, password: string, role: string) => {
     try {
       setLoading(true);
@@ -151,6 +205,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     user,
     isAuthenticated: !!user,
     login,
+    loginWithGoogle,
     register,
     logout,
     loading,

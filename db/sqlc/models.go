@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type OrderStatus string
@@ -249,6 +250,16 @@ type Fee struct {
 	MakerFee  string    `json:"maker_fee"`
 	TakerFee  string    `json:"taker_fee"`
 	CreatedAt time.Time `json:"created_at"`
+}
+
+type GoogleAuth struct {
+	ID         uuid.UUID        `json:"id"`
+	Email      string           `json:"email"`
+	Username   string           `json:"username"`
+	Provider   string           `json:"provider"`
+	ProviderID string           `json:"provider_id"`
+	Role       pgtype.Text      `json:"role"`
+	CreatedAt  pgtype.Timestamp `json:"created_at"`
 }
 
 type Market struct {
