@@ -41,10 +41,11 @@ interface GoogleLoginResponse {
 }
 
 interface AuthContextType {
+  client: Client | null;
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
-  loginWithGoogle: (googleIdToken: string) => Promise<void>;
+  loginWithGoogle: (googleIdToken: string) => Promise<Client>;
   register: (username: string, email: string, password: string, role: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
@@ -163,7 +164,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       localStorage.setItem('refresh_token_expiration', refresh_token_expires_at);
 
       setClient(client);
+      setUser({
+        id: client.id,
+        username: client.username,
+        email: client.email,
+        role: client.role,
+        is_verified: true,
+        created_at: client.created_at,
+        updated_at: client.created_at,
+      });
+
       toast.success('login successful!');
+      return client;
     } catch (error: any) {
       const message = error.response?.data?.error || 'Google login failed';
       toast.error(message);
@@ -203,6 +215,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const value: AuthContextType = {
     user,
+    client,
     isAuthenticated: !!user,
     login,
     loginWithGoogle,

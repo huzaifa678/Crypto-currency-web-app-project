@@ -11,8 +11,10 @@ const Login: React.FC = () => {
       <GoogleLogin
         onSuccess={async credentialResponse => {
           if (credentialResponse.credential) {
-            await loginWithGoogle(credentialResponse.credential);
-            navigate("/dashboard"); 
+            const client = await loginWithGoogle(credentialResponse.credential);
+            if (client) {
+              navigate('/dashboard');
+            }
           }
         }}
         onError={() => {
