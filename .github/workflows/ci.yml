@@ -37,6 +37,12 @@ jobs:
       with:
         go-version: 1.23.4
       id: go_ci
+
+    - name: Create app.env file
+      run: |
+        echo "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> app.env
+        echo "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> app.env
+        echo "REDIRECT_URL" >> app.env
     
     - name: Install migrations
       run: | 
