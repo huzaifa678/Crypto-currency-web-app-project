@@ -66,6 +66,21 @@ func (mr *MockStore_interfaceMockRecorder) CreateFee(arg0, arg1 interface{}) *go
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateFee", reflect.TypeOf((*MockStore_interface)(nil).CreateFee), arg0, arg1)
 }
 
+// CreateGoogleUser mocks base method.
+func (m *MockStore_interface) CreateGoogleUser(arg0 context.Context, arg1 db.CreateGoogleUserParams) (db.GoogleAuth, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateGoogleUser", arg0, arg1)
+	ret0, _ := ret[0].(db.GoogleAuth)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateGoogleUser indicates an expected call of CreateGoogleUser.
+func (mr *MockStore_interfaceMockRecorder) CreateGoogleUser(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGoogleUser", reflect.TypeOf((*MockStore_interface)(nil).CreateGoogleUser), arg0, arg1)
+}
+
 // CreateMarket mocks base method.
 func (m *MockStore_interface) CreateMarket(arg0 context.Context, arg1 db.CreateMarketParams) (db.CreateMarketRow, error) {
 	m.ctrl.T.Helper()
@@ -355,6 +370,36 @@ func (m *MockStore_interface) GetFeeByMarketID(arg0 context.Context, arg1 uuid.U
 func (mr *MockStore_interfaceMockRecorder) GetFeeByMarketID(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetFeeByMarketID", reflect.TypeOf((*MockStore_interface)(nil).GetFeeByMarketID), arg0, arg1)
+}
+
+// GetGoogleUserByEmail mocks base method.
+func (m *MockStore_interface) GetGoogleUserByEmail(arg0 context.Context, arg1 string) (db.GoogleAuth, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGoogleUserByEmail", arg0, arg1)
+	ret0, _ := ret[0].(db.GoogleAuth)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetGoogleUserByEmail indicates an expected call of GetGoogleUserByEmail.
+func (mr *MockStore_interfaceMockRecorder) GetGoogleUserByEmail(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGoogleUserByEmail", reflect.TypeOf((*MockStore_interface)(nil).GetGoogleUserByEmail), arg0, arg1)
+}
+
+// GetGoogleUserByProviderID mocks base method.
+func (m *MockStore_interface) GetGoogleUserByProviderID(arg0 context.Context, arg1 string) (db.GoogleAuth, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetGoogleUserByProviderID", arg0, arg1)
+	ret0, _ := ret[0].(db.GoogleAuth)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetGoogleUserByProviderID indicates an expected call of GetGoogleUserByProviderID.
+func (mr *MockStore_interfaceMockRecorder) GetGoogleUserByProviderID(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetGoogleUserByProviderID", reflect.TypeOf((*MockStore_interface)(nil).GetGoogleUserByProviderID), arg0, arg1)
 }
 
 // GetMarketByCurrencies mocks base method.

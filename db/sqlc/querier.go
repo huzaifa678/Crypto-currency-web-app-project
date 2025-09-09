@@ -13,6 +13,7 @@ import (
 type Querier interface {
 	CreateAuditLog(ctx context.Context, arg CreateAuditLogParams) (AuditLog, error)
 	CreateFee(ctx context.Context, arg CreateFeeParams) (CreateFeeRow, error)
+	CreateGoogleUser(ctx context.Context, arg CreateGoogleUserParams) (GoogleAuth, error)
 	CreateMarket(ctx context.Context, arg CreateMarketParams) (CreateMarketRow, error)
 	CreateOrder(ctx context.Context, arg CreateOrderParams) (CreateOrderRow, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) (Session, error)
@@ -31,6 +32,8 @@ type Querier interface {
 	DeleteWallet(ctx context.Context, id uuid.UUID) error
 	GetAuditLogsByUserEmail(ctx context.Context, userEmail string) ([]AuditLog, error)
 	GetFeeByMarketID(ctx context.Context, marketID uuid.UUID) (Fee, error)
+	GetGoogleUserByEmail(ctx context.Context, email string) (GoogleAuth, error)
+	GetGoogleUserByProviderID(ctx context.Context, providerID string) (GoogleAuth, error)
 	GetMarketByCurrencies(ctx context.Context, arg GetMarketByCurrenciesParams) (Market, error)
 	GetMarketByID(ctx context.Context, id uuid.UUID) (Market, error)
 	GetOrderByID(ctx context.Context, id uuid.UUID) (Order, error)

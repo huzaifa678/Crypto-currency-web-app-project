@@ -24,6 +24,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/gapi"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/mail"
+	"github.com/huzaifa678/Crypto-currency-web-app-project/oauth2"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/worker"
@@ -50,6 +51,8 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot load config")
 	}
+
+	oauth2.InitGoogleOAuth(config)
 
 	ctx, stop := signal.NotifyContext(context.Background(), interruptSignals...)
 	defer stop() 
@@ -200,6 +203,9 @@ func runGatewayServer(
 
     fs := http.FileServer(http.FS(docsFS))
     mux.Handle("/docs/", http.StripPrefix("/", fs))
+
+	mux.HandleFunc("/oauth/google/login", oauth2.GoogleLoginHandler)
+	mux.HandleFunc("/oauth/google/callback", oauth2.GoogleCallbackHandler)
 
     c := cors.New(cors.Options{
         AllowedOrigins:   []string{"http://localhost:3000"},

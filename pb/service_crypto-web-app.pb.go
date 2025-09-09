@@ -27,7 +27,7 @@ var File_service_crypto_web_app_proto protoreflect.FileDescriptor
 
 const file_service_crypto_web_app_proto_rawDesc = "" +
 	"\n" +
-	"\x1cservice_crypto-web-app.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17rpc_create_market.proto\x1a\x17rpc_delete_market.proto\x1a\x14rpc_get_market.proto\x1a\x15rpc_list_market.proto\x1a\x16rpc_create_order.proto\x1a\x16rpc_delete_order.proto\x1a\x13rpc_get_order.proto\x1a\x15rpc_create_user.proto\x1a\x15rpc_delete_user.proto\x1a\x15rpc_update_user.proto\x1a\x12rpc_get_user.proto\x1a\x14rpc_login_user.proto\x1a\x17rpc_create_wallet.proto\x1a\x17rpc_delete_wallet.proto\x1a\x17rpc_update_wallet.proto\x1a\x14rpc_get_wallet.proto\x1a\x16rpc_verify_email.proto\x1a\x18rpc_binance_stream.proto\x1a\x16rpc_create_trade.proto\x1a\x13rpc_get_trade.proto\x1a\x16rpc_delete_trade.proto\x1a\x1crpc_create_transaction.proto\x1a\x19rpc_get_transaction.proto\x1a\x1crpc_update_transaction.proto\x1a\x1crpc_delete_transaction.proto\x1a'rpc_get_transaction_by_user_email.proto\x1a/rpc_update_order_status_and_filled_amount.proto\x1a\x14rpc_list_order.proto\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto2\x8f\"\n" +
+	"\x1cservice_crypto-web-app.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17rpc_create_market.proto\x1a\x17rpc_delete_market.proto\x1a\x14rpc_get_market.proto\x1a\x15rpc_list_market.proto\x1a\x16rpc_create_order.proto\x1a\x16rpc_delete_order.proto\x1a\x13rpc_get_order.proto\x1a\x15rpc_create_user.proto\x1a\x15rpc_delete_user.proto\x1a\x15rpc_update_user.proto\x1a\x12rpc_get_user.proto\x1a\x14rpc_login_user.proto\x1a\x17rpc_create_wallet.proto\x1a\x17rpc_delete_wallet.proto\x1a\x17rpc_update_wallet.proto\x1a\x14rpc_get_wallet.proto\x1a\x16rpc_verify_email.proto\x1a\x18rpc_binance_stream.proto\x1a\x16rpc_create_trade.proto\x1a\x13rpc_get_trade.proto\x1a\x16rpc_delete_trade.proto\x1a\x1crpc_create_transaction.proto\x1a\x19rpc_get_transaction.proto\x1a\x1crpc_update_transaction.proto\x1a\x1crpc_delete_transaction.proto\x1a'rpc_get_transaction_by_user_email.proto\x1a/rpc_update_order_status_and_filled_amount.proto\x1a\x14rpc_list_order.proto\x1a\x16rpc_google_login.proto\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto2\xcb#\n" +
 	"\fCryptoWebApp\x12\x95\x01\n" +
 	"\n" +
 	"CreateUser\x12\x15.pb.CreateUserRequest\x1a\x16.pb.CreateUserResponse\"X\x92A;\x12\vCreate user\x1a,Create a new user with the specified details\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/create_user\x12\x80\x01\n" +
@@ -65,7 +65,8 @@ const file_service_crypto_web_app_proto_rawDesc = "" +
 	"\x0eGetTransaction\x12\x1d.pb.GetTransactionByIDRequest\x1a\x1e.pb.GetTransactionByIDResponse\"_\x92A3\x12\x0fGet Transaction\x1a Get the transaction for the user\x82\xd3\xe4\x93\x02#\x12!/v1/transactions/{transaction_id}\x12\xf3\x01\n" +
 	"\x1aGetTransactionsByUserEmail\x12%.pb.GetTransactionsByUserEmailRequest\x1a&.pb.GetTransactionsByUserEmailResponse\"\x85\x01\x92AX\x12\x1dGet Transaction By User Email\x1a7Get all the transactions done by user using their email\x82\xd3\xe4\x93\x02$\x12\"/v1/transactions/list/{user_email}\x12\xda\x01\n" +
 	"\x17UpdateTransactionStatus\x12\".pb.UpdateTransactionStatusRequest\x1a#.pb.UpdateTransactionStatusResponse\"v\x92AG\x12\x19Update Transaction Status\x1a*Update the transaction status for the user\x82\xd3\xe4\x93\x02&:\x01*2!/v1/transactions/{transaction_id}\x12\xb7\x01\n" +
-	"\x11DeleteTransaction\x12\x1c.pb.DeleteTransactionRequest\x1a\x1d.pb.DeleteTransactionResponse\"e\x92A9\x12\x12Delete Transaction\x1a#Delete the transaction for the user\x82\xd3\xe4\x93\x02#*!/v1/transactions/{transaction_id}B\xa7\x01\x92Aj\x12h\n" +
+	"\x11DeleteTransaction\x12\x1c.pb.DeleteTransactionRequest\x1a\x1d.pb.DeleteTransactionResponse\"e\x92A9\x12\x12Delete Transaction\x1a#Delete the transaction for the user\x82\xd3\xe4\x93\x02#*!/v1/transactions/{transaction_id}\x12\xb9\x01\n" +
+	"\vGoogleLogin\x12\x16.pb.GoogleLoginRequest\x1a\x17.pb.GoogleLoginResponse\"y\x92A[\x12\fGoogle Login\x1aKLogin or register using Google OAuth and get access token and refresh token\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/v1/google_loginB\xa7\x01\x92Aj\x12h\n" +
 	"\x12Crypto web app API\"M\n" +
 	"\x12Huzaifa Ahmad Gill\x12\x1dhttps://github.com/huzaifa678\x1a\x18huzaifagill411@gmail.com2\x031.0Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"
 
@@ -97,34 +98,36 @@ var file_service_crypto_web_app_proto_goTypes = []any{
 	(*GetTransactionsByUserEmailRequest)(nil),        // 24: pb.GetTransactionsByUserEmailRequest
 	(*UpdateTransactionStatusRequest)(nil),           // 25: pb.UpdateTransactionStatusRequest
 	(*DeleteTransactionRequest)(nil),                 // 26: pb.DeleteTransactionRequest
-	(*CreateUserResponse)(nil),                       // 27: pb.CreateUserResponse
-	(*DeleteUserResponse)(nil),                       // 28: pb.DeleteUserResponse
-	(*UpdateUserResponse)(nil),                       // 29: pb.UpdateUserResponse
-	(*GetUserResponse)(nil),                          // 30: pb.GetUserResponse
-	(*LoginUserResponse)(nil),                        // 31: pb.LoginUserResponse
-	(*CreateMarketResponse)(nil),                     // 32: pb.CreateMarketResponse
-	(*DeleteMarketResponse)(nil),                     // 33: pb.DeleteMarketResponse
-	(*GetMarketResponse)(nil),                        // 34: pb.GetMarketResponse
-	(*MarketListResponse)(nil),                       // 35: pb.MarketListResponse
-	(*CreateOrderResponse)(nil),                      // 36: pb.CreateOrderResponse
-	(*DeleteOrderResponse)(nil),                      // 37: pb.DeleteOrderResponse
-	(*GetOrderResponse)(nil),                         // 38: pb.GetOrderResponse
-	(*UpdateOrderStatusAndFilledAmountResponse)(nil), // 39: pb.UpdateOrderStatusAndFilledAmountResponse
-	(*OrderListResponse)(nil),                        // 40: pb.OrderListResponse
-	(*CreateWalletResponse)(nil),                     // 41: pb.CreateWalletResponse
-	(*DeleteWalletResponse)(nil),                     // 42: pb.DeleteWalletResponse
-	(*UpdateWalletResponse)(nil),                     // 43: pb.UpdateWalletResponse
-	(*GetWalletResponse)(nil),                        // 44: pb.GetWalletResponse
-	(*VerifyEmailResponse)(nil),                      // 45: pb.VerifyEmailResponse
-	(*Trade)(nil),                                    // 46: pb.Trade
-	(*CreateTradeResponse)(nil),                      // 47: pb.CreateTradeResponse
-	(*GetTradeByIDResponse)(nil),                     // 48: pb.GetTradeByIDResponse
-	(*DeleteTradeResponse)(nil),                      // 49: pb.DeleteTradeResponse
-	(*CreateTransactionResponse)(nil),                // 50: pb.CreateTransactionResponse
-	(*GetTransactionByIDResponse)(nil),               // 51: pb.GetTransactionByIDResponse
-	(*GetTransactionsByUserEmailResponse)(nil),       // 52: pb.GetTransactionsByUserEmailResponse
-	(*UpdateTransactionStatusResponse)(nil),          // 53: pb.UpdateTransactionStatusResponse
-	(*DeleteTransactionResponse)(nil),                // 54: pb.DeleteTransactionResponse
+	(*GoogleLoginRequest)(nil),                       // 27: pb.GoogleLoginRequest
+	(*CreateUserResponse)(nil),                       // 28: pb.CreateUserResponse
+	(*DeleteUserResponse)(nil),                       // 29: pb.DeleteUserResponse
+	(*UpdateUserResponse)(nil),                       // 30: pb.UpdateUserResponse
+	(*GetUserResponse)(nil),                          // 31: pb.GetUserResponse
+	(*LoginUserResponse)(nil),                        // 32: pb.LoginUserResponse
+	(*CreateMarketResponse)(nil),                     // 33: pb.CreateMarketResponse
+	(*DeleteMarketResponse)(nil),                     // 34: pb.DeleteMarketResponse
+	(*GetMarketResponse)(nil),                        // 35: pb.GetMarketResponse
+	(*MarketListResponse)(nil),                       // 36: pb.MarketListResponse
+	(*CreateOrderResponse)(nil),                      // 37: pb.CreateOrderResponse
+	(*DeleteOrderResponse)(nil),                      // 38: pb.DeleteOrderResponse
+	(*GetOrderResponse)(nil),                         // 39: pb.GetOrderResponse
+	(*UpdateOrderStatusAndFilledAmountResponse)(nil), // 40: pb.UpdateOrderStatusAndFilledAmountResponse
+	(*OrderListResponse)(nil),                        // 41: pb.OrderListResponse
+	(*CreateWalletResponse)(nil),                     // 42: pb.CreateWalletResponse
+	(*DeleteWalletResponse)(nil),                     // 43: pb.DeleteWalletResponse
+	(*UpdateWalletResponse)(nil),                     // 44: pb.UpdateWalletResponse
+	(*GetWalletResponse)(nil),                        // 45: pb.GetWalletResponse
+	(*VerifyEmailResponse)(nil),                      // 46: pb.VerifyEmailResponse
+	(*Trade)(nil),                                    // 47: pb.Trade
+	(*CreateTradeResponse)(nil),                      // 48: pb.CreateTradeResponse
+	(*GetTradeByIDResponse)(nil),                     // 49: pb.GetTradeByIDResponse
+	(*DeleteTradeResponse)(nil),                      // 50: pb.DeleteTradeResponse
+	(*CreateTransactionResponse)(nil),                // 51: pb.CreateTransactionResponse
+	(*GetTransactionByIDResponse)(nil),               // 52: pb.GetTransactionByIDResponse
+	(*GetTransactionsByUserEmailResponse)(nil),       // 53: pb.GetTransactionsByUserEmailResponse
+	(*UpdateTransactionStatusResponse)(nil),          // 54: pb.UpdateTransactionStatusResponse
+	(*DeleteTransactionResponse)(nil),                // 55: pb.DeleteTransactionResponse
+	(*GoogleLoginResponse)(nil),                      // 56: pb.GoogleLoginResponse
 }
 var file_service_crypto_web_app_proto_depIdxs = []int32{
 	0,  // 0: pb.CryptoWebApp.CreateUser:input_type -> pb.CreateUserRequest
@@ -155,36 +158,38 @@ var file_service_crypto_web_app_proto_depIdxs = []int32{
 	24, // 25: pb.CryptoWebApp.GetTransactionsByUserEmail:input_type -> pb.GetTransactionsByUserEmailRequest
 	25, // 26: pb.CryptoWebApp.UpdateTransactionStatus:input_type -> pb.UpdateTransactionStatusRequest
 	26, // 27: pb.CryptoWebApp.DeleteTransaction:input_type -> pb.DeleteTransactionRequest
-	27, // 28: pb.CryptoWebApp.CreateUser:output_type -> pb.CreateUserResponse
-	28, // 29: pb.CryptoWebApp.DeleteUser:output_type -> pb.DeleteUserResponse
-	29, // 30: pb.CryptoWebApp.UpdateUser:output_type -> pb.UpdateUserResponse
-	30, // 31: pb.CryptoWebApp.GetUser:output_type -> pb.GetUserResponse
-	31, // 32: pb.CryptoWebApp.LoginUser:output_type -> pb.LoginUserResponse
-	32, // 33: pb.CryptoWebApp.CreateMarket:output_type -> pb.CreateMarketResponse
-	33, // 34: pb.CryptoWebApp.DeleteMarket:output_type -> pb.DeleteMarketResponse
-	34, // 35: pb.CryptoWebApp.GetMarket:output_type -> pb.GetMarketResponse
-	35, // 36: pb.CryptoWebApp.ListMarkets:output_type -> pb.MarketListResponse
-	36, // 37: pb.CryptoWebApp.CreateOrder:output_type -> pb.CreateOrderResponse
-	37, // 38: pb.CryptoWebApp.DeleteOrder:output_type -> pb.DeleteOrderResponse
-	38, // 39: pb.CryptoWebApp.GetOrder:output_type -> pb.GetOrderResponse
-	39, // 40: pb.CryptoWebApp.UpdateOrder:output_type -> pb.UpdateOrderStatusAndFilledAmountResponse
-	40, // 41: pb.CryptoWebApp.ListOrder:output_type -> pb.OrderListResponse
-	41, // 42: pb.CryptoWebApp.CreateWallet:output_type -> pb.CreateWalletResponse
-	42, // 43: pb.CryptoWebApp.DeleteWallet:output_type -> pb.DeleteWalletResponse
-	43, // 44: pb.CryptoWebApp.UpdateWallet:output_type -> pb.UpdateWalletResponse
-	44, // 45: pb.CryptoWebApp.GetWallet:output_type -> pb.GetWalletResponse
-	45, // 46: pb.CryptoWebApp.VerifyEmail:output_type -> pb.VerifyEmailResponse
-	46, // 47: pb.CryptoWebApp.StreamTrades:output_type -> pb.Trade
-	47, // 48: pb.CryptoWebApp.CreateTrade:output_type -> pb.CreateTradeResponse
-	48, // 49: pb.CryptoWebApp.GetTrade:output_type -> pb.GetTradeByIDResponse
-	49, // 50: pb.CryptoWebApp.DeleteTrade:output_type -> pb.DeleteTradeResponse
-	50, // 51: pb.CryptoWebApp.CreateTransaction:output_type -> pb.CreateTransactionResponse
-	51, // 52: pb.CryptoWebApp.GetTransaction:output_type -> pb.GetTransactionByIDResponse
-	52, // 53: pb.CryptoWebApp.GetTransactionsByUserEmail:output_type -> pb.GetTransactionsByUserEmailResponse
-	53, // 54: pb.CryptoWebApp.UpdateTransactionStatus:output_type -> pb.UpdateTransactionStatusResponse
-	54, // 55: pb.CryptoWebApp.DeleteTransaction:output_type -> pb.DeleteTransactionResponse
-	28, // [28:56] is the sub-list for method output_type
-	0,  // [0:28] is the sub-list for method input_type
+	27, // 28: pb.CryptoWebApp.GoogleLogin:input_type -> pb.GoogleLoginRequest
+	28, // 29: pb.CryptoWebApp.CreateUser:output_type -> pb.CreateUserResponse
+	29, // 30: pb.CryptoWebApp.DeleteUser:output_type -> pb.DeleteUserResponse
+	30, // 31: pb.CryptoWebApp.UpdateUser:output_type -> pb.UpdateUserResponse
+	31, // 32: pb.CryptoWebApp.GetUser:output_type -> pb.GetUserResponse
+	32, // 33: pb.CryptoWebApp.LoginUser:output_type -> pb.LoginUserResponse
+	33, // 34: pb.CryptoWebApp.CreateMarket:output_type -> pb.CreateMarketResponse
+	34, // 35: pb.CryptoWebApp.DeleteMarket:output_type -> pb.DeleteMarketResponse
+	35, // 36: pb.CryptoWebApp.GetMarket:output_type -> pb.GetMarketResponse
+	36, // 37: pb.CryptoWebApp.ListMarkets:output_type -> pb.MarketListResponse
+	37, // 38: pb.CryptoWebApp.CreateOrder:output_type -> pb.CreateOrderResponse
+	38, // 39: pb.CryptoWebApp.DeleteOrder:output_type -> pb.DeleteOrderResponse
+	39, // 40: pb.CryptoWebApp.GetOrder:output_type -> pb.GetOrderResponse
+	40, // 41: pb.CryptoWebApp.UpdateOrder:output_type -> pb.UpdateOrderStatusAndFilledAmountResponse
+	41, // 42: pb.CryptoWebApp.ListOrder:output_type -> pb.OrderListResponse
+	42, // 43: pb.CryptoWebApp.CreateWallet:output_type -> pb.CreateWalletResponse
+	43, // 44: pb.CryptoWebApp.DeleteWallet:output_type -> pb.DeleteWalletResponse
+	44, // 45: pb.CryptoWebApp.UpdateWallet:output_type -> pb.UpdateWalletResponse
+	45, // 46: pb.CryptoWebApp.GetWallet:output_type -> pb.GetWalletResponse
+	46, // 47: pb.CryptoWebApp.VerifyEmail:output_type -> pb.VerifyEmailResponse
+	47, // 48: pb.CryptoWebApp.StreamTrades:output_type -> pb.Trade
+	48, // 49: pb.CryptoWebApp.CreateTrade:output_type -> pb.CreateTradeResponse
+	49, // 50: pb.CryptoWebApp.GetTrade:output_type -> pb.GetTradeByIDResponse
+	50, // 51: pb.CryptoWebApp.DeleteTrade:output_type -> pb.DeleteTradeResponse
+	51, // 52: pb.CryptoWebApp.CreateTransaction:output_type -> pb.CreateTransactionResponse
+	52, // 53: pb.CryptoWebApp.GetTransaction:output_type -> pb.GetTransactionByIDResponse
+	53, // 54: pb.CryptoWebApp.GetTransactionsByUserEmail:output_type -> pb.GetTransactionsByUserEmailResponse
+	54, // 55: pb.CryptoWebApp.UpdateTransactionStatus:output_type -> pb.UpdateTransactionStatusResponse
+	55, // 56: pb.CryptoWebApp.DeleteTransaction:output_type -> pb.DeleteTransactionResponse
+	56, // 57: pb.CryptoWebApp.GoogleLogin:output_type -> pb.GoogleLoginResponse
+	29, // [29:58] is the sub-list for method output_type
+	0,  // [0:29] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -223,6 +228,7 @@ func file_service_crypto_web_app_proto_init() {
 	file_rpc_get_transaction_by_user_email_proto_init()
 	file_rpc_update_order_status_and_filled_amount_proto_init()
 	file_rpc_list_order_proto_init()
+	file_rpc_google_login_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

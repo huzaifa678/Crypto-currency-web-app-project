@@ -31,6 +31,7 @@ import "rpc_delete_transaction.proto";
 import "rpc_get_transaction_by_user_email.proto";
 import "rpc_update_order_status_and_filled_amount.proto";
 import "rpc_list_order.proto";
+import "rpc_google_login.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -374,6 +375,18 @@ service CryptoWebApp {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Delete the transaction for the user"
             summary: "Delete Transaction"
+        };
+    }
+
+    rpc GoogleLogin (GoogleLoginRequest) returns (GoogleLoginResponse) {
+        option (google.api.http) = {
+            post: "/v1/google_login"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Login or register using Google OAuth and get access token and refresh token";
+            summary: "Google Login";
         };
     }
 }
