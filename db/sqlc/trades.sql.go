@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const createTrade = `-- name: CreateTrade :one
@@ -18,13 +19,13 @@ RETURNING id, username, buy_order_id, sell_order_id, market_id, price, amount, f
 `
 
 type CreateTradeParams struct {
-	Username    string    `json:"username"`
-	BuyOrderID  uuid.UUID `json:"buy_order_id"`
-	SellOrderID uuid.UUID `json:"sell_order_id"`
-	MarketID    uuid.UUID `json:"market_id"`
-	Price       string    `json:"price"`
-	Amount      string    `json:"amount"`
-	Fee         string    `json:"fee"`
+	Username    string          `json:"username"`
+	BuyOrderID  uuid.UUID       `json:"buy_order_id"`
+	SellOrderID uuid.UUID       `json:"sell_order_id"`
+	MarketID    uuid.UUID       `json:"market_id"`
+	Price       decimal.Decimal `json:"price"`
+	Amount      decimal.Decimal `json:"amount"`
+	Fee         decimal.Decimal `json:"fee"`
 }
 
 func (q *Queries) CreateTrade(ctx context.Context, arg CreateTradeParams) (Trade, error) {

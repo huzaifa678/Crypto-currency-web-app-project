@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -38,7 +39,7 @@ func TestDeleteMarket(t *testing.T) {
 		Username:       marketParams.Username,
 		BaseCurrency:   "USD",
 		QuoteCurrency:  "INR",
-		MinOrderAmount: "0.01",
+		MinOrderAmount: decimal.NewFromFloat(0.01),
 		PricePrecision: 8,
 	}
 
@@ -66,7 +67,7 @@ func TestGetMarketById(t *testing.T) {
 		Username:       marketParams.Username,
 		BaseCurrency:   "BTC",
 		QuoteCurrency:  "INR",
-		MinOrderAmount: "0.01",
+		MinOrderAmount: decimal.NewFromFloat(0.01),
 		PricePrecision: 8,
 	}
 
@@ -147,7 +148,7 @@ func createRandomMarket() (CreateMarketParams, Market, CreateMarketRow) {
 		Username:       user.Username,
 		BaseCurrency:   baseCurrency,
 		QuoteCurrency:  quoteCurrency,
-		MinOrderAmount: "0.1",
+		MinOrderAmount: decimal.NewFromFloat(0.1),
 		PricePrecision: 8,
 	}
 

@@ -6,8 +6,8 @@ import toast from 'react-hot-toast';
 interface Wallet {
   id: string;
   currency: string;
-  balance: string;
-  locked_balance: string;
+  balance: number;
+  locked_balance: number;
 }
 
 const WalletPage: React.FC = () => {
@@ -19,7 +19,26 @@ const WalletPage: React.FC = () => {
   const [searchedWallet, setSearchedWallet] = useState<Wallet | null>(null);
 
   useEffect(() => {
-    setLoading(false);
+    const fetchWallets = async () => {
+      try {
+        const res = await api.get<{ wallets: Wallet[] }>('/v1/wallets');
+        const normalized = (res.data.wallets || []).filter(Boolean).map(w => ({
+          id: w.id,
+          currency: w.currency,
+          balance: Number(w.balance),
+          locked_balance: Number(w.locked_balance),
+        }));
+        setWallets(normalized);
+        console.log(res.data.wallets);
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to load wallets');
+      } finally {
+      setLoading(false);
+      }
+    };
+
+    fetchWallets();
   }, []);
 
   const handleCreateWallet = async () => {
@@ -41,8 +60,13 @@ const WalletPage: React.FC = () => {
       const walletId = response.data.wallet_id;
 
       const walletResponse = await api.get<{ wallet: Wallet }>(`/v1/wallets/${walletId}`);
-      const createdWallet = walletResponse.data.wallet;
-
+      const raw = walletResponse.data.wallet;
+      const createdWallet: Wallet = {
+        id: raw.id,
+        currency: raw.currency,
+        balance: Number(raw.balance),
+        locked_balance: Number(raw.locked_balance),
+      };
       setSearchedWallet(createdWallet);
       setWallets((prev) => [...prev, createdWallet]);
 
@@ -69,36 +93,32 @@ const WalletPage: React.FC = () => {
 
   const handleUpdateWallet = async (walletId: string, delta: number) => {
     try {
-      const wallet = wallets.find((w) => w.id === walletId);
+      const wallet = wallets.filter(Boolean).find((w) => w.id === walletId);
       if (!wallet) return;
 
-      const updatedBalance = (parseFloat(wallet.balance) + delta).toString();
+      const updatedBalance = wallet.balance + delta;
 
-      const response = await api.patch<{ wallet: Wallet }>(`/v1/wallets/${walletId}`, {
+      await api.patch<{ wallet: Wallet }>(`/v1/wallets/${walletId}`, {
         balance: updatedBalance,
         locked_balance: wallet.locked_balance,
-        wallet_id: walletId,
+        id: walletId,
       });
-
-      const updatedWallet = response.data.wallet;
-
-      setWallets(wallets.map((w) => (w.id === walletId ? updatedWallet : w)));
-      if (searchedWallet?.id === walletId) setSearchedWallet(updatedWallet);
 
       toast.success(delta >= 0 ? 'Deposit successful!' : 'Withdrawal successful!');
     } catch (error: any) {
+      console.error(error);
       toast.error('Failed to update wallet');
     }
   };
 
-  const formatCurrency = (amount: string, currency: string) => {
+  const formatCurrency = (amount: number, currency: string) => {
     if (currency === 'USD') {
       return new Intl.NumberFormat('en-US', {
         style: 'currency',
         currency: 'USD',
-      }).format(parseFloat(amount));
+      }).format(amount);
     }
-    return `${parseFloat(amount).toFixed(8)} ${currency}`;
+    return `${amount} ${currency}`;
   };
 
   if (loading) {
@@ -110,7 +130,7 @@ const WalletPage: React.FC = () => {
   }
 
   return (
-    <div className="fixed top-10 mt-10 left-1/2 transform -translate-x-1/2 px-6 py-6">
+    <div className="fixed top-10 mt-10 left-1/2 transform -translate-x-1/3 w-full max-w-3xl px-6 py-6 h-[calc(100vh-6rem)] overflow-y-auto"> 
       {/* Header */}
       <div className="bg-white rounded-lg shadow p-6 mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Wallet</h1>
@@ -149,10 +169,10 @@ const WalletPage: React.FC = () => {
 
       {/* Wallet Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {wallets.filter(Boolean).map((wallet) => (
+        {Array.isArray(wallets) && wallets.filter(Boolean).map((wallet) => (
           <div
             key={wallet.id}
-            className="bg-white rounded-lg shadow p-6 min-h-[320px] flex flex-col"
+            className="bg-white rounded-lg shadow p-5 min-h-[320px] flex flex-col justify-between"
           >
             {/* Top content */}
             <div className="flex-1">
@@ -192,7 +212,7 @@ const WalletPage: React.FC = () => {
             </div>
 
             {/* Action buttons */}
-            <div className="flex space-x-2 mt-6">
+            <div className="flex space-x-2 mt-4">
               <button
                 type="button"
                 onClick={() => handleUpdateWallet(wallet.id, 100)}

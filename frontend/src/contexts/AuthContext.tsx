@@ -208,6 +208,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
     setUser(null);
+    setClient(null);
     toast.success('Logged out successfully');
   };
 

@@ -6,6 +6,7 @@ import (
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -17,8 +18,8 @@ type WalletRequest struct {
 }
 
 type UpdateWalletRequest struct {
-	Balance       string `json:"balance"`
-	LockedBalance string `json:"locked_balance"`
+	Balance       decimal.Decimal `json:"balance"`
+	LockedBalance decimal.Decimal `json:"locked_balance"`
 	UserEmail     string         `json:"user_email"`
 	Currency      string         `json:"currency"`
 }
@@ -37,7 +38,7 @@ func (server *server) createWallet(ctx *gin.Context) {
         Username:  authPayload.Username,
         UserEmail: req.UserEmail,
         Currency:  req.Currency,
-        Balance:   "0",
+        Balance:   decimal.NewFromFloat(0),
     }
 
     wallet, err := server.store.CreateWallet(ctx, arg)
@@ -129,6 +130,7 @@ func (server *server) updateWallet(ctx *gin.Context) {
 	arg := db.UpdateWalletBalanceParams{
 		Balance:       req.Balance,
 		LockedBalance: req.LockedBalance,
+        ID: walletID,
 	}
 
     err = server.store.UpdateWalletBalance(ctx, arg)

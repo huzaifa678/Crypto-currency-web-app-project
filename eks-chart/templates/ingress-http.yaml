@@ -3,12 +3,12 @@ kind: Ingress
 metadata:
   name: {{ .Values.appName }}-ingress-http
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: "{{ .Values.domainName }}"
+    external-dns.alpha.kubernetes.io/hostname: "{{ .Values.domainName.http }}"
     cert-manager.io/cluster-issuer: letsencrypt
 spec:
   ingressClassName: {{ .Values.ingressClass }}
   rules:
-  - host: {{ .Values.domainName }}
+  - host: {{ .Values.domainName.http }}
     http:
       paths:
       - path: /
@@ -20,5 +20,5 @@ spec:
               number: 80
   tls:
   - hosts:
-    - {{ .Values.domainName }}
-    secretName: {{ .Values.tlsSecretName }}
+    - {{ .Values.domainName.http }}
+    secretName: {{ .Values.tlsSecretName.http }}

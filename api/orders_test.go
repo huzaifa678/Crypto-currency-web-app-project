@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -18,6 +19,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -49,9 +51,18 @@ func TestCreateOrderAPI(t *testing.T) {
             },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
-                    CreateOrder(gomock.Any(), gomock.Eq(createOrderParams)).
-                    Times(1).
-                    Return(createOrderRow, nil)
+                    CreateOrder(gomock.Any(), gomock.Any()).
+                    DoAndReturn(func(ctx context.Context, arg db.CreateOrderParams) (db.CreateOrderRow, error) {
+                        require.Equal(t, createOrderParams.Username, arg.Username)
+                        require.Equal(t, createOrderParams.UserEmail, arg.UserEmail)
+                        require.Equal(t, createOrderParams.MarketID, arg.MarketID)
+                        require.Equal(t, createOrderParams.Type, arg.Type)
+                        require.Equal(t, createOrderParams.Status, arg.Status)
+                        require.True(t, createOrderParams.Price.Equal(arg.Price), "price mismatch")
+                        require.True(t, createOrderParams.Amount.Equal(arg.Amount), "amount mismatch")
+                        return createOrderRow, nil
+                    }).
+                    Times(1)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusOK, recorder.Code)
@@ -74,9 +85,18 @@ func TestCreateOrderAPI(t *testing.T) {
             },
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
-                    CreateOrder(gomock.Any(), gomock.Eq(createOrderParams)).
-                    Times(1).
-                    Return(createOrderRow, sql.ErrConnDone)
+                    CreateOrder(gomock.Any(), gomock.Any()).
+                    DoAndReturn(func(ctx context.Context, arg db.CreateOrderParams) (db.CreateOrderRow, error) {
+                        require.Equal(t, createOrderParams.Username, arg.Username)
+                        require.Equal(t, createOrderParams.UserEmail, arg.UserEmail)
+                        require.Equal(t, createOrderParams.MarketID, arg.MarketID)
+                        require.Equal(t, createOrderParams.Type, arg.Type)
+                        require.Equal(t, createOrderParams.Status, arg.Status)
+                        require.True(t, createOrderParams.Price.Equal(arg.Price), "price mismatch")
+                        require.True(t, createOrderParams.Amount.Equal(arg.Amount), "amount mismatch")
+                        return createOrderRow, sql.ErrConnDone
+                    }).
+                    Times(1)
             },
             checkResponse: func(recorder *httptest.ResponseRecorder) {
                 require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -360,8 +380,8 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 	marketID := uuid.New()
 	orderType := db.OrderType(fmt.Sprint(rand.Intn(2))) 
 	orderStatus := db.OrderStatus(fmt.Sprint(rand.Intn(3))) 
-	price := "100.50"
-	amount := "10"
+	price := decimal.NewFromFloat(100.50)
+	amount := decimal.NewFromFloat(10.30)
 
 	createOrderParams = db.CreateOrderParams{
 		Username: username,
@@ -383,14 +403,14 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: "5", 
+		FilledAmount: decimal.NewFromFloat(5), 
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
 
 	updatedOrderParams = db.UpdateOrderStatusAndFilledAmountParams{
 		Status:       db.OrderStatus(fmt.Sprint(1)), 
-		FilledAmount: "10", 
+		FilledAmount: decimal.NewFromFloat(10), 
 		ID:           createdOrder.ID,
 	}
 
@@ -402,7 +422,7 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: "5", 
+		FilledAmount: decimal.NewFromFloat(5), 
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
@@ -424,7 +444,7 @@ func requireBodyMatchOrderForGet(t *testing.T, body *bytes.Buffer, order db.Orde
     require.Equal(t, order.MarketID, gotOrder.MarketID)
     require.Equal(t, order.Type, gotOrder.Type)
     require.Equal(t, order.Status, gotOrder.Status)
-    require.Equal(t, order.Price, order.Price)
+    require.Equal(t, order.Price, gotOrder.Price)
     require.Equal(t, order.Amount, gotOrder.Amount)
     require.Equal(t, order.FilledAmount, gotOrder.FilledAmount)
     require.WithinDuration(t, order.CreatedAt, gotOrder.CreatedAt, time.Second)

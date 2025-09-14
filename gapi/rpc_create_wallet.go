@@ -7,6 +7,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/val"
+	"github.com/shopspring/decimal"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -28,7 +29,7 @@ func (server *server) CreateWallet(ctx context.Context, req *pb.CreateWalletRequ
 		Username:  authPayload.Username,
 		UserEmail: req.GetUserEmail(),
 		Currency:  req.GetCurrency(),
-		Balance:   "0",
+		Balance:   decimal.NewFromFloat(float64(0)),
 	}
 
 	wallet, err := server.store.CreateWallet(ctx, arg)

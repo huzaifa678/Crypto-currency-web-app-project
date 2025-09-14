@@ -8,6 +8,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/val"
+	"github.com/shopspring/decimal"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -47,9 +48,9 @@ func (server *server) CreateTrade(ctx context.Context, req *pb.CreateTradeReques
 		BuyOrderID: buyOrderId,
 		SellOrderID: sellOrderId,
 		MarketID: marketID,
-		Price: req.GetPrice(),
-		Amount: req.GetAmount(),
-		Fee: req.GetFee(),
+		Price: decimal.NewFromFloat(float64(req.GetPrice())),
+		Amount: decimal.NewFromFloat(float64(req.GetAmount())),
+		Fee: decimal.NewFromFloat(float64(req.GetFee())),
 	}
 
 	trade, err := server.store.CreateTrade(ctx, args)
@@ -68,7 +69,7 @@ func (server *server) CreateTrade(ctx context.Context, req *pb.CreateTradeReques
 }
 
 func validateCreateTradeRequest(req *pb.CreateTradeRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateCreateTradeRequest(req.GetBuyOrderId(), req.GetSellOrderId(), req.GetMarketId(), req.GetPrice(), req.GetAmount(), req.GetFee()); err != nil {
+	if err := val.ValidateCreateTradeRequest(req.GetBuyOrderId(), req.GetSellOrderId(), req.GetMarketId(), decimal.NewFromFloat(float64(req.GetPrice())), decimal.NewFromFloat(float64(req.GetAmount())), decimal.NewFromFloat(float64(req.GetFee()))); err != nil {
 		log.Println("ERROR", err)
 		violations = append(violations, fieldViolation("buy_order_id", err))
 		violations = append(violations, fieldViolation("sell_order_id", err))

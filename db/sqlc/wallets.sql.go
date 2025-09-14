@@ -9,6 +9,7 @@ import (
 	"context"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const createWallet = `-- name: CreateWallet :one
@@ -18,10 +19,10 @@ RETURNING id, username, user_email, currency, balance, locked_balance, created_a
 `
 
 type CreateWalletParams struct {
-	Username  string `json:"username"`
-	UserEmail string `json:"user_email"`
-	Currency  string `json:"currency"`
-	Balance   string `json:"balance"`
+	Username  string          `json:"username"`
+	UserEmail string          `json:"user_email"`
+	Currency  string          `json:"currency"`
+	Balance   decimal.Decimal `json:"balance"`
 }
 
 func (q *Queries) CreateWallet(ctx context.Context, arg CreateWalletParams) (Wallet, error) {
@@ -75,6 +76,40 @@ func (q *Queries) GetWalletByID(ctx context.Context, id uuid.UUID) (Wallet, erro
 	return i, err
 }
 
+const getWallets = `-- name: GetWallets :many
+SELECT id, username, user_email, currency, balance, locked_balance, created_at
+FROM wallets
+ORDER BY created_at DESC
+`
+
+func (q *Queries) GetWallets(ctx context.Context) ([]Wallet, error) {
+	rows, err := q.db.Query(ctx, getWallets)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Wallet
+	for rows.Next() {
+		var i Wallet
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.UserEmail,
+			&i.Currency,
+			&i.Balance,
+			&i.LockedBalance,
+			&i.CreatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const updateWalletBalance = `-- name: UpdateWalletBalance :exec
 UPDATE wallets
 SET balance = $1, locked_balance = $2
@@ -82,9 +117,9 @@ WHERE id = $3
 `
 
 type UpdateWalletBalanceParams struct {
-	Balance       string    `json:"balance"`
-	LockedBalance string    `json:"locked_balance"`
-	ID            uuid.UUID `json:"id"`
+	Balance       decimal.Decimal `json:"balance"`
+	LockedBalance decimal.Decimal `json:"locked_balance"`
+	ID            uuid.UUID       `json:"id"`
 }
 
 func (q *Queries) UpdateWalletBalance(ctx context.Context, arg UpdateWalletBalanceParams) error {

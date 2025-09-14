@@ -64,11 +64,11 @@ variable "min_size" {
   default     = 1
 }
 
-variable "ecr_repo_name" {
-  description = "ECR repository name"
-  type        = string
-  default     = "crypto-ecr-repo"
-}
+# variable "ecr_repo_name" {
+#   description = "ECR repository name"
+#   type        = string
+#   default     = "crypto-ecr-repo"
+# }
 
 variable "rds_db_name" {
     description = "RDS DB name"
@@ -84,7 +84,32 @@ variable "rds_db_username" {
 }
 
 variable "rds_db_password" {
-    description = "password credential for RDS DB"
+    description = "password credential for RDS DB Optionally can be generated using random_password resource"
     type        = string
-    default     = "secret1234"
+    default     = null
+    sensitive   = true
+}
+
+variable "google_client_id" {
+  description = "Google OAuth2 Client ID"
+  type        = string
+  sensitive   = true
+}
+
+variable "google_client_secret" {
+  description = "Google OAuth2 Client Secret"
+  type        = string
+  sensitive   = true
+}
+
+variable "redirect_url" {
+  description = "OAuth2 Redirect URL"
+  type        = string
+  default     = "http://localhost:8081/oauth/google/callback"
+}
+
+variable "token_symmetric_key" {
+  description = "Token Symmetric Key"
+  type        = string
+  sensitive   = true
 }

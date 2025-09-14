@@ -27,8 +27,8 @@ type Wallet struct {
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	UserEmail     string                 `protobuf:"bytes,2,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
 	Currency      string                 `protobuf:"bytes,3,opt,name=currency,proto3" json:"currency,omitempty"`
-	Balance       string                 `protobuf:"bytes,4,opt,name=balance,proto3" json:"balance,omitempty"`
-	LockedBalance string                 `protobuf:"bytes,5,opt,name=locked_balance,json=lockedBalance,proto3" json:"locked_balance,omitempty"`
+	Balance       int64                  `protobuf:"varint,4,opt,name=balance,proto3" json:"balance,omitempty"`
+	LockedBalance int64                  `protobuf:"varint,5,opt,name=locked_balance,json=lockedBalance,proto3" json:"locked_balance,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -85,18 +85,18 @@ func (x *Wallet) GetCurrency() string {
 	return ""
 }
 
-func (x *Wallet) GetBalance() string {
+func (x *Wallet) GetBalance() int64 {
 	if x != nil {
 		return x.Balance
 	}
-	return ""
+	return 0
 }
 
-func (x *Wallet) GetLockedBalance() string {
+func (x *Wallet) GetLockedBalance() int64 {
 	if x != nil {
 		return x.LockedBalance
 	}
-	return ""
+	return 0
 }
 
 func (x *Wallet) GetCreatedAt() *timestamppb.Timestamp {
@@ -116,8 +116,8 @@ const file_wallet_proto_rawDesc = "" +
 	"\n" +
 	"user_email\x18\x02 \x01(\tR\tuserEmail\x12\x1a\n" +
 	"\bcurrency\x18\x03 \x01(\tR\bcurrency\x12\x18\n" +
-	"\abalance\x18\x04 \x01(\tR\abalance\x12%\n" +
-	"\x0elocked_balance\x18\x05 \x01(\tR\rlockedBalance\x129\n" +
+	"\abalance\x18\x04 \x01(\x03R\abalance\x12%\n" +
+	"\x0elocked_balance\x18\x05 \x01(\x03R\rlockedBalance\x129\n" +
 	"\n" +
 	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAtB:Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"
 

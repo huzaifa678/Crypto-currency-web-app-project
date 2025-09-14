@@ -25,7 +25,7 @@ type CreateMarketRequest struct {
 	state          protoimpl.MessageState `protogen:"open.v1"`
 	BaseCurrency   string                 `protobuf:"bytes,1,opt,name=base_currency,json=baseCurrency,proto3" json:"base_currency,omitempty"`
 	QuoteCurrency  string                 `protobuf:"bytes,2,opt,name=quote_currency,json=quoteCurrency,proto3" json:"quote_currency,omitempty"`
-	MinOrderAmount string                 `protobuf:"bytes,3,opt,name=min_order_amount,json=minOrderAmount,proto3" json:"min_order_amount,omitempty"`
+	MinOrderAmount int64                  `protobuf:"varint,3,opt,name=min_order_amount,json=minOrderAmount,proto3" json:"min_order_amount,omitempty"`
 	PricePrecision int32                  `protobuf:"varint,4,opt,name=price_precision,json=pricePrecision,proto3" json:"price_precision,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -75,11 +75,11 @@ func (x *CreateMarketRequest) GetQuoteCurrency() string {
 	return ""
 }
 
-func (x *CreateMarketRequest) GetMinOrderAmount() string {
+func (x *CreateMarketRequest) GetMinOrderAmount() int64 {
 	if x != nil {
 		return x.MinOrderAmount
 	}
-	return ""
+	return 0
 }
 
 func (x *CreateMarketRequest) GetPricePrecision() int32 {
@@ -141,7 +141,7 @@ const file_rpc_create_market_proto_rawDesc = "" +
 	"\x13CreateMarketRequest\x12#\n" +
 	"\rbase_currency\x18\x01 \x01(\tR\fbaseCurrency\x12%\n" +
 	"\x0equote_currency\x18\x02 \x01(\tR\rquoteCurrency\x12(\n" +
-	"\x10min_order_amount\x18\x03 \x01(\tR\x0eminOrderAmount\x12'\n" +
+	"\x10min_order_amount\x18\x03 \x01(\x03R\x0eminOrderAmount\x12'\n" +
 	"\x0fprice_precision\x18\x04 \x01(\x05R\x0epricePrecision\"3\n" +
 	"\x14CreateMarketResponse\x12\x1b\n" +
 	"\tmarket_id\x18\x01 \x01(\tR\bmarketIdB:Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"

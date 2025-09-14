@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -31,7 +32,7 @@ func TestCreateTransaction(t *testing.T) {
 		UserEmail: user.Email,
 		Type:      TransactionType("deposit"),
 		Currency:  "USD",
-		Amount:    "100.00000000",
+		Amount:    decimal.NewFromFloat(100.00000000),
 		Address:   "0x 0000 0000 0000 0000",
 		TxHash:    "0x 0000 0000 0000 0000",
 	}
@@ -61,7 +62,7 @@ func TestDeleteTransaction(t *testing.T) {
 		UserEmail: user.Email,
 		Type:      TransactionType("deposit"),
 		Currency:  "USD",
-		Amount:    "100.00000000",
+		Amount:    decimal.NewFromFloat(100.00000000),
 		Address:   "0x 0000 0000 0000 0000",
 		TxHash:    "0x 0000 0000 0000 0000",
 	}
@@ -96,7 +97,7 @@ func TestGetTransactionById(t *testing.T) {
 		UserEmail: user.Email,
 		Type:      TransactionType("deposit"),
 		Currency:  "USD",
-		Amount:    "100.00000000",
+		Amount:    decimal.NewFromFloat(100.00000000),
 		Address:   "0x 0000 0000 0000 0000",
 		TxHash:    "0x 0000 0000 0000 0000",
 	}
@@ -136,7 +137,7 @@ func TestGetTransactionsByUserID(t *testing.T) {
 		UserEmail: user.Email,
 		Type:      TransactionType("deposit"),
 		Currency:  "USD",
-		Amount:    "100.00000000",
+		Amount:    decimal.NewFromFloat(100.00000000),
 		Address:   "0x 0000 0000 0000 0000",
 		TxHash:    "0x 0000 0000 0000 0000",
 	}

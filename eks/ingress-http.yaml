@@ -4,7 +4,6 @@ metadata:
   name: crypto-app-api-ingress-http
   annotations:  
     zalando.org/aws-load-balancer-type: nlb
-
 spec:
   rules:
   - host: "api.freeeasycrypto.com"

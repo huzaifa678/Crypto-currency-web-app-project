@@ -6,6 +6,7 @@ import (
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -14,7 +15,7 @@ import (
 type MarketRequest struct {
     BaseCurrency   string `json:"base_currency"`
     QuoteCurrency  string `json:"quote_currency"`
-    MinOrderAmount string `json:"min_order_amount"`
+    MinOrderAmount decimal.Decimal `json:"min_order_amount"`
     PricePrecision int32 `json:"price_precision"`
 }
 

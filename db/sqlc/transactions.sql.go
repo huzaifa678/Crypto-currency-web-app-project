@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const createTransaction = `-- name: CreateTransaction :one
@@ -23,7 +24,7 @@ type CreateTransactionParams struct {
 	UserEmail string          `json:"user_email"`
 	Type      TransactionType `json:"type"`
 	Currency  string          `json:"currency"`
-	Amount    string          `json:"amount"`
+	Amount    decimal.Decimal `json:"amount"`
 	Address   string          `json:"address"`
 	TxHash    string          `json:"tx_hash"`
 }
@@ -33,7 +34,7 @@ type CreateTransactionRow struct {
 	UserEmail string            `json:"user_email"`
 	Type      TransactionType   `json:"type"`
 	Currency  string            `json:"currency"`
-	Amount    string            `json:"amount"`
+	Amount    decimal.Decimal   `json:"amount"`
 	Status    TransactionStatus `json:"status"`
 	Address   string            `json:"address"`
 	TxHash    string            `json:"tx_hash"`

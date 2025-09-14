@@ -11,6 +11,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -30,8 +31,8 @@ func TestUpdateWalletRPC(t *testing.T) {
 			name: "OK",
 			req: &pb.UpdateWalletRequest{
 				WalletId:      wallet.ID.String(),
-				Balance:       "100",
-				LockedBalance: "50",
+				Balance:       100,
+				LockedBalance: 50,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
@@ -39,8 +40,8 @@ func TestUpdateWalletRPC(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				arg := db.UpdateWalletBalanceParams{
 					ID:            wallet.ID,
-					Balance:       "100",
-					LockedBalance: "50",
+					Balance:       decimal.NewFromFloat(100),
+					LockedBalance: decimal.NewFromFloat(50),
 				}
 				store.EXPECT().
 					UpdateWalletBalance(gomock.Any(), gomock.Eq(arg)).
@@ -62,8 +63,8 @@ func TestUpdateWalletRPC(t *testing.T) {
 			name: "Unauthorized",
 			req: &pb.UpdateWalletRequest{
 				WalletId:      wallet.ID.String(),
-				Balance:       "100",
-				LockedBalance: "50",
+				Balance:       100,
+				LockedBalance: 50,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return context.Background()
@@ -84,8 +85,8 @@ func TestUpdateWalletRPC(t *testing.T) {
 			name: "InvalidUUID",
 			req: &pb.UpdateWalletRequest{
 				WalletId:      "invalid-uuid",
-				Balance:       "100",
-				LockedBalance: "50",
+				Balance:       100,
+				LockedBalance: 50,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
@@ -106,8 +107,8 @@ func TestUpdateWalletRPC(t *testing.T) {
 			name: "InternalError",
 			req: &pb.UpdateWalletRequest{
 				WalletId:      wallet.ID.String(),
-				Balance:       "100",
-				LockedBalance: "50",
+				Balance:       100,
+				LockedBalance: 50,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
@@ -115,8 +116,8 @@ func TestUpdateWalletRPC(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				arg := db.UpdateWalletBalanceParams{
 					ID:            wallet.ID,
-					Balance:       "100",
-					LockedBalance: "50",
+					Balance:       decimal.NewFromFloat(100),
+					LockedBalance: decimal.NewFromFloat(50),
 				}
 				store.EXPECT().
 					UpdateWalletBalance(gomock.Any(), gomock.Eq(arg)).

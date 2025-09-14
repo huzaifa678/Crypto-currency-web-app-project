@@ -13,6 +13,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -40,7 +41,7 @@ func TestCreateWalletRPC(t *testing.T) {
 					Username:  user.Username,
 					UserEmail: user.Email,
 					Currency:  "BTC",
-					Balance:   "0",
+					Balance:   decimal.NewFromFloat(0),
 				}
 				store.EXPECT().
 					CreateWallet(gomock.Any(), gomock.Eq(arg)).
@@ -50,7 +51,7 @@ func TestCreateWalletRPC(t *testing.T) {
 						Username:  user.Username,
 						UserEmail: user.Email,
 						Currency:  "BTC",
-						Balance:   "0",
+						Balance:   decimal.NewFromFloat(0),
 					}, nil)
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
@@ -140,7 +141,7 @@ func TestCreateWalletRPC(t *testing.T) {
 					Username:  user.Username,
 					UserEmail: user.Email,
 					Currency:  "BTC",
-					Balance:   "0",
+					Balance:   decimal.NewFromFloat(0),
 				}
 				store.EXPECT().
 					CreateWallet(gomock.Any(), gomock.Eq(arg)).

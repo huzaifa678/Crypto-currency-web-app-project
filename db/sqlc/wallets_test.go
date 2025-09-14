@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -30,7 +31,7 @@ func TestCreateWallet(t *testing.T) {
 		Username:  user.Username,
 		UserEmail: user.Email,
 		Currency:  "USD",
-		Balance:   "1000.00000000",
+		Balance:   decimal.NewFromFloat(1000.00000000),
 	}
 
 	wallet, err := testStore.CreateWallet(context.Background(), arg)
@@ -40,9 +41,9 @@ func TestCreateWallet(t *testing.T) {
 	require.Equal(t, arg.Username, wallet.Username)
 	require.Equal(t, arg.UserEmail, wallet.UserEmail)
 	require.Equal(t, arg.Currency, wallet.Currency)
-	require.Equal(t, arg.Balance, wallet.Balance)
+	require.True(t, arg.Balance.Equal(wallet.Balance), "Balance mismatch")
 	require.NotZero(t, wallet.CreatedAt)
-	require.Equal(t, "0", wallet.LockedBalance)
+	require.True(t, decimal.NewFromFloat(0).Equal(wallet.LockedBalance), "LockedBalance should be zero")
 }
 
 func TestDeleteWallet(t *testing.T) {
@@ -63,7 +64,7 @@ func TestDeleteWallet(t *testing.T) {
 		Username:  user.Username,
 		UserEmail: user.Email,
 		Currency:  "USD",
-		Balance:   "1000.00000000",
+		Balance:   decimal.NewFromFloat(1000.00000000),
 	}
 
 	wallet, err := testStore.CreateWallet(context.Background(), walletArg)
@@ -92,7 +93,7 @@ func TestGetWalletByUserEmailAndCurrency(t *testing.T) {
 		Username:  user.Username,
 		UserEmail: user.Email,
 		Currency:  "USD",
-		Balance:   "1000.00000000",
+		Balance:   decimal.NewFromFloat(1000.00000000),
 	}
 
 	wallet, err := testStore.CreateWallet(context.Background(), walletArgs)
@@ -122,7 +123,7 @@ func TestUpdateWallet(t *testing.T) {
 		Username:  user.Username,
 		UserEmail: user.Email,
 		Currency:  "USD",
-		Balance:   "1000.00000000",
+		Balance:   decimal.NewFromFloat(1000.00000000),
 	}
 
 	wallet, err := testStore.CreateWallet(context.Background(), walletArgs)
@@ -130,8 +131,8 @@ func TestUpdateWallet(t *testing.T) {
 
 	updatedWalletArgs := UpdateWalletBalanceParams{
 		ID:            wallet.ID,
-		Balance:       "2000.00000000",
-		LockedBalance: "0",
+		Balance:       decimal.NewFromFloat(2000.00000000),
+		LockedBalance: decimal.NewFromFloat(0),
 	}
 
 	err = testStore.UpdateWalletBalance(context.Background(), updatedWalletArgs)
@@ -140,8 +141,8 @@ func TestUpdateWallet(t *testing.T) {
 	updatedWallet, err := testStore.GetWalletByID(context.Background(), wallet.ID)
 
 	require.NoError(t, err)
-	require.Equal(t, updatedWallet.Balance, updatedWalletArgs.Balance)
-	require.Equal(t, updatedWallet.LockedBalance, updatedWalletArgs.LockedBalance)
+	require.True(t, updatedWalletArgs.Balance.Equal(updatedWallet.Balance), "Balance mismatch")
+	require.True(t, updatedWalletArgs.LockedBalance.Equal(updatedWallet.LockedBalance), "LockedBalance mismatch")
 }
 
 func createRandomEmailForWallet() string {

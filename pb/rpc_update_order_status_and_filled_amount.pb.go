@@ -25,7 +25,7 @@ type UpdateOrderStatusAndFilledAmountRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
 	OrderStatus   Status                 `protobuf:"varint,2,opt,name=order_status,json=orderStatus,proto3,enum=pb.Status" json:"order_status,omitempty"`
-	FilledAmount  string                 `protobuf:"bytes,3,opt,name=filled_amount,json=filledAmount,proto3" json:"filled_amount,omitempty"`
+	FilledAmount  int64                  `protobuf:"varint,3,opt,name=filled_amount,json=filledAmount,proto3" json:"filled_amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -74,11 +74,11 @@ func (x *UpdateOrderStatusAndFilledAmountRequest) GetOrderStatus() Status {
 	return Status_OPEN
 }
 
-func (x *UpdateOrderStatusAndFilledAmountRequest) GetFilledAmount() string {
+func (x *UpdateOrderStatusAndFilledAmountRequest) GetFilledAmount() int64 {
 	if x != nil {
 		return x.FilledAmount
 	}
-	return ""
+	return 0
 }
 
 type UpdateOrderStatusAndFilledAmountResponse struct {
@@ -134,7 +134,7 @@ const file_rpc_update_order_status_and_filled_amount_proto_rawDesc = "" +
 	"\border_id\x18\x01 \x01(\tR\aorderId\x12-\n" +
 	"\forder_status\x18\x02 \x01(\x0e2\n" +
 	".pb.StatusR\vorderStatus\x12#\n" +
-	"\rfilled_amount\x18\x03 \x01(\tR\ffilledAmount\"D\n" +
+	"\rfilled_amount\x18\x03 \x01(\x03R\ffilledAmount\"D\n" +
 	"(UpdateOrderStatusAndFilledAmountResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\tR\asuccessB:Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"
 

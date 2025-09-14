@@ -7,7 +7,7 @@ option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
 message CreateMarketRequest {
   string base_currency = 1;
   string quote_currency = 2;
-  string min_order_amount = 3;
+  int64 min_order_amount = 3;
   int32 price_precision = 4;
 }
 

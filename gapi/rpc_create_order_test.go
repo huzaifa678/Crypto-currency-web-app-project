@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"math/rand"
@@ -16,6 +15,7 @@ import (
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -38,19 +38,23 @@ func TestCreateOrderRPC(t *testing.T) {
 				MarketId:  order.MarketID.String(),
 				Type:      pb.OrderType_BUY,
 				Status:    pb.Status_OPEN,
-				Price:     order.Price,
-				Amount:    order.Amount,
+				Price:     order.Price.Mul(decimal.New(1, scale)).IntPart(),
+				Amount:    order.Amount.Mul(decimal.New(1, scale)).IntPart(),
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
             },
 			buildStubs: func(store *mockdb.MockStore_interface) {
-				arg := createOrderParams
 
 				store.EXPECT().
-					CreateOrder(gomock.Any(), gomock.Eq(arg)).
-					Times(1).
-					Return(createOrderRow, nil)
+					CreateOrder(gomock.Any(), gomock.Any()).
+					DoAndReturn(func(ctx context.Context, arg db.CreateOrderParams) (db.Order, error) {
+						require.Equal(t, createOrderParams.UserEmail, arg.UserEmail)
+						require.True(t, createOrderParams.Price.Equal(arg.Price))
+						require.True(t, createOrderParams.Amount.Equal(arg.Amount))
+						return order, nil
+					}).
+					Times(1)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateOrderResponse, err error) {
 				log.Println("ERROR: ", err)
@@ -66,8 +70,8 @@ func TestCreateOrderRPC(t *testing.T) {
 				MarketId:  order.MarketID.String(),
 				Type:      pb.OrderType_BUY,
 				Status:    pb.Status_OPEN,
-				Price:     "100.50",
-				Amount:    "1.5",
+				Price:     100,
+				Amount:    1,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
 				return context.Background()
@@ -91,8 +95,8 @@ func TestCreateOrderRPC(t *testing.T) {
 				MarketId:  order.ID.String(),
 				Type:      pb.OrderType_BUY,
 				Status:    pb.Status_OPEN,
-				Price:     "100.50",
-				Amount:    "1.5",
+				Price:     100,
+				Amount:    1,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
@@ -116,8 +120,8 @@ func TestCreateOrderRPC(t *testing.T) {
 				MarketId:  "invalid-uuid",
 				Type:      pb.OrderType_BUY,
 				Status:    pb.Status_OPEN,
-				Price:     "100.50",
-				Amount:    "1.5",
+				Price:     100,
+				Amount:    1,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
@@ -142,8 +146,8 @@ func TestCreateOrderRPC(t *testing.T) {
 				MarketId:  order.MarketID.String(),
 				Type:      pb.OrderType_BUY,
 				Status:    pb.Status_OPEN,
-				Price:     "100.50",
-				Amount:    "1.5",
+				Price:     100,
+				Amount:    1,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
@@ -152,7 +156,7 @@ func TestCreateOrderRPC(t *testing.T) {
 				store.EXPECT().
 					CreateOrder(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(createOrderRow, sql.ErrConnDone)
+					Return(createOrderRow, db.ErrRecordNotFound)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateOrderResponse, err error) {
 				log.Println("ERROR: ", err)
@@ -190,8 +194,8 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 	marketID := uuid.New()
 	orderType := db.OrderType("buy") 
 	orderStatus := db.OrderStatus("open") 
-	price := "100.50"
-	amount := "10"
+	price := decimal.NewFromFloat(100.50)
+	amount := decimal.NewFromFloat(10)
 
 	createOrderParams = db.CreateOrderParams{
 		Username: username,
@@ -213,18 +217,18 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: "5", 
+		FilledAmount: decimal.NewFromFloat(5), 
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
 
 	updatedOrderParams = db.UpdateOrderStatusAndFilledAmountParams{
 		Status:       db.OrderStatus(fmt.Sprint(1)), 
-		FilledAmount: "10", 
+		FilledAmount: decimal.NewFromFloat(10), 
 		ID:           createdOrder.ID,
 	}
 
-	createOrderRow = db.CreateOrderRow {
+	createOrderRow = db.CreateOrderRow{
 		ID:           createdOrder.ID,
 		UserEmail:    email,
 		MarketID:     marketID,
@@ -232,7 +236,7 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: "5", 
+		FilledAmount: decimal.NewFromFloat(5), 
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}

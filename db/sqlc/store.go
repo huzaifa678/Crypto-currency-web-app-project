@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/shopspring/decimal"
 )
 
 type Store_interface interface {
@@ -15,6 +16,7 @@ type Store_interface interface {
 	VerifyEmailTx(ctx context.Context, arg VerifyEmailTxParams) (VerifyEmailTxResult, error)
 }
 
+// Defining the SQLStore struct to execute the queries and transactions defined
 type SQLStore struct {
 	*Queries
 	connPool *pgxpool.Pool
@@ -36,7 +38,7 @@ type TransactionsParams struct {
 	UserEmail string          `json:"user_email"`
 	Type      TransactionType `json:"type"`
 	Currency  string          `json:"currency"`
-	Amount    string          `json:"amount"`
+	Amount    decimal.Decimal          `json:"amount"`
 	Status    string          `json:"status"`
 	Address   string          `json:"address"`
 	TxHash    string          `json:"tx_hash"`
@@ -44,18 +46,18 @@ type TransactionsParams struct {
 
 type FeeParams struct {
 	MarketID uuid.UUID `json:"market_id"`
-	Amount   string    `json:"amount"`
-	TakerFee string    `json:"taker_fee"`
+	Amount   decimal.Decimal    `json:"amount"`
+	TakerFee decimal.Decimal    `json:"taker_fee"`
 }
 
 type UpdatedOrderParams struct {
 	Status       OrderStatus `json:"status"`
-	FilledAmount string      `json:"filled_amount"`
+	FilledAmount decimal.Decimal    `json:"filled_amount"`
 	ID           uuid.UUID   `json:"id"`
 }
 
 type ReturnAmountParams struct {
-	Amount string `json:"amount"`
+	Amount decimal.Decimal `json:"amount"`
 }
 
 func (store *SQLStore) CreateTransactionTx(ctx context.Context, arg TransactionsParams, feeArgs FeeParams) error {

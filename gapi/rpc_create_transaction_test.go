@@ -2,7 +2,6 @@ package gapi
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
 	"log"
 	"testing"
@@ -14,6 +13,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -35,7 +35,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 				UserEmail: createTxParams.UserEmail,
 				Type:      pb.TransactionType_DEPOSIT,
 				Currency:  transaction.Currency,
-				Amount:    transaction.Amount,
+				Amount:    transaction.Amount.Mul(decimal.New(1, scale)).IntPart(),
 				Address:   transaction.Address,
 				TxHash:    transaction.TxHash,
 			},
@@ -43,11 +43,18 @@ func TestCreateTransactionRPC(t *testing.T) {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
-				arg := createTxParams
 				store.EXPECT().
-					CreateTransaction(gomock.Any(), gomock.Eq(arg)).
-					Times(1).
-					Return(transactionRow, nil)
+					CreateTransaction(gomock.Any(), gomock.Any()).
+					DoAndReturn(func(ctx context.Context, arg db.CreateTransactionParams) (db.CreateTransactionRow, error) {
+						require.True(t, createTxParams.Amount.Equal(arg.Amount))
+						require.Equal(t, createTxParams.UserEmail, arg.UserEmail)
+						require.Equal(t, createTxParams.Type, arg.Type)
+						require.Equal(t, createTxParams.Currency, arg.Currency)
+						require.Equal(t, createTxParams.Address, arg.Address)
+						require.Equal(t, createTxParams.TxHash, arg.TxHash)
+						return transactionRow, nil
+					}).
+					Times(1)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateTransactionResponse, err error) {
 				require.NoError(t, err)
@@ -62,7 +69,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 				UserEmail: transaction.UserEmail,
 				Type:      pb.TransactionType_DEPOSIT,
 				Currency:  transaction.Currency,
-				Amount:    transaction.Amount,
+				Amount:    transaction.Amount.IntPart(),
 				Address:   transaction.Address,
 				TxHash:    transaction.TxHash,
 			},
@@ -87,7 +94,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 				UserEmail: "invalid-email",
 				Type:      pb.TransactionType_DEPOSIT,
 				Currency:  "BTC",
-				Amount:    "10.5",
+				Amount:    10,
 				Address:   "1BitcoinAddress",
 				TxHash:    uuid.New().String(),
 			},
@@ -113,7 +120,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 				UserEmail: transaction.UserEmail,
 				Type:      pb.TransactionType_DEPOSIT,
 				Currency:  transaction.Currency,
-				Amount:    transaction.Amount,
+				Amount:    transaction.Amount.IntPart(),
 				Address:   transaction.Address,
 				TxHash:    transaction.TxHash,
 			},
@@ -121,11 +128,10 @@ func TestCreateTransactionRPC(t *testing.T) {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
-				arg := createTxParams
 				store.EXPECT().
-					CreateTransaction(gomock.Any(), gomock.Eq(arg)).
+					CreateTransaction(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(transactionRow, sql.ErrConnDone)
+					Return(transactionRow, db.ErrRecordNotFound)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateTransactionResponse, err error) {
 				require.Error(t, err)
@@ -161,7 +167,7 @@ func createRandomTransaction() (db.Transaction, db.CreateTransactionRow, db.Crea
 	txType := db.TransactionType("deposit")
 	txStatus := db.TransactionStatus("pending")
 	currency := "BTC"
-	amount := "10.5"
+	amount := decimal.NewFromFloat(10.5)
 	address := "1BitcoinAddress"
 	txHash := uuid.New().String()
 

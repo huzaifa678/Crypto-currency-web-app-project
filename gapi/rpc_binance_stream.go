@@ -3,13 +3,14 @@ package gapi
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"strconv"
 	"strings"
 
 	"github.com/gorilla/websocket"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/pb"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type binanceTradeEvent struct {
@@ -26,6 +27,17 @@ type binanceTradeEvent struct {
     Ignore        bool    `json:"M"`
 }
 
+type wsConn interface {
+	ReadMessage() (int, []byte, error)
+	Close() error
+}
+
+// Using this DI for easier testing and for error handling
+var websocketDial = func(url string) (wsConn, error) {
+	c, _, err := websocket.DefaultDialer.Dial(url, nil)
+	return c, err
+}
+
 func parseStringToFloat64(str string) float64 {
     f, err := strconv.ParseFloat(str, 64)
     if err != nil {
@@ -37,7 +49,7 @@ func parseStringToFloat64(str string) float64 {
 func (server *server) StreamTrades(req *pb.TradeStreamRequest, stream pb.CryptoWebApp_StreamTradesServer) error {
     symbols := req.GetSymbols()
     if len(symbols) == 0 {
-        return fmt.Errorf("no symbols provided")
+        return status.Errorf(codes.InvalidArgument, "no symbols provided")
     }
 
     streams := make([]string, len(symbols))
@@ -51,9 +63,9 @@ func (server *server) StreamTrades(req *pb.TradeStreamRequest, stream pb.CryptoW
 
     log.Printf("Connecting to Binance WS: %s\n", url)
 
-    c, _, err := websocket.DefaultDialer.Dial(url, nil)
+    c,  err := websocketDial(url)
     if err != nil {
-        return fmt.Errorf("failed to connect to binance websocket: %v", err)
+        return status.Errorf(codes.Internal, "failed to connect to binance websocket: %v", err)
     }
     defer c.Close()
 
@@ -69,7 +81,13 @@ func (server *server) StreamTrades(req *pb.TradeStreamRequest, stream pb.CryptoW
                     log.Println("client canceled stream")
                     return nil
                 }
-                return fmt.Errorf("error reading from websocket: %v", err)
+
+                if err.Error() == "closed" {
+                    log.Println("websocket closed, ending stream")
+                    return nil
+                }
+                
+                return status.Errorf(codes.Internal, "error reading from websocket: %v", err)
             }
 
             var wrapped struct {

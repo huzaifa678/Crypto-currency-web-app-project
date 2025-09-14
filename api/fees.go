@@ -6,6 +6,7 @@ import (
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -13,8 +14,8 @@ import (
 
 type FeeRequest struct {
     MarketID uuid.UUID `json:"market_id"`
-    MakerFee string `json:"maker_fee"`
-    TakerFee string `json:"taker_fee"`
+    MakerFee decimal.Decimal `json:"maker_fee"`
+    TakerFee decimal.Decimal `json:"taker_fee"`
 }
 
 func (server *server) createFee(ctx *gin.Context) {

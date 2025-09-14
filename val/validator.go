@@ -7,6 +7,7 @@ import (
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
+	"github.com/shopspring/decimal"
 )
 
 var (
@@ -68,7 +69,7 @@ func ValidateCurrency(value string) error {
 	return nil
 }
 
-func ValidateMarket(marketID, baseCurrency, quoteCurrency, minOrderAmount string, pricePrecision int32) error {
+func ValidateMarket(marketID, baseCurrency, quoteCurrency string, minOrderAmount decimal.Decimal, pricePrecision int32) error {
 	if err := ValidateString(marketID, 1, 50); err != nil {
 		return fmt.Errorf("market_id %v", err)
 	}
@@ -78,7 +79,7 @@ func ValidateMarket(marketID, baseCurrency, quoteCurrency, minOrderAmount string
 	if err := ValidateCurrency(quoteCurrency); err != nil {
 		return fmt.Errorf("quote_currency %v", err)
 	}
-	if err := ValidateString(minOrderAmount, 1, 20); err != nil {
+	if err := validateDecimal(minOrderAmount); err != nil {
 		return fmt.Errorf("min_order_amount %v", err)
 	}
 	if pricePrecision < 0 {
@@ -121,11 +122,11 @@ func ValidateDeleteRequest(id string) error {
 	return ValidateString(id, 1, 50)
 }
 
-func ValidateCreateMarketRequest(baseCurrency, quoteCurrency, minOrderAmount string, pricePrecision int32) error {
+func ValidateCreateMarketRequest(baseCurrency, quoteCurrency string, minOrderAmount decimal.Decimal, pricePrecision int32) error {
 	return ValidateMarket("dummy", baseCurrency, quoteCurrency, minOrderAmount, pricePrecision)
 }
 
-func ValidateCreateOrderRequest(userEmail, marketID, price, amount string, orderType pb.OrderType) error {
+func ValidateCreateOrderRequest(userEmail string, marketID string, price decimal.Decimal, amount decimal.Decimal, orderType pb.OrderType) error {
 	if err := ValidateEmail(userEmail); err != nil {
 		return err
 	}
@@ -134,11 +135,11 @@ func ValidateCreateOrderRequest(userEmail, marketID, price, amount string, order
 		return err
 	}
 
-	if err := ValidateString(price, 1, 20); err != nil {
+	if err := validateDecimal(price); err != nil {
 		return err
 	}
 
-	if err := ValidateString(amount, 1, 20); err != nil {
+	if err := validateDecimal(amount); err != nil {
 		return err
 	}
 
@@ -156,19 +157,19 @@ func ValidateUpdateUser(userID, password string) error {
 	return ValidateString(password, 6, 100)
 }
 
-func ValidateUpdateWalletRequest(walletID, balance, lockedBalance string) error {
+func ValidateUpdateWalletRequest(walletID string, balance, lockedBalance decimal.Decimal) error {
 	if err := ValidateString(walletID, 1, 50); err != nil {
 		return err
 	}
 
-	if err := ValidateString(balance, 1, 20); err != nil {
+	if err := validateDecimal(balance); err != nil {
 		return err
 	}
 
-	return ValidateString(lockedBalance, 1, 20)
+	return validateDecimal(lockedBalance)
 }
 
-func ValidateCreateTradeRequest(buyOrderId, sellOrderId, marketID, price, amount, fee string) error {
+func ValidateCreateTradeRequest(buyOrderId, sellOrderId, marketID string, price, amount, fee decimal.Decimal) error {
 	if err := ValidateString(buyOrderId, 1, 50); err != nil {
 		return err
 	}
@@ -181,27 +182,27 @@ func ValidateCreateTradeRequest(buyOrderId, sellOrderId, marketID, price, amount
 		return err
 	}
 
-	if err := ValidateString(price, 1, 20); err != nil {
+	if err := validateDecimal(price); err != nil {
 		return err
 	}
 
-	if err := ValidateString(amount, 1, 20); err != nil {
+	if err := validateDecimal(amount); err != nil {
 		return err
 	}
 
-	if err := ValidateString(fee, 1, 20); err != nil {
+	if err := validateDecimal(fee); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func ValidateCreateTransactionRequest(userEmail, amount string, transactionType pb.TransactionType) error {
+func ValidateCreateTransactionRequest(userEmail string, amount decimal.Decimal, transactionType pb.TransactionType) error {
 	if err := ValidateEmail(userEmail); err != nil {
 		return err
 	}
 
-	if err := ValidateString(amount, 1, 20); err != nil {
+	if err := validateDecimal(amount); err != nil {
 		return err
 	}
 
@@ -224,7 +225,7 @@ func ValidateUpdateTransactionStatusRequest(transactionID string, transactionSta
 	return nil
 }
 
-func ValidateUpdateOrderStatusAndFilledAmount(orderID string, status pb.Status, filledAmount string) error {
+func ValidateUpdateOrderStatusAndFilledAmount(orderID string, status pb.Status, filledAmount decimal.Decimal) error {
 	if err := ValidateString(orderID, 1, 50); err != nil {
 		return err
 	}
@@ -233,7 +234,7 @@ func ValidateUpdateOrderStatusAndFilledAmount(orderID string, status pb.Status, 
 		return fmt.Errorf("status must be 0 (OPEN), 1 (PARTIALLY_FILLED), 2 (FILLED) or 3 (CANCELLED)")
 	}
 
-	if err := ValidateString(filledAmount, 1, 20); err != nil {
+	if err := validateDecimal(filledAmount); err != nil {
 		return err
 	}
 
@@ -249,4 +250,15 @@ func ValidateEmailId(value int64) error {
 
 func ValidateSecretCode(value string) error {
 	return ValidateString(value, 32, 128)
+}
+
+func validateDecimal(value decimal.Decimal) error {
+    coeff := value.Coefficient()          
+    precision := len(coeff.String())      
+    scale := -value.Exponent()             
+
+    if precision > 20 || scale > 8 {
+        return fmt.Errorf("the value exceeds precision of 20 and scale of 8 constraints")
+    }
+    return nil
 }

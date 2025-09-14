@@ -32,9 +32,8 @@ func TestCreateTradeRPC(t *testing.T) {
 				BuyOrderId:  createTradeParams.BuyOrderID.String(),
 				SellOrderId: createTradeParams.SellOrderID.String(),
 				MarketId:    createTradeParams.MarketID.String(),
-				Price:       createTradeParams.Price,
-				Amount:      createTradeParams.Amount,
-				Fee:         createTradeParams.Fee,
+				Price:       createTradeParams.Price.IntPart(),
+				Fee:         createTradeParams.Fee.IntPart(),
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, trade.Username, time.Minute, token.TokenTypeAccessToken)
@@ -60,9 +59,9 @@ func TestCreateTradeRPC(t *testing.T) {
 				BuyOrderId:  createTradeParams.BuyOrderID.String(),
 				SellOrderId: createTradeParams.SellOrderID.String(),
 				MarketId:    createTradeParams.MarketID.String(),
-				Price:       createTradeParams.Price,
-				Amount:      createTradeParams.Amount,
-				Fee:         createTradeParams.Fee,
+				Price:       createTradeParams.Price.IntPart(),
+				Amount:      createTradeParams.Amount.IntPart(),
+				Fee:         createTradeParams.Fee.IntPart(),
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
@@ -85,9 +84,9 @@ func TestCreateTradeRPC(t *testing.T) {
 				BuyOrderId:  "invalid-uuid",
 				SellOrderId: createTradeParams.SellOrderID.String(),
 				MarketId:    createTradeParams.MarketID.String(),
-				Price:       createTradeParams.Price,
-				Amount:      createTradeParams.Amount,
-				Fee:         createTradeParams.Fee,
+				Price:       createTradeParams.Price.IntPart(),
+				Amount:      createTradeParams.Amount.IntPart(),
+				Fee:         createTradeParams.Fee.IntPart(),
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, trade.Username, time.Minute, token.TokenTypeAccessToken)
@@ -111,9 +110,9 @@ func TestCreateTradeRPC(t *testing.T) {
 				BuyOrderId:  createTradeParams.BuyOrderID.String(),
 				SellOrderId: createTradeParams.SellOrderID.String(),
 				MarketId:    createTradeParams.MarketID.String(),
-				Price:       createTradeParams.Price,
-				Amount:      createTradeParams.Amount,
-				Fee:         createTradeParams.Fee,
+				Price:       createTradeParams.Price.IntPart(),
+				Amount:      createTradeParams.Amount.IntPart(),
+				Fee:         createTradeParams.Fee.IntPart(),
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, trade.Username, time.Minute, token.TokenTypeAccessToken)

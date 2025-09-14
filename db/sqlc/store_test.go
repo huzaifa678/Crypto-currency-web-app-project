@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/jackc/pgconn"
+	"github.com/shopspring/decimal"
 
 	"github.com/stretchr/testify/require"
 )
@@ -34,7 +35,7 @@ func TestCreateTransactionTx(t *testing.T) {
 		UserEmail: user.Email,
 		Type:      "deposit",
 		Currency:  "usd",
-		Amount:    "100.00000000",
+		Amount:    decimal.NewFromFloat(100.00000000),
 		Status:    "pending",
 		Address:   "0x0000",
 		TxHash:    "0x0000",
@@ -45,8 +46,8 @@ func TestCreateTransactionTx(t *testing.T) {
 	feeArgs := CreateFeeParams{
 		Username: market.Username,
 		MarketID: market.ID,
-		MakerFee: "0.0100",
-		TakerFee: "0.0500",
+		MakerFee: decimal.NewFromFloat(0.0100),
+		TakerFee: decimal.NewFromFloat(0.0500),
 	}
 
 	feeParams := FeeParams{
@@ -63,7 +64,7 @@ func TestCreateTransactionTx(t *testing.T) {
 	require.Equal(t, transactionArgs.UserEmail, transaction[0].UserEmail, "UserID should match")
 	require.Equal(t, transactionArgs.Type, transaction[0].Type, "Type should match")
 	require.Equal(t, transactionArgs.Currency, transaction[0].Currency, "Currency should match")
-	require.Equal(t, transactionArgs.Amount, transaction[0].Amount, "Amount should match")
+	require.True(t, transactionArgs.Amount.Equal(transaction[0].Amount), transaction[0].Amount, "Amount should match")
 	require.Equal(t, TransactionStatus(transactionArgs.Status), transaction[0].Status, "Status should match")
 	require.Equal(t, transactionArgs.Address, transaction[0].Address, "Address should match")
 	require.Equal(t, transactionArgs.TxHash, transaction[0].TxHash, "TxHash should match")
@@ -74,8 +75,8 @@ func TestCreateTransactionTx(t *testing.T) {
 	require.NoError(t, err, "Failed to get fee")
 	require.NotEmpty(t, fee, "Fee should not be empty")
 	require.Equal(t, feeArgs.MarketID, fee.MarketID, "MarketID should match")
-	require.Equal(t, feeArgs.MakerFee, fee.MakerFee, "MakerFee should match")
-	require.Equal(t, feeArgs.TakerFee, fee.TakerFee, "TakerFee should match")
+	require.True(t, feeArgs.MakerFee.Equal(fee.MakerFee), fee.MakerFee, "MakerFee should match")
+	require.True(t, feeArgs.TakerFee.Equal(fee.TakerFee), fee.TakerFee, "TakerFee should match")
 }
 
 func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
@@ -100,7 +101,7 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 		UserEmail: user.Email,
 		Type:      "deposit",
 		Currency:  "USD",
-		Amount:    "50.00000000",
+		Amount:    decimal.NewFromFloat(50.00000000),
 		Status:    "pending",
 		Address:   "0x1111",
 		TxHash:    "0xhash1",
@@ -111,7 +112,7 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 		UserEmail: user.Email,
 		Type:      "withdrawal",
 		Currency:  "usd",
-		Amount:    "30.00000000",
+		Amount:    decimal.NewFromFloat(30.00000000),
 		Status:    "pending",
 		Address:   "0x2222",
 		TxHash:    "0xhash2",
@@ -122,8 +123,8 @@ func TestDeadlockDetectionForCreateTransaction(t *testing.T) {
 	feeArgs := CreateFeeParams{
 		Username: market.Username,
 		MarketID: market.ID,
-		MakerFee: "0.0100",
-		TakerFee: "0.0200",
+		MakerFee: decimal.NewFromFloat(0.0100),
+		TakerFee: decimal.NewFromFloat(0.0200),
 	}
 
 	feeParams := FeeParams{
@@ -191,8 +192,8 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      "buy",
 		Status:    "open",
-		Price:     "100.5000",
-		Amount:    "10.00000000",
+		Price:     decimal.NewFromFloat(100.5000),
+		Amount:    decimal.NewFromFloat(10.00000000),
 	}
 
 	order1, err := testStore.CreateOrder(context.Background(), createOrder1Params)
@@ -204,8 +205,8 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      "sell",
 		Status:    "open",
-		Price:     "100.5000",
-		Amount:    "10.00000000",
+		Price:     decimal.NewFromFloat(100.5000),
+		Amount:    decimal.NewFromFloat(10.00000000),
 	}
 
 	order2, err := testStore.CreateOrder(context.Background(), createOrder2Params)
@@ -221,7 +222,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	go func() {
 		_, err := testStore.UpdatedOrderTx(context.Background(), UpdatedOrderParams{
 			Status:       "filled",
-			FilledAmount: "15.00000",
+			FilledAmount: decimal.NewFromFloat(15.00000),
 			ID:           order1.ID,
 		})
 		errCh <- err
@@ -230,7 +231,7 @@ func TestDeadLockDetectionForUpdatingAmount(t *testing.T) {
 	go func() {
 		_, err := testStore.UpdatedOrderTx(context.Background(), UpdatedOrderParams{
 			Status:       "filled",
-			FilledAmount: "5.000000",
+			FilledAmount: decimal.NewFromFloat(5.000000),
 			ID:           order2.ID,
 		})
 		errCh <- err

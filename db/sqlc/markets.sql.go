@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const createMarket = `-- name: CreateMarket :one
@@ -19,11 +20,11 @@ RETURNING id, username, base_currency, quote_currency, created_at
 `
 
 type CreateMarketParams struct {
-	Username       string `json:"username"`
-	BaseCurrency   string `json:"base_currency"`
-	QuoteCurrency  string `json:"quote_currency"`
-	MinOrderAmount string `json:"min_order_amount"`
-	PricePrecision int32  `json:"price_precision"`
+	Username       string          `json:"username"`
+	BaseCurrency   string          `json:"base_currency"`
+	QuoteCurrency  string          `json:"quote_currency"`
+	MinOrderAmount decimal.Decimal `json:"min_order_amount"`
+	PricePrecision int32           `json:"price_precision"`
 }
 
 type CreateMarketRow struct {
@@ -117,12 +118,12 @@ ORDER BY created_at DESC
 `
 
 type ListMarketsRow struct {
-	ID             uuid.UUID `json:"id"`
-	BaseCurrency   string    `json:"base_currency"`
-	QuoteCurrency  string    `json:"quote_currency"`
-	MinOrderAmount string    `json:"min_order_amount"`
-	PricePrecision int32     `json:"price_precision"`
-	CreatedAt      time.Time `json:"created_at"`
+	ID             uuid.UUID       `json:"id"`
+	BaseCurrency   string          `json:"base_currency"`
+	QuoteCurrency  string          `json:"quote_currency"`
+	MinOrderAmount decimal.Decimal `json:"min_order_amount"`
+	PricePrecision int32           `json:"price_precision"`
+	CreatedAt      time.Time       `json:"created_at"`
 }
 
 func (q *Queries) ListMarkets(ctx context.Context) ([]ListMarketsRow, error) {

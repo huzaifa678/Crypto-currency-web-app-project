@@ -20,6 +20,7 @@ import (
 	mockdb "github.com/huzaifa678/Crypto-currency-web-app-project/db/mock"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -468,7 +469,7 @@ func createRandomTransaction() (transaction db.Transaction, transactionArgs db.C
 
 	currency := currencies[rand.Intn(len(currencies))]
 
-	amount := fmt.Sprint(rand.Intn(10000))
+	amount := decimal.NewFromFloat(rand.Float64())
 
 	status := []string{"completed", "pending"}
 
@@ -533,7 +534,7 @@ func createRandomTransactionWithEmail(Email string) (transaction db.Transaction)
 
 	currency := currencies[rand.Intn(len(currencies))]
 
-	amount := fmt.Sprint(rand.Intn(10000))
+	amount := decimal.NewFromFloat(rand.Float64())
 
 	status := []string{"completed", "pending"}
 

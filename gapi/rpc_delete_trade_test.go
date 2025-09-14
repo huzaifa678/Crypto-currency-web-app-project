@@ -12,6 +12,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -183,9 +184,9 @@ func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams
 		BuyOrderID: BuyOrder.ID,
     	SellOrderID: sellOrder.ID,   
     	MarketID:    market.ID,      
-    	Price:       "0.0",   
-    	Amount:      "0.0",         
-    	Fee:         "5",
+    	Price:       decimal.NewFromFloat(0.0),   
+    	Amount:      decimal.NewFromFloat(0.0),         
+    	Fee:         decimal.NewFromFloat(5),
 	}
 
 	Trade := db.Trade {

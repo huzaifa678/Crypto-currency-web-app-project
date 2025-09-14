@@ -14,6 +14,7 @@ import (
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -168,7 +169,7 @@ func createRandomWallet() (db.CreateWalletParams, db.Wallet, db.UpdateWalletBala
         Username: utils.RandomUser(),
 		UserEmail: randomEmail,
 		Currency: randomCurrency,
-		Balance: "0",
+		Balance: decimal.NewFromFloat(0),
 	}
 
 	createWalletRows := db.Wallet {
@@ -177,13 +178,13 @@ func createRandomWallet() (db.CreateWalletParams, db.Wallet, db.UpdateWalletBala
 		UserEmail: walletArgs.UserEmail,
 		Currency: walletArgs.Currency,
 		Balance: walletArgs.Balance,
-		LockedBalance: "0",
+		LockedBalance: decimal.NewFromFloat(0),
 		CreatedAt: time.Now(),
 	}
 
 	updateWalletParams := db.UpdateWalletBalanceParams {
-		Balance: "100",
-		LockedBalance: "0",
+		Balance: decimal.NewFromFloat(100),
+		LockedBalance: decimal.NewFromFloat(0),
 	}
 
 	return walletArgs, createWalletRows, updateWalletParams

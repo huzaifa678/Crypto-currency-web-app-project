@@ -850,6 +850,28 @@
       }
     },
     "/v1/wallets": {
+      "get": {
+        "summary": "Get wallets",
+        "description": "Get all wallets",
+        "operationId": "CryptoWebApp_GetWallets",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetWalletsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "CryptoWebApp"
+        ]
+      },
       "post": {
         "summary": "Create wallet",
         "description": "Create a new wallet for a user with the specified currency",
@@ -992,7 +1014,8 @@
           "$ref": "#/definitions/pbStatus"
         },
         "filledAmount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -1016,10 +1039,12 @@
       "type": "object",
       "properties": {
         "balance": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "lockedBalance": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -1052,7 +1077,8 @@
           "type": "string"
         },
         "minOrderAmount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "pricePrecision": {
           "type": "integer",
@@ -1084,10 +1110,12 @@
           "$ref": "#/definitions/pbStatus"
         },
         "price": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -1115,13 +1143,16 @@
           "type": "string"
         },
         "price": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "fee": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -1149,7 +1180,8 @@
           "type": "string"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "address": {
           "type": "string"
@@ -1319,6 +1351,18 @@
         }
       }
     },
+    "pbGetWalletsResponse": {
+      "type": "object",
+      "properties": {
+        "wallets": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbWallet"
+          }
+        }
+      }
+    },
     "pbGoogleLoginRequest": {
       "type": "object",
       "properties": {
@@ -1362,7 +1406,8 @@
           "type": "string"
         },
         "minOrderAmount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "pricePrecision": {
           "type": "integer",
@@ -1450,7 +1495,8 @@
           "type": "string"
         },
         "minOrderAmount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "pricePrecision": {
           "type": "integer",
@@ -1496,13 +1542,16 @@
           "$ref": "#/definitions/pbStatus"
         },
         "price": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "filledAmount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "createdAt": {
           "type": "string",
@@ -1597,13 +1646,16 @@
           "type": "string"
         },
         "price": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "fee": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "createdAt": {
           "type": "string",
@@ -1630,7 +1682,8 @@
           "type": "string"
         },
         "amount": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "status": {
           "$ref": "#/definitions/pbTransactionStatus"
@@ -1754,10 +1807,12 @@
           "type": "string"
         },
         "balance": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "lockedBalance": {
-          "type": "string"
+          "type": "string",
+          "format": "int64"
         },
         "createdAt": {
           "type": "string",

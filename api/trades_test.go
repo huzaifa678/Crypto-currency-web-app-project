@@ -17,6 +17,7 @@ import (
 	mockdb "github.com/huzaifa678/Crypto-currency-web-app-project/db/mock"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -485,9 +486,9 @@ func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams
 		BuyOrderID: BuyOrder.ID,
     	SellOrderID: sellOrder.ID,   
     	MarketID:    market.ID,      
-    	Price:       "0.0",   
-    	Amount:      "0.0",         
-    	Fee:         "5",
+    	Price:       decimal.NewFromFloat(0.0),   
+    	Amount:      decimal.NewFromFloat(0.0),         
+    	Fee:         decimal.NewFromFloat(5),
 	}
 
 	Trade := db.Trade {

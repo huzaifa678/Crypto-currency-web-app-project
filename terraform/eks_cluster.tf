@@ -46,6 +46,15 @@ resource "aws_security_group" "rds" {
   }
 }
 
+resource "aws_security_group" "redis_sg" {
+  name   = "redis-sg"
+  vpc_id = module.vpc.vpc_id
+
+  tags = {
+    Name = "redis-sg"
+  }
+}
+
 resource "aws_security_group_rule" "allow_eks_to_rds" {
   type                     = "ingress"
   from_port                = 5432
@@ -53,6 +62,15 @@ resource "aws_security_group_rule" "allow_eks_to_rds" {
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.eks_nodes.id
   security_group_id        = aws_security_group.rds.id
+}
+
+resource "aws_security_group_rule" "allow_eks_to_redis" {
+  type                     = "ingress"
+  from_port                = 6379
+  to_port                  = 6379
+  protocol                 = "tcp"
+  source_security_group_id = aws_security_group.eks_nodes.id
+  security_group_id        = aws_security_group.redis_sg.id
 }
 
 resource "aws_iam_role" "eks_cluster_role" {
@@ -104,11 +122,6 @@ resource "aws_eks_node_group" "eks_node_group" {
   }
 
   ami_type       = "AL2_x86_64"
-
-  launch_template {
-    id      = aws_launch_template.eks_nodes.id
-    version = "$Latest"
-  }
 }
 
 

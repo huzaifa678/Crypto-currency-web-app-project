@@ -20,5 +20,4 @@ sql:
           - db_type: "uuid"
             go_type: "github.com/google/uuid.UUID"      
           - db_type: "pg_catalog.numeric"
-            go_type:
-              type: "string"
+            go_type: "github.com/shopspring/decimal.Decimal"

@@ -19,6 +19,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 )
 
@@ -28,8 +29,8 @@ func createRandomFee() (db.CreateFeeParams, db.Fee, db.CreateFeeRow) {
     feeArgs := db.CreateFeeParams{
         Username: utils.RandomUser(),
         MarketID: marketID,
-        MakerFee: "0.01",
-        TakerFee: "0.02",
+        MakerFee: decimal.NewFromFloat(0.01),
+        TakerFee: decimal.NewFromFloat(0.02),
     }
 
     fee := db.Fee{

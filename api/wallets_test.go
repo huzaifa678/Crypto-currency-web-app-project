@@ -2,6 +2,7 @@ package api
 
 import (
 	"bytes"
+	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -20,6 +21,7 @@ import (
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -270,7 +272,7 @@ func createRandomWallet() (db.CreateWalletParams, db.Wallet, db.UpdateWalletBala
         Username: utils.RandomUser(),
 		UserEmail: randomEmail,
 		Currency: randomCurrency,
-		Balance: "0",
+		Balance: decimal.NewFromFloat(0),
 	}
 
 	createWalletRows := db.Wallet {
@@ -279,13 +281,14 @@ func createRandomWallet() (db.CreateWalletParams, db.Wallet, db.UpdateWalletBala
 		UserEmail: walletArgs.UserEmail,
 		Currency: walletArgs.Currency,
 		Balance: walletArgs.Balance,
-		LockedBalance: "0",
+		LockedBalance: decimal.NewFromFloat(0),
 		CreatedAt: time.Now(),
 	}
 
 	updateWalletParams := db.UpdateWalletBalanceParams {
-		Balance: "100",
-		LockedBalance: "0",
+		Balance: decimal.NewFromFloat(100),
+		LockedBalance: decimal.NewFromFloat(0),
+        ID: createWalletRows.ID,
 	}
 
 	return walletArgs, createWalletRows, updateWalletParams
@@ -316,9 +319,14 @@ func TestUpdateWalletAPI(t *testing.T) {
                     Return(wallet, nil)
 
                 store.EXPECT().
-                    UpdateWalletBalance(gomock.Any(), gomock.Eq(updateWalletParams)).
-                    Times(1).
-                    Return(nil)
+                    UpdateWalletBalance(gomock.Any(), gomock.Any()).
+                        DoAndReturn(func(ctx context.Context, arg db.UpdateWalletBalanceParams) error {
+                            require.True(t, arg.Balance.Equal(updateWalletParams.Balance))
+                            require.True(t, arg.LockedBalance.Equal(updateWalletParams.LockedBalance))
+                            require.Equal(t, updateWalletParams.ID, arg.ID)
+                        return nil
+                    }).
+                    Times(1)
             },
             setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
                 addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, wallet.Username, time.Minute)
@@ -341,9 +349,14 @@ func TestUpdateWalletAPI(t *testing.T) {
                     Return(wallet, nil)
 
                 store.EXPECT().
-                    UpdateWalletBalance(gomock.Any(), gomock.Eq(updateWalletParams)).
-                    Times(1).
-                    Return(sql.ErrConnDone)
+                    UpdateWalletBalance(gomock.Any(), gomock.Any()).
+                    DoAndReturn(func(ctx context.Context, arg db.UpdateWalletBalanceParams) error {
+                        require.True(t, arg.Balance.Equal(updateWalletParams.Balance))
+                        require.True(t, arg.LockedBalance.Equal(updateWalletParams.LockedBalance))
+                        require.Equal(t, updateWalletParams.ID, arg.ID)
+                    return sql.ErrConnDone
+                }).
+                Times(1)
             },
             setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
                 addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, wallet.Username, time.Minute)

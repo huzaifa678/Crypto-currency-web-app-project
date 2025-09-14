@@ -11,8 +11,8 @@ message CreateOrderRequest {
   string market_id = 2;
   OrderType type = 3;
   Status status = 4;
-  string price = 5;
-  string amount = 6;
+  int64 price = 5;
+  int64 amount = 6;
 }
 
 message CreateOrderResponse {

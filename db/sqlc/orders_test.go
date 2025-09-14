@@ -8,6 +8,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -34,8 +35,8 @@ func TestCreateOrder(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "100.50000000",
-		Amount:    "10.00000000",
+		Price:     decimal.NewFromFloat(100.50000000),
+		Amount:    decimal.NewFromFloat(10.00000000),
 	}
 
 	order, err := testStore.CreateOrder(context.Background(), args)
@@ -46,8 +47,8 @@ func TestCreateOrder(t *testing.T) {
 	require.Equal(t, args.MarketID, order.MarketID)
 	require.Equal(t, args.Type, order.Type)
 	require.Equal(t, args.Status, order.Status)
-	require.Equal(t, args.Price, order.Price)
-	require.Equal(t, args.Amount, order.Amount)
+	require.True(t, args.Price.Equal(order.Price), "Price mismatch")
+	require.True(t, args.Amount.Equal(order.Amount), "Amount mismatch")
 }
 
 func TestGetOrderById(t *testing.T) {
@@ -72,8 +73,8 @@ func TestGetOrderById(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "100.50000000",
-		Amount:    "10.00000000",
+		Price:     decimal.NewFromFloat(100.50000000),
+		Amount:    decimal.NewFromFloat(10.00000000),
 	}
 
 	order, _ := testStore.CreateOrder(context.Background(), args)
@@ -112,8 +113,8 @@ func TestDeleteOrder(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "100.50000000",
-		Amount:    "10.00000000",
+		Price:     decimal.NewFromFloat(100.50000000),
+		Amount:    decimal.NewFromFloat(10.00000000),
 	}
 
 	order, err := testStore.CreateOrder(context.Background(), args)
@@ -133,7 +134,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 	email := createRandomEmailForOrder()
 
 	userArgs := CreateUserParams{
-		Username:     utils.RandomString(13),
+		Username:     fmt.Sprintf("testuser_%s", uuid.New()),
 		Email:        email,
 		PasswordHash: "9009909dddxxwd",
 		Role:         "user",
@@ -150,8 +151,8 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "100.50000000",
-		Amount:    "10.00000000",
+		Price:     decimal.NewFromFloat(100.50000000),
+		Amount:    decimal.NewFromFloat(10.00000000),
 	}
 
 	order, err := testStore.CreateOrder(context.Background(), args)
@@ -160,7 +161,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 
 	updatedArg := UpdateOrderStatusAndFilledAmountParams{
 		Status:       OrderStatus("open"),
-		FilledAmount: "10.00000000",
+		FilledAmount: decimal.NewFromFloat(10.00000000),
 		ID:           order.ID,
 	}
 
@@ -170,7 +171,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 	updatedOrder, err := testStore.GetOrderByID(context.Background(), order.ID)
 	require.NoError(t, err, "Failed to fetch updated order")
 	require.Equal(t, updatedArg.Status, updatedOrder.Status)
-	require.Equal(t, updatedArg.FilledAmount, updatedOrder.FilledAmount)
+	require.True(t, updatedArg.FilledAmount.Equal(updatedOrder.FilledAmount), "Filled amount mismatch")
 	require.WithinDuration(t, time.Now(), updatedOrder.UpdatedAt, time.Second, "UpdatedAt should be recent")
 }
 
@@ -215,7 +216,7 @@ func createRandomMarketForOrder(t *testing.T) CreateMarketRow {
 		Username:       user.Username,
 		BaseCurrency:   baseCurrency,
 		QuoteCurrency:  quoteCurrency,
-		MinOrderAmount: "0.6",
+		MinOrderAmount: decimal.NewFromFloat(0.6),
 		PricePrecision: 6,
 	}
 

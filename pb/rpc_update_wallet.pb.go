@@ -23,8 +23,8 @@ const (
 
 type UpdateWalletRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Balance       string                 `protobuf:"bytes,1,opt,name=balance,proto3" json:"balance,omitempty"`
-	LockedBalance string                 `protobuf:"bytes,2,opt,name=locked_balance,json=lockedBalance,proto3" json:"locked_balance,omitempty"`
+	Balance       int64                  `protobuf:"varint,1,opt,name=balance,proto3" json:"balance,omitempty"`
+	LockedBalance int64                  `protobuf:"varint,2,opt,name=locked_balance,json=lockedBalance,proto3" json:"locked_balance,omitempty"`
 	WalletId      string                 `protobuf:"bytes,3,opt,name=wallet_id,json=walletId,proto3" json:"wallet_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -60,18 +60,18 @@ func (*UpdateWalletRequest) Descriptor() ([]byte, []int) {
 	return file_rpc_update_wallet_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *UpdateWalletRequest) GetBalance() string {
+func (x *UpdateWalletRequest) GetBalance() int64 {
 	if x != nil {
 		return x.Balance
 	}
-	return ""
+	return 0
 }
 
-func (x *UpdateWalletRequest) GetLockedBalance() string {
+func (x *UpdateWalletRequest) GetLockedBalance() int64 {
 	if x != nil {
 		return x.LockedBalance
 	}
-	return ""
+	return 0
 }
 
 func (x *UpdateWalletRequest) GetWalletId() string {
@@ -131,8 +131,8 @@ const file_rpc_update_wallet_proto_rawDesc = "" +
 	"\n" +
 	"\x17rpc_update_wallet.proto\x12\x02pb\"s\n" +
 	"\x13UpdateWalletRequest\x12\x18\n" +
-	"\abalance\x18\x01 \x01(\tR\abalance\x12%\n" +
-	"\x0elocked_balance\x18\x02 \x01(\tR\rlockedBalance\x12\x1b\n" +
+	"\abalance\x18\x01 \x01(\x03R\abalance\x12%\n" +
+	"\x0elocked_balance\x18\x02 \x01(\x03R\rlockedBalance\x12\x1b\n" +
 	"\twallet_id\x18\x03 \x01(\tR\bwalletId\"0\n" +
 	"\x14UpdateWalletResponse\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessageB:Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"

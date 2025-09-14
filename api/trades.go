@@ -3,11 +3,12 @@ package api
 import (
 	"database/sql"
 	"log"
+	"math"
 	"net/http"
-	"strconv"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -18,9 +19,9 @@ type RequestTradeParams struct {
 	BuyOrderID  uuid.UUID 	   `json:"buy_order_id" binding:"required"`
 	SellOrderID uuid.UUID	   `json:"sell_order_id" binding:"required"`
 	MarketID    uuid.UUID 	   `json:"market_id" binding:"required"`
-	Price       string         `json:"price" binding:"required"`
-	Amount      string         `json:"amount" binding:"required"`
-	Fee         string 		   `json:"fee" binding:"required"`
+	Price       decimal.Decimal         `json:"price" binding:"required"`
+	Amount      decimal.Decimal         `json:"amount" binding:"required"`
+	Fee         decimal.Decimal 		   `json:"fee" binding:"required"`
 }
 
 
@@ -148,8 +149,8 @@ func (server *server) listTrades(ctx *gin.Context) {
 }
 
 
-func isValidFee(fee string) bool {
-	_, err := strconv.ParseFloat(fee, 64)
-	return err == nil
+func isValidFee(fee decimal.Decimal) bool {
+	f, _ := fee.Float64()
+    return !math.IsInf(f, 0) && !math.IsNaN(f)
 }
 

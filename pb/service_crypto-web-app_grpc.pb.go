@@ -38,6 +38,7 @@ const (
 	CryptoWebApp_DeleteWallet_FullMethodName               = "/pb.CryptoWebApp/DeleteWallet"
 	CryptoWebApp_UpdateWallet_FullMethodName               = "/pb.CryptoWebApp/UpdateWallet"
 	CryptoWebApp_GetWallet_FullMethodName                  = "/pb.CryptoWebApp/GetWallet"
+	CryptoWebApp_GetWallets_FullMethodName                 = "/pb.CryptoWebApp/GetWallets"
 	CryptoWebApp_VerifyEmail_FullMethodName                = "/pb.CryptoWebApp/VerifyEmail"
 	CryptoWebApp_StreamTrades_FullMethodName               = "/pb.CryptoWebApp/StreamTrades"
 	CryptoWebApp_CreateTrade_FullMethodName                = "/pb.CryptoWebApp/CreateTrade"
@@ -73,6 +74,7 @@ type CryptoWebAppClient interface {
 	DeleteWallet(ctx context.Context, in *DeleteWalletRequest, opts ...grpc.CallOption) (*DeleteWalletResponse, error)
 	UpdateWallet(ctx context.Context, in *UpdateWalletRequest, opts ...grpc.CallOption) (*UpdateWalletResponse, error)
 	GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
+	GetWallets(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetWalletsResponse, error)
 	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
 	StreamTrades(ctx context.Context, in *TradeStreamRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Trade], error)
 	CreateTrade(ctx context.Context, in *CreateTradeRequest, opts ...grpc.CallOption) (*CreateTradeResponse, error)
@@ -274,6 +276,16 @@ func (c *cryptoWebAppClient) GetWallet(ctx context.Context, in *GetWalletRequest
 	return out, nil
 }
 
+func (c *cryptoWebAppClient) GetWallets(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetWalletsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetWalletsResponse)
+	err := c.cc.Invoke(ctx, CryptoWebApp_GetWallets_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *cryptoWebAppClient) VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(VerifyEmailResponse)
@@ -415,6 +427,7 @@ type CryptoWebAppServer interface {
 	DeleteWallet(context.Context, *DeleteWalletRequest) (*DeleteWalletResponse, error)
 	UpdateWallet(context.Context, *UpdateWalletRequest) (*UpdateWalletResponse, error)
 	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
+	GetWallets(context.Context, *emptypb.Empty) (*GetWalletsResponse, error)
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
 	StreamTrades(*TradeStreamRequest, grpc.ServerStreamingServer[Trade]) error
 	CreateTrade(context.Context, *CreateTradeRequest) (*CreateTradeResponse, error)
@@ -489,6 +502,9 @@ func (UnimplementedCryptoWebAppServer) UpdateWallet(context.Context, *UpdateWall
 }
 func (UnimplementedCryptoWebAppServer) GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWallet not implemented")
+}
+func (UnimplementedCryptoWebAppServer) GetWallets(context.Context, *emptypb.Empty) (*GetWalletsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWallets not implemented")
 }
 func (UnimplementedCryptoWebAppServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyEmail not implemented")
@@ -868,6 +884,24 @@ func _CryptoWebApp_GetWallet_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CryptoWebApp_GetWallets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CryptoWebAppServer).GetWallets(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CryptoWebApp_GetWallets_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CryptoWebAppServer).GetWallets(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CryptoWebApp_VerifyEmail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(VerifyEmailRequest)
 	if err := dec(in); err != nil {
@@ -1137,6 +1171,10 @@ var CryptoWebApp_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetWallet",
 			Handler:    _CryptoWebApp_GetWallet_Handler,
+		},
+		{
+			MethodName: "GetWallets",
+			Handler:    _CryptoWebApp_GetWallets_Handler,
 		},
 		{
 			MethodName: "VerifyEmail",

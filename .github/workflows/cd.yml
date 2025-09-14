@@ -35,7 +35,12 @@ jobs:
 
       - name: Terraform Plan
         run: |
-          terraform plan -out=tfplan 
+          terraform plan \
+            -var="rds_db_password=${{ secrets.RDS_DB_PASSWORD }}" \
+            -var="google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}" \
+            -var="google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            -var="token_symmetric_key=${{ secrets.TOKEN_SYMMETRIC_KEY }}" \
+            -out=tfplan
         working-directory: ./terraform
 
       - name: Terraform Apply
@@ -72,6 +77,9 @@ jobs:
             docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
             docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
 
+      - name: Load secrets and save to app.env
+        run: aws secretsmanager get-secret-value --secret-id production-credentials-v1 --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' > app.env
+
       - name: Install kubectl
         run: |
           curl -LO "https://dl.k8s.io/release/$(curl -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
@@ -92,7 +100,7 @@ jobs:
           ./helm.sh
         working-directory: ./eks
         
-      
-      - name: Deploy to EKS
+      - name: Deploy to EKS using helm
         run: |
-          kubectl apply -f eks/
+            helm upgrade --install crypto-app-cluster .
+        working-directory: ./eks-chart

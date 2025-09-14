@@ -2,6 +2,7 @@ package gapi
 
 import (
 	"context"
+	"errors"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/oauth2"
@@ -12,8 +13,10 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+var oauth2VerifyGoogleIDToken = oauth2.VerifyGoogleIDToken
+
 func (server *server) GoogleLogin(ctx context.Context, req *pb.GoogleLoginRequest) (*pb.GoogleLoginResponse, error) {
-	payload, err := oauth2.VerifyGoogleIDToken(ctx, req.IdToken, server.config.GoogleClientID)
+    payload, err := oauth2VerifyGoogleIDToken(ctx, req.IdToken, server.config.GoogleClientID)
     if err != nil {
         return nil, status.Errorf(codes.Unauthenticated, "invalid google id_token: %s", err)
     }
@@ -25,17 +28,20 @@ func (server *server) GoogleLogin(ctx context.Context, req *pb.GoogleLoginReques
 
     user, err := server.store.GetGoogleUserByProviderID(ctx, sub)
     if err != nil {
-        user, err = server.store.CreateGoogleUser(ctx, db.CreateGoogleUserParams{
-            Email:      email,
-            Username:   name,
-            ProviderID: sub,
-        })
-        if err != nil {
-            return nil, status.Errorf(codes.Internal, "failed to create google user: %s", err)
+        if errors.Is(err, db.ErrRecordNotFound) {
+            user, err = server.store.CreateGoogleUser(ctx, db.CreateGoogleUserParams{
+                Email: email, 
+                Username: name, 
+                ProviderID: sub,
+            })
+
+            if err != nil {
+                return nil, status.Errorf(codes.Internal, "failed to create google user: %s", err)
+            }
         }
     }
 
-    accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username,server.config.AccessTokenDuration, token.TokenTypeAccessToken)
+    accessToken, accessPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration, token.TokenTypeAccessToken)
     if err != nil {
         return nil, status.Errorf(codes.Internal, "cannot create access token: %s", err)
     }
@@ -47,12 +53,15 @@ func (server *server) GoogleLogin(ctx context.Context, req *pb.GoogleLoginReques
 
 	_, err = server.store.GetUserByEmail(ctx, email)
 	if err != nil  {
-		_, err = server.store.CreateUser(ctx, db.CreateUserParams{
-        	Username:  user.Username,
-        	Email:     user.Email,
-        	PasswordHash: password,
-        	Role: db.UserRole(user.Role.String),
-    	})
+        if errors.Is(err, db.ErrRecordNotFound) {
+            _, err = server.store.CreateUser(ctx, db.CreateUserParams{
+        	    Username:  user.Username,
+        	    Email:     user.Email,
+        	    PasswordHash: password,
+        	    Role: db.UserRole(user.Role.String),
+    	    })
+        }
+
 
 		if err != nil {
         	return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)

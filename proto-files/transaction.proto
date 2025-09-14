@@ -24,7 +24,7 @@ message Transaction {
   string user_email = 3;
   TransactionType type = 4;       
   string currency = 5;   
-  string amount = 6;
+  int64 amount = 6;
   TransactionStatus status = 7;     
   string address = 8;
   string tx_hash = 9;

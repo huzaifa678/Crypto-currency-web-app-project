@@ -8,6 +8,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/val"
+	"github.com/shopspring/decimal"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,6 +16,9 @@ import (
 
 func (server *server) CreateTransaction(ctx context.Context, req *pb.CreateTransactionRequest) (*pb.CreateTransactionResponse, error) {
 	log.Println("req", req)
+
+	amount := decimal.NewFromInt(req.GetAmount()).Div(decimal.New(1, scale))
+
 	violations := validateCreateTransactionRequest(req)
 
 	if violations != nil {
@@ -35,7 +39,7 @@ func (server *server) CreateTransaction(ctx context.Context, req *pb.CreateTrans
 		UserEmail: req.GetUserEmail(),
 		Type: db.TransactionType(pbType),
 		Currency: req.GetCurrency(),
-		Amount: req.GetAmount(),
+		Amount: amount,
 		Address: req.GetAddress(),
 		TxHash: req.TxHash,
 	}
@@ -60,7 +64,7 @@ func (server *server) CreateTransaction(ctx context.Context, req *pb.CreateTrans
 }
 
 func validateCreateTransactionRequest(req *pb.CreateTransactionRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateCreateTransactionRequest(req.UserEmail, req.Amount, req.Type); err != nil {
+	if err := val.ValidateCreateTransactionRequest(req.UserEmail, decimal.NewFromFloat(float64(req.Amount)), req.Type); err != nil {
 		violations = append(violations, fieldViolation("user_email", err))
 		violations = append(violations, fieldViolation("amount", err))
 		violations = append(violations, fieldViolation("type", err))

@@ -50,7 +50,7 @@ func convertMarket(market db.Market) *pb.Market {
 		UserName:     market.Username,
 		BaseCurrency: market.BaseCurrency,
 		QuoteCurrency: market.QuoteCurrency,
-		MinOrderAmount: market.MinOrderAmount,
+		MinOrderAmount: market.MinOrderAmount.IntPart(),
 		PricePrecision: int32(market.PricePrecision),
 		CreatedAt:     timestamppb.New(market.CreatedAt),
 	}
@@ -64,7 +64,7 @@ func convertListMarkets(markets []db.ListMarketsRow) *pb.MarketListResponse {
 			MarketId:      market.ID.String(),
 			BaseCurrency:  market.BaseCurrency,
 			QuoteCurrency: market.QuoteCurrency,
-			MinOrderAmount: market.MinOrderAmount,
+			MinOrderAmount: market.MinOrderAmount.IntPart(),
 			PricePrecision: int32(market.PricePrecision),
 			CreatedAt:      timestamppb.New(market.CreatedAt),
 		}
@@ -83,9 +83,9 @@ func convertOrder(order db.Order) *pb.Order {
 		MarketId:     order.MarketID.String(),
 		Type:         convertOrderType(order.Type),
 		Status:       convertOrderStatus(order.Status),
-		Price:        order.Price,
-		Amount:       order.Amount,
-		FilledAmount: order.FilledAmount,
+		Price:        order.Price.IntPart(),
+		Amount:       order.Amount.IntPart(),
+		FilledAmount: order.FilledAmount.IntPart(),
 		CreatedAt:    timestamppb.New(order.CreatedAt),
 		UpdatedAt:    timestamppb.New(order.UpdatedAt),
 	}
@@ -96,8 +96,8 @@ func convertWallet(wallet db.Wallet) *pb.Wallet {
 		Id:            wallet.ID.String(),
 		UserEmail:     wallet.UserEmail,
 		Currency:      wallet.Currency,
-		Balance:       wallet.Balance,
-		LockedBalance: wallet.LockedBalance,
+		Balance:       wallet.Balance.IntPart(),
+		LockedBalance: wallet.LockedBalance.IntPart(),
 		CreatedAt:     timestamppb.New(wallet.CreatedAt),
 	}
 }
@@ -170,9 +170,9 @@ func convertTrade(trade db.Trade) (*pb.Trades) {
 		BuyOrderId: trade.BuyOrderID.String(),
 		SellOrderId: trade.SellOrderID.String(),
 		MarketId:   trade.MarketID.String(),
-		Price:      trade.Price,
-		Amount:     trade.Amount,
-		Fee:        trade.Fee,
+		Price:      trade.Price.IntPart(),
+		Amount:     trade.Amount.IntPart(),
+		Fee:        trade.Fee.IntPart(),
 		CreatedAt:  timestamppb.New(trade.CreatedAt), 
 	}
 }
@@ -184,7 +184,7 @@ func convertTransaction(transaction db.Transaction) (*pb.Transaction) {
 		UserEmail: transaction.UserEmail,
 		Type: convertTransactionType(transaction.Type),
 		Currency: transaction.Currency,
-		Amount: transaction.Amount,
+		Amount: transaction.Amount.IntPart(),
 		Status: convertTransactionStatus(transaction.Status),
 		Address: transaction.Address,
 		TxHash: transaction.TxHash,
@@ -201,7 +201,7 @@ func convertTransactionList(transactions []db.Transaction) ([] *pb.Transaction) 
 			UserEmail: 	   tx.UserEmail,
 			Type: 		   convertTransactionType(tx.Type),
 			Currency: 	   tx.Currency,	
-			Amount:    	   tx.Amount,
+			Amount:    	   tx.Amount.IntPart(),
 			Status:    	   convertTransactionStatus(tx.Status),
 			Address: 	   tx.Address,	
 			CreatedAt: 	   timestamppb.New(tx.CreatedAt),
@@ -219,7 +219,7 @@ func convertCreateTransaction(userName string, transaction db.CreateTransactionR
 		UserEmail: transaction.UserEmail,
 		Type: convertTransactionType(transaction.Type),
 		Currency: transaction.Currency,
-		Amount: transaction.Amount,
+		Amount: transaction.Amount.IntPart(),
 		Status: convertTransactionStatus(transaction.Status),
 		Address: transaction.Address,
 		TxHash: transaction.TxHash,
@@ -238,9 +238,9 @@ func convertListOrders(orders []db.Order) *pb.OrderListResponse {
 			MarketId:     order.MarketID.String(),
 			Type:         convertOrderType(order.Type),
 			Status:       convertOrderStatus(order.Status),
-			Price:        order.Price,
-			Amount:       order.Amount,
-			FilledAmount: order.FilledAmount,
+			Price:        order.Price.IntPart(),
+			Amount:       order.Amount.IntPart(),
+			FilledAmount: order.FilledAmount.IntPart(),
 			CreatedAt:    timestamppb.New(order.CreatedAt),
 			UpdatedAt:    timestamppb.New(order.UpdatedAt),
 		}
@@ -251,4 +251,21 @@ func convertListOrders(orders []db.Order) *pb.OrderListResponse {
 	}
 }
 
+func convertGetWallets(wallets []db.Wallet) *pb.GetWalletsResponse {
+	pbWallets := make([]*pb.Wallet, len(wallets))
 
+	for i, wallet := range wallets {
+		pbWallets[i] = &pb.Wallet{
+			Id:            wallet.ID.String(),
+			UserEmail:     wallet.UserEmail,
+			Currency:      wallet.Currency,
+			Balance:       wallet.Balance.IntPart(),
+			LockedBalance: wallet.LockedBalance.IntPart(),
+			CreatedAt:     timestamppb.New(wallet.CreatedAt),
+		}
+	}
+
+	return &pb.GetWalletsResponse{
+		Wallets: pbWallets,
+	}
+}

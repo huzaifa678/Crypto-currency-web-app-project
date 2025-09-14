@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const createOrder = `-- name: CreateOrder :one
@@ -19,26 +20,26 @@ RETURNING id, user_email, market_id, type, status, price, amount, filled_amount,
 `
 
 type CreateOrderParams struct {
-	Username  string      `json:"username"`
-	UserEmail string      `json:"user_email"`
-	MarketID  uuid.UUID   `json:"market_id"`
-	Type      OrderType   `json:"type"`
-	Status    OrderStatus `json:"status"`
-	Price     string      `json:"price"`
-	Amount    string      `json:"amount"`
+	Username  string          `json:"username"`
+	UserEmail string          `json:"user_email"`
+	MarketID  uuid.UUID       `json:"market_id"`
+	Type      OrderType       `json:"type"`
+	Status    OrderStatus     `json:"status"`
+	Price     decimal.Decimal `json:"price"`
+	Amount    decimal.Decimal `json:"amount"`
 }
 
 type CreateOrderRow struct {
-	ID           uuid.UUID   `json:"id"`
-	UserEmail    string      `json:"user_email"`
-	MarketID     uuid.UUID   `json:"market_id"`
-	Type         OrderType   `json:"type"`
-	Status       OrderStatus `json:"status"`
-	Price        string      `json:"price"`
-	Amount       string      `json:"amount"`
-	FilledAmount string      `json:"filled_amount"`
-	CreatedAt    time.Time   `json:"created_at"`
-	UpdatedAt    time.Time   `json:"updated_at"`
+	ID           uuid.UUID       `json:"id"`
+	UserEmail    string          `json:"user_email"`
+	MarketID     uuid.UUID       `json:"market_id"`
+	Type         OrderType       `json:"type"`
+	Status       OrderStatus     `json:"status"`
+	Price        decimal.Decimal `json:"price"`
+	Amount       decimal.Decimal `json:"amount"`
+	FilledAmount decimal.Decimal `json:"filled_amount"`
+	CreatedAt    time.Time       `json:"created_at"`
+	UpdatedAt    time.Time       `json:"updated_at"`
 }
 
 func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (CreateOrderRow, error) {
@@ -147,9 +148,9 @@ WHERE id = $3
 `
 
 type UpdateOrderStatusAndFilledAmountParams struct {
-	Status       OrderStatus `json:"status"`
-	FilledAmount string      `json:"filled_amount"`
-	ID           uuid.UUID   `json:"id"`
+	Status       OrderStatus     `json:"status"`
+	FilledAmount decimal.Decimal `json:"filled_amount"`
+	ID           uuid.UUID       `json:"id"`
 }
 
 func (q *Queries) UpdateOrderStatusAndFilledAmount(ctx context.Context, arg UpdateOrderStatusAndFilledAmountParams) error {

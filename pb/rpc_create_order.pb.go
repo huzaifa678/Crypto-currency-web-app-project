@@ -27,8 +27,8 @@ type CreateOrderRequest struct {
 	MarketId      string                 `protobuf:"bytes,2,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
 	Type          OrderType              `protobuf:"varint,3,opt,name=type,proto3,enum=pb.OrderType" json:"type,omitempty"`
 	Status        Status                 `protobuf:"varint,4,opt,name=status,proto3,enum=pb.Status" json:"status,omitempty"`
-	Price         string                 `protobuf:"bytes,5,opt,name=price,proto3" json:"price,omitempty"`
-	Amount        string                 `protobuf:"bytes,6,opt,name=amount,proto3" json:"amount,omitempty"`
+	Price         int64                  `protobuf:"varint,5,opt,name=price,proto3" json:"price,omitempty"`
+	Amount        int64                  `protobuf:"varint,6,opt,name=amount,proto3" json:"amount,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -91,18 +91,18 @@ func (x *CreateOrderRequest) GetStatus() Status {
 	return Status_OPEN
 }
 
-func (x *CreateOrderRequest) GetPrice() string {
+func (x *CreateOrderRequest) GetPrice() int64 {
 	if x != nil {
 		return x.Price
 	}
-	return ""
+	return 0
 }
 
-func (x *CreateOrderRequest) GetAmount() string {
+func (x *CreateOrderRequest) GetAmount() int64 {
 	if x != nil {
 		return x.Amount
 	}
-	return ""
+	return 0
 }
 
 type CreateOrderResponse struct {
@@ -161,8 +161,8 @@ const file_rpc_create_order_proto_rawDesc = "" +
 	"\x04type\x18\x03 \x01(\x0e2\r.pb.OrderTypeR\x04type\x12\"\n" +
 	"\x06status\x18\x04 \x01(\x0e2\n" +
 	".pb.StatusR\x06status\x12\x14\n" +
-	"\x05price\x18\x05 \x01(\tR\x05price\x12\x16\n" +
-	"\x06amount\x18\x06 \x01(\tR\x06amount\"0\n" +
+	"\x05price\x18\x05 \x01(\x03R\x05price\x12\x16\n" +
+	"\x06amount\x18\x06 \x01(\x03R\x06amount\"0\n" +
 	"\x13CreateOrderResponse\x12\x19\n" +
 	"\border_id\x18\x01 \x01(\tR\aorderIdB:Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"
 

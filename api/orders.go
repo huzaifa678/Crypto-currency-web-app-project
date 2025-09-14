@@ -7,6 +7,7 @@ import (
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -17,8 +18,8 @@ type OrderRequest struct {
     MarketID  uuid.UUID       `json:"market_id"`
     Type      db.OrderType    `json:"type"`
     Status    db.OrderStatus  `json:"status"`
-    Price     string          `json:"price"`
-    Amount    string          `json:"amount"`
+    Price     decimal.Decimal `json:"price"`
+    Amount    decimal.Decimal `json:"amount"`
 }
 
 func (server *server) createOrder(ctx *gin.Context) {

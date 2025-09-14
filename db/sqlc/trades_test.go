@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -34,8 +35,8 @@ func TestCreateTrade(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "100.50000000",
-		Amount:    "1000.00000000",
+		Price:     decimal.NewFromFloat(100.50000000),
+		Amount:    decimal.NewFromFloat(1000.00000000),
 	}
 
 	buyOrder, err := testStore.CreateOrder(context.Background(), buyOrderArgs)
@@ -60,8 +61,8 @@ func TestCreateTrade(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "110.50000000",
-		Amount:    "1000.00000000",
+		Price:     decimal.NewFromFloat(110.50000000),
+		Amount:    decimal.NewFromFloat(1000.00000000),
 	}
 
 	sellOrder, err := testStore.CreateOrder(context.Background(), sellOrderArgs)
@@ -72,9 +73,9 @@ func TestCreateTrade(t *testing.T) {
 		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID:    market.ID,
-		Price:       "105.50000000",
-		Amount:      "10.00000000",
-		Fee:         "0.01",
+		Price:       decimal.NewFromFloat(105.50000000),
+		Amount:      decimal.NewFromFloat(10.00000000),
+		Fee:         decimal.NewFromFloat(0.01),
 	}
 
 	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
@@ -84,8 +85,8 @@ func TestCreateTrade(t *testing.T) {
 	require.Equal(t, buyOrder.ID, trade.BuyOrderID, "BuyOrderID should match")
 	require.Equal(t, sellOrder.ID, trade.SellOrderID, "SellOrderID should match")
 	require.Equal(t, market.ID, trade.MarketID, "MarketID should match")
-	require.Equal(t, "105.50000000", trade.Price, "Price should match the trade price")
-	require.Equal(t, "10.00000000", trade.Amount, "Amount should match the trade amount")
+	require.True(t, decimal.NewFromFloat(105.50000000).Equal(trade.Price), "Price should match the trade price")
+	require.True(t, decimal.NewFromFloat(10.00000000).Equal(trade.Amount), "Amount should match the trade amount")
 }
 
 func TestDeleteTrade(t *testing.T) {
@@ -110,8 +111,8 @@ func TestDeleteTrade(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "100.50000000",
-		Amount:    "1000.00000000",
+		Price:     decimal.NewFromFloat(100.50000000),
+		Amount:    decimal.NewFromFloat(1000.00000000),
 	}
 
 	buyOrder, err := testStore.CreateOrder(context.Background(), buyOrderArgs)
@@ -136,8 +137,8 @@ func TestDeleteTrade(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "110.50000000",
-		Amount:    "1000.00000000",
+		Price:     decimal.NewFromFloat(110.50000000),
+		Amount:    decimal.NewFromFloat(1000.00000000),
 	}
 
 	sellOrder, err := testStore.CreateOrder(context.Background(), sellOrderArgs)
@@ -148,9 +149,9 @@ func TestDeleteTrade(t *testing.T) {
 		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID:    market.ID,
-		Price:       "105.50000000",
-		Amount:      "10.00000000",
-		Fee:         "0.01",
+		Price:       decimal.NewFromFloat(105.50000000),
+		Amount:      decimal.NewFromFloat(10.00000000),
+		Fee:         decimal.NewFromFloat(0.01),
 	}
 
 	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
@@ -184,8 +185,8 @@ func TestGetTradeById(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "100.50000000",
-		Amount:    "1000.00000000",
+		Price:     decimal.NewFromFloat(100.50000000),
+		Amount:    decimal.NewFromFloat(1000.00000000),
 	}
 
 	buyOrder, err := testStore.CreateOrder(context.Background(), buyOrderArgs)
@@ -210,8 +211,8 @@ func TestGetTradeById(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "110.50000000",
-		Amount:    "1000.00000000",
+		Price:     decimal.NewFromFloat(110.50000000),
+		Amount:    decimal.NewFromFloat(1000.00000000),
 	}
 
 	sellOrder, err := testStore.CreateOrder(context.Background(), sellOrderArgs)
@@ -222,9 +223,9 @@ func TestGetTradeById(t *testing.T) {
 		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID:    market.ID,
-		Price:       "105.50000000",
-		Amount:      "10.00000000",
-		Fee:         "0.01",
+		Price:       decimal.NewFromFloat(105.50000000),
+		Amount:      decimal.NewFromFloat(10.00000000),
+		Fee:         decimal.NewFromFloat(0.01),
 	}
 
 	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
@@ -261,8 +262,8 @@ func TestGetTradeByMarketID(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "100.50000000",
-		Amount:    "1000.00000000",
+		Price:     decimal.NewFromFloat(100.50000000),
+		Amount:    decimal.NewFromFloat(1000.00000000),
 	}
 
 	buyOrder, err := testStore.CreateOrder(context.Background(), buyOrderArgs)
@@ -287,8 +288,8 @@ func TestGetTradeByMarketID(t *testing.T) {
 		MarketID:  market.ID,
 		Type:      OrderType("buy"),
 		Status:    OrderStatus("open"),
-		Price:     "110.50000000",
-		Amount:    "1000.00000000",
+		Price:     decimal.NewFromFloat(110.50000000),
+		Amount:    decimal.NewFromFloat(1000.00000000),
 	}
 
 	sellOrder, err := testStore.CreateOrder(context.Background(), sellOrderArgs)
@@ -299,9 +300,9 @@ func TestGetTradeByMarketID(t *testing.T) {
 		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID:    market.ID,
-		Price:       "105.50000000",
-		Amount:      "10.00000000",
-		Fee:         "0.01",
+		Price:       decimal.NewFromFloat(105.50000000),
+		Amount:      decimal.NewFromFloat(10.00000000),
+		Fee:         decimal.NewFromFloat(0.01),
 	}
 
 	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
@@ -353,7 +354,7 @@ func createRandomMarketForTrade(t *testing.T) CreateMarketRow {
 		Username:       user.Username,
 		BaseCurrency:   baseCurrency,
 		QuoteCurrency:  quoteCurrency,
-		MinOrderAmount: "0.1",
+		MinOrderAmount: decimal.NewFromFloat(0.1),
 		PricePrecision: 6,
 	}
 

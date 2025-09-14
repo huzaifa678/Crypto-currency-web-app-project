@@ -12,6 +12,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -32,19 +33,23 @@ func TestCreateMarketRPC(t *testing.T) {
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   market.BaseCurrency,
 				QuoteCurrency:  market.QuoteCurrency,
-				MinOrderAmount: market.MinOrderAmount,
+				MinOrderAmount: market.MinOrderAmount.Mul(decimal.New(1, scale)).IntPart(),
 				PricePrecision: market.PricePrecision,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
             },
 			buildStubs: func(store *mockdb.MockStore_interface) {
-				arg := CreateMarketParams
-
 				store.EXPECT().
-					CreateMarket(gomock.Any(), gomock.Eq(arg)).
-					Times(1).
-					Return(CreateMarketRow, nil)
+					CreateMarket(gomock.Any(), gomock.Any()).
+					DoAndReturn(func(ctx context.Context, arg db.CreateMarketParams) (db.CreateMarketRow, error) {
+						require.Equal(t, CreateMarketParams.BaseCurrency, arg.BaseCurrency)
+						require.Equal(t, CreateMarketParams.QuoteCurrency, arg.QuoteCurrency)
+						require.True(t, CreateMarketParams.MinOrderAmount.Equal(arg.MinOrderAmount))
+						require.Equal(t, CreateMarketParams.PricePrecision, arg.PricePrecision)
+						return CreateMarketRow, nil
+					}).
+					Times(1)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateMarketResponse, err error) {
 				require.NoError(t, err)
@@ -57,7 +62,7 @@ func TestCreateMarketRPC(t *testing.T) {
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   market.BaseCurrency,
 				QuoteCurrency:  market.QuoteCurrency,
-				MinOrderAmount: market.MinOrderAmount,
+				MinOrderAmount: market.MinOrderAmount.IntPart(),
 				PricePrecision: market.PricePrecision,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
@@ -80,7 +85,7 @@ func TestCreateMarketRPC(t *testing.T) {
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   "", 
 				QuoteCurrency:  market.QuoteCurrency,
-				MinOrderAmount: market.MinOrderAmount,
+				MinOrderAmount: market.MinOrderAmount.IntPart(),
 				PricePrecision: market.PricePrecision,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
@@ -103,7 +108,7 @@ func TestCreateMarketRPC(t *testing.T) {
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   market.BaseCurrency,
 				QuoteCurrency:  "", 
-				MinOrderAmount: market.MinOrderAmount,
+				MinOrderAmount: market.MinOrderAmount.IntPart(),
 				PricePrecision: market.PricePrecision,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
@@ -126,19 +131,18 @@ func TestCreateMarketRPC(t *testing.T) {
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   market.BaseCurrency,
 				QuoteCurrency:  market.QuoteCurrency,
-				MinOrderAmount: market.MinOrderAmount,
+				MinOrderAmount: market.MinOrderAmount.IntPart(),
 				PricePrecision: market.PricePrecision,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
                 return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
             },
 			buildStubs: func(store *mockdb.MockStore_interface) {
-				arg := CreateMarketParams
 
 				store.EXPECT().
-					CreateMarket(gomock.Any(), gomock.Eq(arg)).
+					CreateMarket(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(db.CreateMarketRow{}, db.ErrRecordNotFound)
+					Return(CreateMarketRow, db.ErrRecordNotFound)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateMarketResponse, err error) {
 				require.Error(t, err)
@@ -181,7 +185,7 @@ func createRandomMarket() (db.CreateMarketParams, db.Market, db.CreateMarketRow)
 	marketArgs := db.CreateMarketParams{
 		BaseCurrency:  baseCurrency,
 		QuoteCurrency: quoteCurrency,
-		MinOrderAmount: "0.1",
+		MinOrderAmount: decimal.NewFromFloat(0.1),
 		PricePrecision: 8,
 	}
 

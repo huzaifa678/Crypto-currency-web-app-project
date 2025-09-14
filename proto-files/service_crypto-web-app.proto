@@ -32,6 +32,7 @@ import "rpc_get_transaction_by_user_email.proto";
 import "rpc_update_order_status_and_filled_amount.proto";
 import "rpc_list_order.proto";
 import "rpc_google_login.proto";
+import "rpc_get_wallets.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -252,6 +253,17 @@ service CryptoWebApp {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Get wallet details by wallet ID";
             summary: "Get wallet";
+        };
+    }
+
+    rpc GetWallets (google.protobuf.Empty) returns (GetWalletsResponse) {
+        option (google.api.http) = {
+            get: "/v1/wallets"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Get all wallets";
+            summary: "Get wallets";
         };
     }
 

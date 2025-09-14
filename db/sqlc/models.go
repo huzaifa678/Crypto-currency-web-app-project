@@ -11,6 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/shopspring/decimal"
 )
 
 type OrderStatus string
@@ -244,12 +245,12 @@ type AuditLog struct {
 }
 
 type Fee struct {
-	ID        uuid.UUID `json:"id"`
-	Username  string    `json:"username"`
-	MarketID  uuid.UUID `json:"market_id"`
-	MakerFee  string    `json:"maker_fee"`
-	TakerFee  string    `json:"taker_fee"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        uuid.UUID       `json:"id"`
+	Username  string          `json:"username"`
+	MarketID  uuid.UUID       `json:"market_id"`
+	MakerFee  decimal.Decimal `json:"maker_fee"`
+	TakerFee  decimal.Decimal `json:"taker_fee"`
+	CreatedAt time.Time       `json:"created_at"`
 }
 
 type GoogleAuth struct {
@@ -263,27 +264,27 @@ type GoogleAuth struct {
 }
 
 type Market struct {
-	ID             uuid.UUID `json:"id"`
-	Username       string    `json:"username"`
-	BaseCurrency   string    `json:"base_currency"`
-	QuoteCurrency  string    `json:"quote_currency"`
-	MinOrderAmount string    `json:"min_order_amount"`
-	PricePrecision int32     `json:"price_precision"`
-	CreatedAt      time.Time `json:"created_at"`
+	ID             uuid.UUID       `json:"id"`
+	Username       string          `json:"username"`
+	BaseCurrency   string          `json:"base_currency"`
+	QuoteCurrency  string          `json:"quote_currency"`
+	MinOrderAmount decimal.Decimal `json:"min_order_amount"`
+	PricePrecision int32           `json:"price_precision"`
+	CreatedAt      time.Time       `json:"created_at"`
 }
 
 type Order struct {
-	ID           uuid.UUID   `json:"id"`
-	Username     string      `json:"username"`
-	UserEmail    string      `json:"user_email"`
-	MarketID     uuid.UUID   `json:"market_id"`
-	Type         OrderType   `json:"type"`
-	Status       OrderStatus `json:"status"`
-	Price        string      `json:"price"`
-	Amount       string      `json:"amount"`
-	FilledAmount string      `json:"filled_amount"`
-	CreatedAt    time.Time   `json:"created_at"`
-	UpdatedAt    time.Time   `json:"updated_at"`
+	ID           uuid.UUID       `json:"id"`
+	Username     string          `json:"username"`
+	UserEmail    string          `json:"user_email"`
+	MarketID     uuid.UUID       `json:"market_id"`
+	Type         OrderType       `json:"type"`
+	Status       OrderStatus     `json:"status"`
+	Price        decimal.Decimal `json:"price"`
+	Amount       decimal.Decimal `json:"amount"`
+	FilledAmount decimal.Decimal `json:"filled_amount"`
+	CreatedAt    time.Time       `json:"created_at"`
+	UpdatedAt    time.Time       `json:"updated_at"`
 }
 
 type Session struct {
@@ -297,15 +298,15 @@ type Session struct {
 }
 
 type Trade struct {
-	ID          uuid.UUID `json:"id"`
-	Username    string    `json:"username"`
-	BuyOrderID  uuid.UUID `json:"buy_order_id"`
-	SellOrderID uuid.UUID `json:"sell_order_id"`
-	MarketID    uuid.UUID `json:"market_id"`
-	Price       string    `json:"price"`
-	Amount      string    `json:"amount"`
-	Fee         string    `json:"fee"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID          uuid.UUID       `json:"id"`
+	Username    string          `json:"username"`
+	BuyOrderID  uuid.UUID       `json:"buy_order_id"`
+	SellOrderID uuid.UUID       `json:"sell_order_id"`
+	MarketID    uuid.UUID       `json:"market_id"`
+	Price       decimal.Decimal `json:"price"`
+	Amount      decimal.Decimal `json:"amount"`
+	Fee         decimal.Decimal `json:"fee"`
+	CreatedAt   time.Time       `json:"created_at"`
 }
 
 type Transaction struct {
@@ -314,7 +315,7 @@ type Transaction struct {
 	UserEmail string            `json:"user_email"`
 	Type      TransactionType   `json:"type"`
 	Currency  string            `json:"currency"`
-	Amount    string            `json:"amount"`
+	Amount    decimal.Decimal   `json:"amount"`
 	Status    TransactionStatus `json:"status"`
 	Address   string            `json:"address"`
 	TxHash    string            `json:"tx_hash"`
@@ -344,11 +345,11 @@ type VerifyEmail struct {
 }
 
 type Wallet struct {
-	ID            uuid.UUID `json:"id"`
-	Username      string    `json:"username"`
-	UserEmail     string    `json:"user_email"`
-	Currency      string    `json:"currency"`
-	Balance       string    `json:"balance"`
-	LockedBalance string    `json:"locked_balance"`
-	CreatedAt     time.Time `json:"created_at"`
+	ID            uuid.UUID       `json:"id"`
+	Username      string          `json:"username"`
+	UserEmail     string          `json:"user_email"`
+	Currency      string          `json:"currency"`
+	Balance       decimal.Decimal `json:"balance"`
+	LockedBalance decimal.Decimal `json:"locked_balance"`
+	CreatedAt     time.Time       `json:"created_at"`
 }

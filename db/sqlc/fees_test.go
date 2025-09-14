@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -17,8 +18,8 @@ func TestCreateFee(t *testing.T) {
 	feeArgs := CreateFeeParams{
 		Username: market.Username,
 		MarketID: market.ID,
-		MakerFee: "0.01",
-		TakerFee: "0.02",
+		MakerFee: decimal.NewFromFloat(0.01),
+		TakerFee: decimal.NewFromFloat(0.02),
 	}
 
 	fee, err := testStore.CreateFee(context.Background(), feeArgs)
@@ -32,8 +33,8 @@ func TestDeleteFee(t *testing.T) {
 	feeArgs := CreateFeeParams{
 		Username: market.Username,
 		MarketID: market.ID,
-		MakerFee: "0.03",
-		TakerFee: "0.04",
+		MakerFee: decimal.NewFromFloat(0.03),
+		TakerFee: decimal.NewFromFloat(0.04),
 	}
 
 	fee, err := testStore.CreateFee(context.Background(), feeArgs)
@@ -49,8 +50,8 @@ func TestGetFeeByMarketID(t *testing.T) {
 	feeArgs := CreateFeeParams{
 		Username: market.Username,
 		MarketID: market.ID,
-		MakerFee: "0.0100",
-		TakerFee: "0.0500",
+		MakerFee: decimal.NewFromFloat(0.0100),
+		TakerFee: decimal.NewFromFloat(0.0500),
 	}
 	fee, err := testStore.CreateFee(context.Background(), feeArgs)
 	require.NoError(t, err, "Failed to create fee")
@@ -103,7 +104,7 @@ func createRandomMarketForFee(t *testing.T) CreateMarketRow {
 		Username:       user.Username,
 		BaseCurrency:   baseCurrency,
 		QuoteCurrency:  quoteCurrency,
-		MinOrderAmount: "0.1",
+		MinOrderAmount: decimal.NewFromFloat(0.1),
 		PricePrecision: 8,
 	}
 

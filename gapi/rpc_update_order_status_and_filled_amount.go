@@ -8,6 +8,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	val "github.com/huzaifa678/Crypto-currency-web-app-project/val"
+	"github.com/shopspring/decimal"
 	"google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -44,7 +45,7 @@ func (server *server) UpdateOrderStatusAndFilledAmount(ctx context.Context, req 
 
 	args := db.UpdateOrderStatusAndFilledAmountParams{
 		Status:       db.OrderStatus(pbStatus),
-		FilledAmount: req.GetFilledAmount(),
+		FilledAmount: decimal.NewFromFloat(float64(req.GetFilledAmount())),
 		ID:           orderId,
 	}
 
@@ -63,7 +64,7 @@ func (server *server) UpdateOrderStatusAndFilledAmount(ctx context.Context, req 
 
 
 func validateUpdateOrderStatusAndFilledAmount(req *pb.UpdateOrderStatusAndFilledAmountRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateUpdateOrderStatusAndFilledAmount(req.GetOrderId(), req.GetOrderStatus(), req.GetFilledAmount()); err != nil {
+	if err := val.ValidateUpdateOrderStatusAndFilledAmount(req.GetOrderId(), req.GetOrderStatus(), decimal.NewFromFloat(float64(req.GetFilledAmount()))); err != nil {
 		violations = append(violations, fieldViolation("id", err))
 		violations = append(violations, fieldViolation("status", err))
 		violations = append(violations, fieldViolation("filled_amount", err))

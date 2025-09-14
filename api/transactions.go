@@ -8,6 +8,7 @@ import (
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -18,7 +19,7 @@ type TransactionRequest struct {
 	UserEmail string         `json:"user_email"`
 	Type      db.TransactionType `json:"type"`
 	Currency  string          `json:"currency"`
-	Amount    string          `json:"amount"`
+	Amount    decimal.Decimal          `json:"amount"`
 	Address   string  `json:"address"`
 	TxHash    string  `json:"tx_hash"`
 }

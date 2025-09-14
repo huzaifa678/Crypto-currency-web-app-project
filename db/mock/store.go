@@ -567,6 +567,21 @@ func (mr *MockStore_interfaceMockRecorder) GetWalletByID(arg0, arg1 interface{})
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWalletByID", reflect.TypeOf((*MockStore_interface)(nil).GetWalletByID), arg0, arg1)
 }
 
+// GetWallets mocks base method.
+func (m *MockStore_interface) GetWallets(arg0 context.Context) ([]db.Wallet, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetWallets", arg0)
+	ret0, _ := ret[0].([]db.Wallet)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetWallets indicates an expected call of GetWallets.
+func (mr *MockStore_interfaceMockRecorder) GetWallets(arg0 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetWallets", reflect.TypeOf((*MockStore_interface)(nil).GetWallets), arg0)
+}
+
 // ListMarkets mocks base method.
 func (m *MockStore_interface) ListMarkets(arg0 context.Context) ([]db.ListMarketsRow, error) {
 	m.ctrl.T.Helper()

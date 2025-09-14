@@ -11,9 +11,9 @@ message CreateTradeRequest {
   string buy_order_id = 2;
   string sell_order_id = 3;
   string market_id = 4;
-  string price = 5;
-  string amount = 6;
-  string fee = 7;
+  int64 price = 5;
+  int64 amount = 6;
+  int64 fee = 7;
 }
 
 message CreateTradeResponse {

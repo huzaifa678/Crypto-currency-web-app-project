@@ -10,7 +10,7 @@ option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
 message UpdateOrderStatusAndFilledAmountRequest {
     string order_id = 1;
     Status order_status = 2;
-    string filled_amount = 3;
+    int64 filled_amount = 3;
 }
 
 message UpdateOrderStatusAndFilledAmountResponse {

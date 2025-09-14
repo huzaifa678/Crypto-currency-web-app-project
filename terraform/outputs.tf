@@ -6,7 +6,7 @@ output "rds_db" {
 output "rds_username" {
   description = "Username"
   sensitive = true
-  value = local.db_creds.username
+  value = local.db_creds
 }
 
 output "vpc_id" {
@@ -20,7 +20,12 @@ output "eks_cluster_name" {
 
 }
 
-output "ecr_repository_url" {
-  description = "ECR repository URL"
-  value       = aws_ecr_repository.ecr_repo.repository_url
+# output "ecr_repository_url" {
+#   description = "ECR repository URL"
+#   value       = aws_ecr_repository.ecr_repo.repository_url
+# }
+
+output "redis_endpoint" {
+  description = "Redis Endpoint"
+  value       = aws_elasticache_replication_group.redis_cluster.primary_endpoint_address
 }

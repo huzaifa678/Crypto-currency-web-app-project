@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/shopspring/decimal"
 )
 
 const createFee = `-- name: CreateFee :one
@@ -19,18 +20,18 @@ RETURNING id, market_id, maker_fee, taker_fee, created_at
 `
 
 type CreateFeeParams struct {
-	Username string    `json:"username"`
-	MarketID uuid.UUID `json:"market_id"`
-	MakerFee string    `json:"maker_fee"`
-	TakerFee string    `json:"taker_fee"`
+	Username string          `json:"username"`
+	MarketID uuid.UUID       `json:"market_id"`
+	MakerFee decimal.Decimal `json:"maker_fee"`
+	TakerFee decimal.Decimal `json:"taker_fee"`
 }
 
 type CreateFeeRow struct {
-	ID        uuid.UUID `json:"id"`
-	MarketID  uuid.UUID `json:"market_id"`
-	MakerFee  string    `json:"maker_fee"`
-	TakerFee  string    `json:"taker_fee"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        uuid.UUID       `json:"id"`
+	MarketID  uuid.UUID       `json:"market_id"`
+	MakerFee  decimal.Decimal `json:"maker_fee"`
+	TakerFee  decimal.Decimal `json:"taker_fee"`
+	CreatedAt time.Time       `json:"created_at"`
 }
 
 func (q *Queries) CreateFee(ctx context.Context, arg CreateFeeParams) (CreateFeeRow, error) {

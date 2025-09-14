@@ -27,7 +27,7 @@ var File_service_crypto_web_app_proto protoreflect.FileDescriptor
 
 const file_service_crypto_web_app_proto_rawDesc = "" +
 	"\n" +
-	"\x1cservice_crypto-web-app.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17rpc_create_market.proto\x1a\x17rpc_delete_market.proto\x1a\x14rpc_get_market.proto\x1a\x15rpc_list_market.proto\x1a\x16rpc_create_order.proto\x1a\x16rpc_delete_order.proto\x1a\x13rpc_get_order.proto\x1a\x15rpc_create_user.proto\x1a\x15rpc_delete_user.proto\x1a\x15rpc_update_user.proto\x1a\x12rpc_get_user.proto\x1a\x14rpc_login_user.proto\x1a\x17rpc_create_wallet.proto\x1a\x17rpc_delete_wallet.proto\x1a\x17rpc_update_wallet.proto\x1a\x14rpc_get_wallet.proto\x1a\x16rpc_verify_email.proto\x1a\x18rpc_binance_stream.proto\x1a\x16rpc_create_trade.proto\x1a\x13rpc_get_trade.proto\x1a\x16rpc_delete_trade.proto\x1a\x1crpc_create_transaction.proto\x1a\x19rpc_get_transaction.proto\x1a\x1crpc_update_transaction.proto\x1a\x1crpc_delete_transaction.proto\x1a'rpc_get_transaction_by_user_email.proto\x1a/rpc_update_order_status_and_filled_amount.proto\x1a\x14rpc_list_order.proto\x1a\x16rpc_google_login.proto\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto2\xcb#\n" +
+	"\x1cservice_crypto-web-app.proto\x12\x02pb\x1a\x1bgoogle/protobuf/empty.proto\x1a\x17rpc_create_market.proto\x1a\x17rpc_delete_market.proto\x1a\x14rpc_get_market.proto\x1a\x15rpc_list_market.proto\x1a\x16rpc_create_order.proto\x1a\x16rpc_delete_order.proto\x1a\x13rpc_get_order.proto\x1a\x15rpc_create_user.proto\x1a\x15rpc_delete_user.proto\x1a\x15rpc_update_user.proto\x1a\x12rpc_get_user.proto\x1a\x14rpc_login_user.proto\x1a\x17rpc_create_wallet.proto\x1a\x17rpc_delete_wallet.proto\x1a\x17rpc_update_wallet.proto\x1a\x14rpc_get_wallet.proto\x1a\x16rpc_verify_email.proto\x1a\x18rpc_binance_stream.proto\x1a\x16rpc_create_trade.proto\x1a\x13rpc_get_trade.proto\x1a\x16rpc_delete_trade.proto\x1a\x1crpc_create_transaction.proto\x1a\x19rpc_get_transaction.proto\x1a\x1crpc_update_transaction.proto\x1a\x1crpc_delete_transaction.proto\x1a'rpc_get_transaction_by_user_email.proto\x1a/rpc_update_order_status_and_filled_amount.proto\x1a\x14rpc_list_order.proto\x1a\x16rpc_google_login.proto\x1a\x15rpc_get_wallets.proto\x1a\x1cgoogle/api/annotations.proto\x1a.protoc-gen-openapiv2/options/annotations.proto2\xbf$\n" +
 	"\fCryptoWebApp\x12\x95\x01\n" +
 	"\n" +
 	"CreateUser\x12\x15.pb.CreateUserRequest\x1a\x16.pb.CreateUserResponse\"X\x92A;\x12\vCreate user\x1a,Create a new user with the specified details\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/v1/create_user\x12\x80\x01\n" +
@@ -54,7 +54,9 @@ const file_service_crypto_web_app_proto_rawDesc = "" +
 	"\fDeleteWallet\x12\x17.pb.DeleteWalletRequest\x1a\x18.pb.DeleteWalletResponse\"M\x92A+\x12\rDelete wallet\x1a\x1aDelete wallet by wallet ID\x82\xd3\xe4\x93\x02\x19*\x17/v1/wallets/{wallet_id}\x12\x9b\x01\n" +
 	"\fUpdateWallet\x12\x17.pb.UpdateWalletRequest\x1a\x18.pb.UpdateWalletResponse\"X\x92A3\x12\rUpdate wallet\x1a\"Update wallet details by wallet ID\x82\xd3\xe4\x93\x02\x1c:\x01*2\x17/v1/wallets/{wallet_id}\x12\x89\x01\n" +
 	"\tGetWallet\x12\x14.pb.GetWalletRequest\x1a\x15.pb.GetWalletResponse\"O\x92A-\x12\n" +
-	"Get wallet\x1a\x1fGet wallet details by wallet ID\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/wallets/{wallet_id}\x12\x9a\x01\n" +
+	"Get wallet\x1a\x1fGet wallet details by wallet ID\x82\xd3\xe4\x93\x02\x19\x12\x17/v1/wallets/{wallet_id}\x12r\n" +
+	"\n" +
+	"GetWallets\x12\x16.google.protobuf.Empty\x1a\x16.pb.GetWalletsResponse\"4\x92A\x1e\x12\vGet wallets\x1a\x0fGet all wallets\x82\xd3\xe4\x93\x02\r\x12\v/v1/wallets\x12\x9a\x01\n" +
 	"\vVerifyEmail\x12\x16.pb.VerifyEmailRequest\x1a\x17.pb.VerifyEmailResponse\"Z\x92A?\x12\fVerify email\x1a/Verify user email with the provided secret code\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/verify_email\x12\x88\x01\n" +
 	"\fStreamTrades\x12\x16.pb.TradeStreamRequest\x1a\t.pb.Trade\"S\x92A7\x12\rServer stream\x1a&Stream binance live data to the client\x82\xd3\xe4\x93\x02\x13\x12\x11/v1/stream_trades0\x01\x12\x87\x01\n" +
 	"\vCreateTrade\x12\x16.pb.CreateTradeRequest\x1a\x17.pb.CreateTradeResponse\"G\x92A/\x12\fCreate Trade\x1a\x1fCreate a new trade for the user\x82\xd3\xe4\x93\x02\x0f:\x01*\"\n" +
@@ -117,17 +119,18 @@ var file_service_crypto_web_app_proto_goTypes = []any{
 	(*DeleteWalletResponse)(nil),                     // 43: pb.DeleteWalletResponse
 	(*UpdateWalletResponse)(nil),                     // 44: pb.UpdateWalletResponse
 	(*GetWalletResponse)(nil),                        // 45: pb.GetWalletResponse
-	(*VerifyEmailResponse)(nil),                      // 46: pb.VerifyEmailResponse
-	(*Trade)(nil),                                    // 47: pb.Trade
-	(*CreateTradeResponse)(nil),                      // 48: pb.CreateTradeResponse
-	(*GetTradeByIDResponse)(nil),                     // 49: pb.GetTradeByIDResponse
-	(*DeleteTradeResponse)(nil),                      // 50: pb.DeleteTradeResponse
-	(*CreateTransactionResponse)(nil),                // 51: pb.CreateTransactionResponse
-	(*GetTransactionByIDResponse)(nil),               // 52: pb.GetTransactionByIDResponse
-	(*GetTransactionsByUserEmailResponse)(nil),       // 53: pb.GetTransactionsByUserEmailResponse
-	(*UpdateTransactionStatusResponse)(nil),          // 54: pb.UpdateTransactionStatusResponse
-	(*DeleteTransactionResponse)(nil),                // 55: pb.DeleteTransactionResponse
-	(*GoogleLoginResponse)(nil),                      // 56: pb.GoogleLoginResponse
+	(*GetWalletsResponse)(nil),                       // 46: pb.GetWalletsResponse
+	(*VerifyEmailResponse)(nil),                      // 47: pb.VerifyEmailResponse
+	(*Trade)(nil),                                    // 48: pb.Trade
+	(*CreateTradeResponse)(nil),                      // 49: pb.CreateTradeResponse
+	(*GetTradeByIDResponse)(nil),                     // 50: pb.GetTradeByIDResponse
+	(*DeleteTradeResponse)(nil),                      // 51: pb.DeleteTradeResponse
+	(*CreateTransactionResponse)(nil),                // 52: pb.CreateTransactionResponse
+	(*GetTransactionByIDResponse)(nil),               // 53: pb.GetTransactionByIDResponse
+	(*GetTransactionsByUserEmailResponse)(nil),       // 54: pb.GetTransactionsByUserEmailResponse
+	(*UpdateTransactionStatusResponse)(nil),          // 55: pb.UpdateTransactionStatusResponse
+	(*DeleteTransactionResponse)(nil),                // 56: pb.DeleteTransactionResponse
+	(*GoogleLoginResponse)(nil),                      // 57: pb.GoogleLoginResponse
 }
 var file_service_crypto_web_app_proto_depIdxs = []int32{
 	0,  // 0: pb.CryptoWebApp.CreateUser:input_type -> pb.CreateUserRequest
@@ -148,48 +151,50 @@ var file_service_crypto_web_app_proto_depIdxs = []int32{
 	14, // 15: pb.CryptoWebApp.DeleteWallet:input_type -> pb.DeleteWalletRequest
 	15, // 16: pb.CryptoWebApp.UpdateWallet:input_type -> pb.UpdateWalletRequest
 	16, // 17: pb.CryptoWebApp.GetWallet:input_type -> pb.GetWalletRequest
-	17, // 18: pb.CryptoWebApp.VerifyEmail:input_type -> pb.VerifyEmailRequest
-	18, // 19: pb.CryptoWebApp.StreamTrades:input_type -> pb.TradeStreamRequest
-	19, // 20: pb.CryptoWebApp.CreateTrade:input_type -> pb.CreateTradeRequest
-	20, // 21: pb.CryptoWebApp.GetTrade:input_type -> pb.GetTradeByIDRequest
-	21, // 22: pb.CryptoWebApp.DeleteTrade:input_type -> pb.DeleteTradeRequest
-	22, // 23: pb.CryptoWebApp.CreateTransaction:input_type -> pb.CreateTransactionRequest
-	23, // 24: pb.CryptoWebApp.GetTransaction:input_type -> pb.GetTransactionByIDRequest
-	24, // 25: pb.CryptoWebApp.GetTransactionsByUserEmail:input_type -> pb.GetTransactionsByUserEmailRequest
-	25, // 26: pb.CryptoWebApp.UpdateTransactionStatus:input_type -> pb.UpdateTransactionStatusRequest
-	26, // 27: pb.CryptoWebApp.DeleteTransaction:input_type -> pb.DeleteTransactionRequest
-	27, // 28: pb.CryptoWebApp.GoogleLogin:input_type -> pb.GoogleLoginRequest
-	28, // 29: pb.CryptoWebApp.CreateUser:output_type -> pb.CreateUserResponse
-	29, // 30: pb.CryptoWebApp.DeleteUser:output_type -> pb.DeleteUserResponse
-	30, // 31: pb.CryptoWebApp.UpdateUser:output_type -> pb.UpdateUserResponse
-	31, // 32: pb.CryptoWebApp.GetUser:output_type -> pb.GetUserResponse
-	32, // 33: pb.CryptoWebApp.LoginUser:output_type -> pb.LoginUserResponse
-	33, // 34: pb.CryptoWebApp.CreateMarket:output_type -> pb.CreateMarketResponse
-	34, // 35: pb.CryptoWebApp.DeleteMarket:output_type -> pb.DeleteMarketResponse
-	35, // 36: pb.CryptoWebApp.GetMarket:output_type -> pb.GetMarketResponse
-	36, // 37: pb.CryptoWebApp.ListMarkets:output_type -> pb.MarketListResponse
-	37, // 38: pb.CryptoWebApp.CreateOrder:output_type -> pb.CreateOrderResponse
-	38, // 39: pb.CryptoWebApp.DeleteOrder:output_type -> pb.DeleteOrderResponse
-	39, // 40: pb.CryptoWebApp.GetOrder:output_type -> pb.GetOrderResponse
-	40, // 41: pb.CryptoWebApp.UpdateOrder:output_type -> pb.UpdateOrderStatusAndFilledAmountResponse
-	41, // 42: pb.CryptoWebApp.ListOrder:output_type -> pb.OrderListResponse
-	42, // 43: pb.CryptoWebApp.CreateWallet:output_type -> pb.CreateWalletResponse
-	43, // 44: pb.CryptoWebApp.DeleteWallet:output_type -> pb.DeleteWalletResponse
-	44, // 45: pb.CryptoWebApp.UpdateWallet:output_type -> pb.UpdateWalletResponse
-	45, // 46: pb.CryptoWebApp.GetWallet:output_type -> pb.GetWalletResponse
-	46, // 47: pb.CryptoWebApp.VerifyEmail:output_type -> pb.VerifyEmailResponse
-	47, // 48: pb.CryptoWebApp.StreamTrades:output_type -> pb.Trade
-	48, // 49: pb.CryptoWebApp.CreateTrade:output_type -> pb.CreateTradeResponse
-	49, // 50: pb.CryptoWebApp.GetTrade:output_type -> pb.GetTradeByIDResponse
-	50, // 51: pb.CryptoWebApp.DeleteTrade:output_type -> pb.DeleteTradeResponse
-	51, // 52: pb.CryptoWebApp.CreateTransaction:output_type -> pb.CreateTransactionResponse
-	52, // 53: pb.CryptoWebApp.GetTransaction:output_type -> pb.GetTransactionByIDResponse
-	53, // 54: pb.CryptoWebApp.GetTransactionsByUserEmail:output_type -> pb.GetTransactionsByUserEmailResponse
-	54, // 55: pb.CryptoWebApp.UpdateTransactionStatus:output_type -> pb.UpdateTransactionStatusResponse
-	55, // 56: pb.CryptoWebApp.DeleteTransaction:output_type -> pb.DeleteTransactionResponse
-	56, // 57: pb.CryptoWebApp.GoogleLogin:output_type -> pb.GoogleLoginResponse
-	29, // [29:58] is the sub-list for method output_type
-	0,  // [0:29] is the sub-list for method input_type
+	8,  // 18: pb.CryptoWebApp.GetWallets:input_type -> google.protobuf.Empty
+	17, // 19: pb.CryptoWebApp.VerifyEmail:input_type -> pb.VerifyEmailRequest
+	18, // 20: pb.CryptoWebApp.StreamTrades:input_type -> pb.TradeStreamRequest
+	19, // 21: pb.CryptoWebApp.CreateTrade:input_type -> pb.CreateTradeRequest
+	20, // 22: pb.CryptoWebApp.GetTrade:input_type -> pb.GetTradeByIDRequest
+	21, // 23: pb.CryptoWebApp.DeleteTrade:input_type -> pb.DeleteTradeRequest
+	22, // 24: pb.CryptoWebApp.CreateTransaction:input_type -> pb.CreateTransactionRequest
+	23, // 25: pb.CryptoWebApp.GetTransaction:input_type -> pb.GetTransactionByIDRequest
+	24, // 26: pb.CryptoWebApp.GetTransactionsByUserEmail:input_type -> pb.GetTransactionsByUserEmailRequest
+	25, // 27: pb.CryptoWebApp.UpdateTransactionStatus:input_type -> pb.UpdateTransactionStatusRequest
+	26, // 28: pb.CryptoWebApp.DeleteTransaction:input_type -> pb.DeleteTransactionRequest
+	27, // 29: pb.CryptoWebApp.GoogleLogin:input_type -> pb.GoogleLoginRequest
+	28, // 30: pb.CryptoWebApp.CreateUser:output_type -> pb.CreateUserResponse
+	29, // 31: pb.CryptoWebApp.DeleteUser:output_type -> pb.DeleteUserResponse
+	30, // 32: pb.CryptoWebApp.UpdateUser:output_type -> pb.UpdateUserResponse
+	31, // 33: pb.CryptoWebApp.GetUser:output_type -> pb.GetUserResponse
+	32, // 34: pb.CryptoWebApp.LoginUser:output_type -> pb.LoginUserResponse
+	33, // 35: pb.CryptoWebApp.CreateMarket:output_type -> pb.CreateMarketResponse
+	34, // 36: pb.CryptoWebApp.DeleteMarket:output_type -> pb.DeleteMarketResponse
+	35, // 37: pb.CryptoWebApp.GetMarket:output_type -> pb.GetMarketResponse
+	36, // 38: pb.CryptoWebApp.ListMarkets:output_type -> pb.MarketListResponse
+	37, // 39: pb.CryptoWebApp.CreateOrder:output_type -> pb.CreateOrderResponse
+	38, // 40: pb.CryptoWebApp.DeleteOrder:output_type -> pb.DeleteOrderResponse
+	39, // 41: pb.CryptoWebApp.GetOrder:output_type -> pb.GetOrderResponse
+	40, // 42: pb.CryptoWebApp.UpdateOrder:output_type -> pb.UpdateOrderStatusAndFilledAmountResponse
+	41, // 43: pb.CryptoWebApp.ListOrder:output_type -> pb.OrderListResponse
+	42, // 44: pb.CryptoWebApp.CreateWallet:output_type -> pb.CreateWalletResponse
+	43, // 45: pb.CryptoWebApp.DeleteWallet:output_type -> pb.DeleteWalletResponse
+	44, // 46: pb.CryptoWebApp.UpdateWallet:output_type -> pb.UpdateWalletResponse
+	45, // 47: pb.CryptoWebApp.GetWallet:output_type -> pb.GetWalletResponse
+	46, // 48: pb.CryptoWebApp.GetWallets:output_type -> pb.GetWalletsResponse
+	47, // 49: pb.CryptoWebApp.VerifyEmail:output_type -> pb.VerifyEmailResponse
+	48, // 50: pb.CryptoWebApp.StreamTrades:output_type -> pb.Trade
+	49, // 51: pb.CryptoWebApp.CreateTrade:output_type -> pb.CreateTradeResponse
+	50, // 52: pb.CryptoWebApp.GetTrade:output_type -> pb.GetTradeByIDResponse
+	51, // 53: pb.CryptoWebApp.DeleteTrade:output_type -> pb.DeleteTradeResponse
+	52, // 54: pb.CryptoWebApp.CreateTransaction:output_type -> pb.CreateTransactionResponse
+	53, // 55: pb.CryptoWebApp.GetTransaction:output_type -> pb.GetTransactionByIDResponse
+	54, // 56: pb.CryptoWebApp.GetTransactionsByUserEmail:output_type -> pb.GetTransactionsByUserEmailResponse
+	55, // 57: pb.CryptoWebApp.UpdateTransactionStatus:output_type -> pb.UpdateTransactionStatusResponse
+	56, // 58: pb.CryptoWebApp.DeleteTransaction:output_type -> pb.DeleteTransactionResponse
+	57, // 59: pb.CryptoWebApp.GoogleLogin:output_type -> pb.GoogleLoginResponse
+	30, // [30:60] is the sub-list for method output_type
+	0,  // [0:30] is the sub-list for method input_type
 	0,  // [0:0] is the sub-list for extension type_name
 	0,  // [0:0] is the sub-list for extension extendee
 	0,  // [0:0] is the sub-list for field type_name
@@ -229,6 +234,7 @@ func file_service_crypto_web_app_proto_init() {
 	file_rpc_update_order_status_and_filled_amount_proto_init()
 	file_rpc_list_order_proto_init()
 	file_rpc_google_login_proto_init()
+	file_rpc_get_wallets_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

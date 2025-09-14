@@ -12,6 +12,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/token"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -39,7 +40,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 			req: &pb.UpdateOrderStatusAndFilledAmountRequest{
 				OrderId:     orderID.String(),
 				OrderStatus: pb.Status_FILLED,
-				FilledAmount: "10",
+				FilledAmount: 10,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, username, time.Minute, token.TokenTypeAccessToken)
@@ -53,7 +54,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 				store.EXPECT().
 					UpdateOrderStatusAndFilledAmount(gomock.Any(), db.UpdateOrderStatusAndFilledAmountParams{
 						Status:       db.OrderStatus("filled"),
-						FilledAmount: "10",
+						FilledAmount: decimal.NewFromFloat(10),
 						ID:           orderID,
 					}).
 					Times(1).
@@ -70,7 +71,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 			req: &pb.UpdateOrderStatusAndFilledAmountRequest{
 				OrderId:     "invalid-uuid",
 				OrderStatus: pb.Status_OPEN,
-				FilledAmount: "5",
+				FilledAmount: 5,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, username, time.Minute, token.TokenTypeAccessToken)
@@ -89,14 +90,12 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 			req: &pb.UpdateOrderStatusAndFilledAmountRequest{
 				OrderId:     orderID.String(),
 				OrderStatus: pb.Status_CANCELLED,
-				FilledAmount: "3",
+				FilledAmount: 3,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				// no auth token
 				return context.Background()
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
-				// no calls expected
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateOrderStatusAndFilledAmountResponse, err error) {
 				require.Error(t, err)
@@ -110,10 +109,9 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 			req: &pb.UpdateOrderStatusAndFilledAmountRequest{
 				OrderId:     orderID.String(),
 				OrderStatus: pb.Status_FILLED,
-				FilledAmount: "7",
+				FilledAmount: 7,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
-				// token for another user
 				return newContextWithBearerToken(t, tokenMaker, "other_user", time.Minute, token.TokenTypeAccessToken)
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
@@ -134,7 +132,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 			req: &pb.UpdateOrderStatusAndFilledAmountRequest{
 				OrderId:     orderID.String(),
 				OrderStatus: pb.Status_FILLED,
-				FilledAmount: "10",
+				FilledAmount: 10,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, username, time.Minute, token.TokenTypeAccessToken)

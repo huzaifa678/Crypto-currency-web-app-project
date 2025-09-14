@@ -19,6 +19,7 @@ import (
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 	"github.com/lib/pq"
+	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
 	"golang.org/x/exp/rand"
 )
@@ -496,7 +497,7 @@ func createRandomMarket() (db.CreateMarketParams, db.Market, db.CreateMarketRow)
     marketArgs := db.CreateMarketParams{
         BaseCurrency:  baseCurrency,
         QuoteCurrency: quoteCurrency,
-        MinOrderAmount: "0.1",
+        MinOrderAmount: decimal.NewFromFloat(0.1),
         PricePrecision: 8,
     }
 
