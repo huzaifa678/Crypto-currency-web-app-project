@@ -11,10 +11,10 @@ resource "aws_secretsmanager_secret_version" "production_credentials_version" {
   secret_string = jsonencode({
     USERNAME              = var.rds_db_username
     PASSWORD              = local.rds_db_password
-    DB_SOURCE             = "postgresql://${var.rds_db_username}:${local.rds_db_password}@${aws_db_instance.postgres.endpoint}/${var.rds_db_name}?sslmode=disable"
+    DB_SOURCE             = "postgresql://${var.rds_db_username}:${local.rds_db_password}@${aws_db_instance.postgres.endpoint}/${var.rds_db_name}"
     HTTP_SERVER_ADDR      = data.external.app_env.result.HTTP_SERVER_ADDR
     GRPC_SERVER_ADDR      = data.external.app_env.result.GRPC_SERVER_ADDR
-    REDIS_ADDR            = data.external.app_env.result.REDIS_ADDR
+    REDIS_ADDR            = "${aws_elasticache_replication_group.redis_cluster.primary_endpoint_address}:6379"
     MIGRATION_URL         = data.external.app_env.result.MIGRATION_URL
     TOKEN_SYMMETRIC_KEY   = var.token_symmetric_key
     ACCESS_TOKEN_EXPIRE   = data.external.app_env.result.ACCESS_TOKEN_DURATION
