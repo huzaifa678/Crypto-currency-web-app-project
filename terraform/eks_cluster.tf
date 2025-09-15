@@ -7,7 +7,7 @@ resource "aws_eks_cluster" "eks_cluster" {
     subnet_ids = module.vpc.private_subnets
     endpoint_private_access = true
     endpoint_public_access  = true
-    public_access_cidrs    = var.cluster_endpoint_public_access_cidrs
+    public_access_cidrs     = var.cluster_endpoint_public_access_cidrs
   }
 
   access_config {
@@ -37,7 +37,7 @@ resource "aws_security_group" "eks_nodes" {
   }
 }
 
-resource "aws_security_group" "rds" {
+resource "aws_security_group" "rds_sg" {
   name   = "rds-postgres-sg"
   vpc_id = module.vpc.vpc_id
 
@@ -61,7 +61,7 @@ resource "aws_security_group_rule" "allow_eks_to_rds" {
   to_port                  = 5432
   protocol                 = "tcp"
   source_security_group_id = aws_security_group.eks_nodes.id
-  security_group_id        = aws_security_group.rds.id
+  security_group_id        = aws_security_group.rds_sg.id
 }
 
 resource "aws_security_group_rule" "allow_eks_to_redis" {
@@ -122,8 +122,12 @@ resource "aws_eks_node_group" "eks_node_group" {
   }
 
   ami_type       = "AL2_x86_64"
-}
 
+  launch_template {
+    id      = aws_launch_template.eks_nodes.id
+    version = "$Latest"
+  }
+}
 
 resource "aws_iam_role" "eks_node_role" {
   name = "eks-node-role"
@@ -171,6 +175,11 @@ resource "aws_iam_role_policy" "eks_cluster_creator_admin_policy" {
       }
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "eks_node_ssm" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  role       = aws_iam_role.eks_node_role.name
 }
 
 resource "aws_iam_role_policy_attachment" "eks_node_policy_attachment" {
