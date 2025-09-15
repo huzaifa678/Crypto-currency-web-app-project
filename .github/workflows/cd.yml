@@ -79,12 +79,6 @@ jobs:
       - name: Load secrets and save to app.env
         run: aws secretsmanager get-secret-value --secret-id production-credentials-v1 --query SecretString --output text | jq -r 'to_entries|map("\(.key)=\(.value)")|.[]' > app.env
 
-      - name: Install kubectl
-        run: |
-          curl -LO "https://dl.k8s.io/release/$(curl -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-          chmod +x kubectl
-          sudo mv kubectl /usr/local/bin/
-
       - name: Update kubeconfig for EKS
         run: |
           aws eks update-kubeconfig --region us-east-1 --name crypto-system-eks-cluster
