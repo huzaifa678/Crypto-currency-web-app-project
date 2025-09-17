@@ -8,6 +8,7 @@ helm repo update
 helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
   --namespace ingress-nginx \
   --create-namespace \
+  --wait --timeout 5m \
   --set controller.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"="nlb" \
   --set controller.publishService.enabled=true \
   --set controller.admissionWebhooks.enabled=true \
@@ -22,6 +23,7 @@ helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
 
 helm upgrade --install external-dns bitnami/external-dns \
   --namespace external-dns --create-namespace \
+  --wait --timeout 5m \
   --set provider=aws \
   --set aws.zoneType=public \
   --set policy=sync \
@@ -50,6 +52,7 @@ helm upgrade --install \
   --version v1.18.2 \
   --namespace cert-manager \
   --create-namespace \
+  --wait --timeout 5m \
   --verify \
   --keyring ./cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg \
   --set crds.enabled=true
