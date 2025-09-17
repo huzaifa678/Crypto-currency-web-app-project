@@ -25,7 +25,7 @@ replicas:
   2
 
 image:
-  533267178572.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:707a3f0bd72024663ba5dd9576ea700e265421eb
+  533267178572.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:latest
 
 server:
   https://acme-v02.api.letsencrypt.org/directory
