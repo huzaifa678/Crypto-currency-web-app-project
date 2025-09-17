@@ -5,7 +5,7 @@ helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo add bitnami https://charts.bitnami.com/bitnami
 helm repo update
 
-helm install ingress-nginx ingress-nginx/ingress-nginx \
+helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
   --namespace ingress-nginx \
   --create-namespace \
   --set controller.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"="nlb" \
@@ -20,7 +20,7 @@ helm install ingress-nginx ingress-nginx/ingress-nginx \
 
 # echo "Installing ExternalDNS..."
 
-helm install external-dns bitnami/external-dns \
+helm upgrade --install external-dns bitnami/external-dns \
   --namespace external-dns --create-namespace \
   --set provider=aws \
   --set aws.zoneType=public \
@@ -45,7 +45,7 @@ helm install external-dns bitnami/external-dns \
 
 curl -LO https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
 
-helm install \
+helm upgrade --install \
   cert-manager oci://quay.io/jetstack/charts/cert-manager \
   --version v1.18.2 \
   --namespace cert-manager \
