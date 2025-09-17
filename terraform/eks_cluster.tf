@@ -55,6 +55,28 @@ resource "aws_security_group" "redis_sg" {
   }
 }
 
+resource "aws_security_group_rule" "allow_node_to_control_plane" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_eks_cluster.eks_cluster.vpc_config[0].cluster_security_group_id
+  source_security_group_id = aws_security_group.eks_nodes.id
+
+  depends_on = [aws_eks_cluster.eks_cluster]
+}
+
+resource "aws_security_group_rule" "allow_control_plane_to_nodes" {
+  type                     = "ingress"
+  from_port                = 443
+  to_port                  = 443
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_nodes.id
+  source_security_group_id = aws_eks_cluster.eks_cluster.vpc_config[0].cluster_security_group_id
+
+  depends_on = [aws_eks_cluster.eks_cluster]
+}
+
 resource "aws_security_group_rule" "allow_eks_to_rds" {
   type                     = "ingress"
   from_port                = 5432
@@ -95,11 +117,22 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_creator_admin" {
   role       = aws_iam_role.eks_cluster_role.name
 }
 
+data "aws_ssm_parameter" "eks_al2_ami" {
+  name = "/aws/service/eks/optimized-ami/1.31/amazon-linux-2/recommended/image_id"
+}
+
 resource "aws_launch_template" "eks_nodes" {
   name_prefix   = "eks-nodes-lt"
   instance_type = "t3.small"
 
-  vpc_security_group_ids = [aws_security_group.eks_nodes.id]
+  vpc_security_group_ids = [
+    aws_security_group.eks_nodes.id,
+    aws_eks_cluster.eks_cluster.vpc_config[0].cluster_security_group_id
+  ]
+
+  image_id = data.aws_ssm_parameter.eks_al2_ami.value
+
+  user_data = base64encode(file("${path.module}/user_data.sh"))
 
   tag_specifications {
     resource_type = "instance"
@@ -121,12 +154,14 @@ resource "aws_eks_node_group" "eks_node_group" {
     max_size     = 2
   }
 
-  ami_type       = "AL2_x86_64"
+  ami_type = "CUSTOM"
 
   launch_template {
     id      = aws_launch_template.eks_nodes.id
-    version = "$Latest"
+    version = aws_launch_template.eks_nodes.latest_version
   }
+
+  depends_on = [aws_security_group_rule.allow_node_to_control_plane]
 }
 
 resource "aws_iam_role" "eks_node_role" {

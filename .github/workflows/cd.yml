@@ -36,7 +36,6 @@ jobs:
       - name: Terraform Plan
         run: |
           terraform plan \
-            -var="rds_db_password=${{ secrets.RDS_DB_PASSWORD }}" \
             -var="google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}" \
             -var="google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
             -var="token_symmetric_key=${{ secrets.TOKEN_SYMMETRIC_KEY }}" \

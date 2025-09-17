@@ -29,3 +29,8 @@ output "redis_endpoint" {
   description = "Redis Endpoint"
   value       = aws_elasticache_replication_group.redis_cluster.primary_endpoint_address
 }
+
+output "launch_template_user_data" {
+  description = "user data"
+  value       = aws_launch_template.eks_nodes.user_data 
+}
