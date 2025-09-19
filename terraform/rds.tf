@@ -1,6 +1,6 @@
 resource "random_password" "rds_db_password" {
   length           = 16
-  special          = true
+  special          = false
   override_special = "!#$&*"
   upper            = true  
   lower            = true  
