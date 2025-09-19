@@ -55,7 +55,10 @@ helm upgrade --install \
   --wait --timeout 5m \
   --verify \
   --keyring ./cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg \
-  --set crds.enabled=true
+  --set crds.enabled=true \
+  --set serviceAccount.create=true \
+  --set serviceAccount.name=cert-manager \
+  --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=$(terraform -chdir=../terraform output -raw cert_manager_irsa_role_arn)
 
 # helm upgrade --install cert-manager jetstack/cert-manager \
 #   --namespace cert-manager \

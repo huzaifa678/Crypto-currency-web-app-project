@@ -37,4 +37,8 @@ tlsSecretName:
   http: crypto-app-api-tls-secret
   grpc: crypto-app-gapi-tls-secret
 
-ingressClass: nginx
+ingressClass: 
+  nginx
+
+hostedZoneId:
+  Z01601922DP7HAM1NYV8Z

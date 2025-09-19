@@ -34,3 +34,7 @@ output "launch_template_user_data" {
   description = "user data"
   value       = aws_launch_template.eks_nodes.user_data 
 }
+
+output "cert_manager_irsa_role_arn" {
+  value = aws_iam_role.cert_manager_irsa_role.arn
+}

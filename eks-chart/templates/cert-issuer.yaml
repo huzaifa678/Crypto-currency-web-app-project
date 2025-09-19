@@ -9,6 +9,7 @@ spec:
     privateKeySecretRef:
       name: letsencrypt-private-key
     solvers:
-      - http01:
-          ingress:
-            ingressClassName: nginx
+      - dns01:
+          route53:
+            region: us-east-1               
+            hostedZoneID: {{ .Values.hostedZoneId }}

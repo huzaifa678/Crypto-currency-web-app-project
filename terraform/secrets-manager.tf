@@ -19,9 +19,9 @@ resource "aws_secretsmanager_secret_version" "production_credentials_version" {
     TOKEN_SYMMETRIC_KEY   = var.token_symmetric_key
     ACCESS_TOKEN_EXPIRE   = data.external.app_env.result.ACCESS_TOKEN_DURATION
     REFRESH_TOKEN_EXPIRE  = data.external.app_env.result.REFRESH_TOKEN_DURATION
-    EMAIL_SENDER_NAME     = data.external.app_env.result.SENDER_NAME
-    EMAIL_SENDER_ADDRESS  = data.external.app_env.result.SENDER_EMAIL
-    EMAIL_SENDER_PASSWORD = data.external.app_env.result.SENDER_PASSWORD
+    SENDER_NAME           = data.external.app_env.result.SENDER_NAME
+    SENDER_ADDRESS        = data.external.app_env.result.SENDER_EMAIL
+    SENDER_PASSWORD       = data.external.app_env.result.SENDER_PASSWORD
     GOOGLE_CLIENT_ID      = var.google_client_id
     GOOGLE_CLIENT_SECRET  = var.google_client_secret
     REDIRECT_URL          = var.redirect_url

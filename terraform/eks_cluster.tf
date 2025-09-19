@@ -20,6 +20,16 @@ resource "aws_eks_cluster" "eks_cluster" {
   }
 }
 
+data "aws_eks_cluster" "this" {
+  name = aws_eks_cluster.eks_cluster.name
+}
+
+resource "aws_iam_openid_connect_provider" "eks" {
+  url             = data.aws_eks_cluster.this.identity[0].oidc[0].issuer
+  client_id_list  = ["sts.amazonaws.com"]
+  thumbprint_list = ["9e99a48a9960b14926bb7f3b02e22da0ecd4e0a4"] 
+}
+
 resource "aws_security_group" "eks_nodes" {
   name        = "eks-nodes-sg"
   description = "Security group for EKS worker nodes"
@@ -243,9 +253,32 @@ resource "aws_iam_policy" "custom_route53_policy" {
         Action = [
           "route53:ChangeResourceRecordSets",
           "route53:ListHostedZones",
-          "route53:ListResourceRecordSets"
+          "route53:ListResourceRecordSets",
+          "route53:GetChange"
         ],
         Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "cert_manager_irsa_role" {
+  name = "cert-manager-irsa-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks.arn
+        },
+        Action = "sts:AssumeRoleWithWebIdentity",
+        Condition = {
+          StringEquals = {
+            "${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:cert-manager:cert-manager"
+          }
+        }
       }
     ]
   })
@@ -254,4 +287,9 @@ resource "aws_iam_policy" "custom_route53_policy" {
 resource "aws_iam_role_policy_attachment" "eks_node_custom_route53_policy_attachment" {
   policy_arn = aws_iam_policy.custom_route53_policy.arn
   role       = aws_iam_role.eks_node_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "cert_manager_irsa_route53_attach" {
+  role       = aws_iam_role.cert_manager_irsa_role.name
+  policy_arn = aws_iam_policy.custom_route53_policy.arn
 }
