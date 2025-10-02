@@ -397,6 +397,40 @@
         ]
       }
     },
+    "/v1/renew_access_token": {
+      "post": {
+        "summary": "Renew Access Token",
+        "description": "Renew access token using refresh token",
+        "operationId": "CryptoWebApp_RenewAccessToken",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbRenewAccessTokenResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/pbRenewAccessTokenRequest"
+            }
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
     "/v1/stream_trades": {
       "get": {
         "summary": "Server stream",
@@ -1583,6 +1617,26 @@
       ],
       "default": "BUY"
     },
+    "pbRenewAccessTokenRequest": {
+      "type": "object",
+      "properties": {
+        "refreshToken": {
+          "type": "string"
+        }
+      }
+    },
+    "pbRenewAccessTokenResponse": {
+      "type": "object",
+      "properties": {
+        "accessToken": {
+          "type": "string"
+        },
+        "accessTokenExpiration": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "pbStatus": {
       "type": "string",
       "enum": [
@@ -1682,8 +1736,7 @@
           "type": "string"
         },
         "amount": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "status": {
           "$ref": "#/definitions/pbTransactionStatus"
@@ -1807,12 +1860,10 @@
           "type": "string"
         },
         "balance": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "lockedBalance": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "createdAt": {
           "type": "string",

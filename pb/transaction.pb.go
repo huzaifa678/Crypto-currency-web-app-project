@@ -127,7 +127,7 @@ type Transaction struct {
 	UserEmail     string                 `protobuf:"bytes,3,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
 	Type          TransactionType        `protobuf:"varint,4,opt,name=type,proto3,enum=pb.TransactionType" json:"type,omitempty"`
 	Currency      string                 `protobuf:"bytes,5,opt,name=currency,proto3" json:"currency,omitempty"`
-	Amount        int64                  `protobuf:"varint,6,opt,name=amount,proto3" json:"amount,omitempty"`
+	Amount        string                 `protobuf:"bytes,6,opt,name=amount,proto3" json:"amount,omitempty"`
 	Status        TransactionStatus      `protobuf:"varint,7,opt,name=status,proto3,enum=pb.TransactionStatus" json:"status,omitempty"`
 	Address       string                 `protobuf:"bytes,8,opt,name=address,proto3" json:"address,omitempty"`
 	TxHash        string                 `protobuf:"bytes,9,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
@@ -201,11 +201,11 @@ func (x *Transaction) GetCurrency() string {
 	return ""
 }
 
-func (x *Transaction) GetAmount() int64 {
+func (x *Transaction) GetAmount() string {
 	if x != nil {
 		return x.Amount
 	}
-	return 0
+	return ""
 }
 
 func (x *Transaction) GetStatus() TransactionStatus {
@@ -248,7 +248,7 @@ const file_transaction_proto_rawDesc = "" +
 	"user_email\x18\x03 \x01(\tR\tuserEmail\x12'\n" +
 	"\x04type\x18\x04 \x01(\x0e2\x13.pb.TransactionTypeR\x04type\x12\x1a\n" +
 	"\bcurrency\x18\x05 \x01(\tR\bcurrency\x12\x16\n" +
-	"\x06amount\x18\x06 \x01(\x03R\x06amount\x12-\n" +
+	"\x06amount\x18\x06 \x01(\tR\x06amount\x12-\n" +
 	"\x06status\x18\a \x01(\x0e2\x15.pb.TransactionStatusR\x06status\x12\x18\n" +
 	"\aaddress\x18\b \x01(\tR\aaddress\x12\x17\n" +
 	"\atx_hash\x18\t \x01(\tR\x06txHash\x129\n" +

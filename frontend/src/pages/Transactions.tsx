@@ -45,7 +45,6 @@ const Transactions: React.FC = () => {
       createdAt: t.created_at,
       }));
 
-      console.log(res.data)
       setTransactions(mapped);
     } catch (err: any) {
       console.error("Error fetching transactions:", err);
@@ -172,9 +171,9 @@ const Transactions: React.FC = () => {
     });
 
   return (
-    <div className="fixed top-20 left-1/2 -translate-x-1/2 max-w-4xl px-6 py-10 ml-10">
+    <div className="fixed top-20 left-1/2 -translate-x-[37%] max-w-6xl px-5 py-10">
       {/* New Transaction Form */}
-      <div className="bg-white p-4 rounded-lg shadow mb-6 ml-10">
+      <div className="bg-white p-4 rounded-lg shadow mb-6">
         <h2 className="text-lg font-bold mb-4">New Transaction</h2>
         <div className="flex space-x-4">
           <select
@@ -223,7 +222,7 @@ const Transactions: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden ml-10">
+      <div className="bg-white rounded-lg shadow overflow-hidden">
         {error && <p className="text-red-500 p-4">{error}</p>}
         {loading && (
           <div className="flex items-center justify-center h-32">

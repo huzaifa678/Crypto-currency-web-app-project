@@ -50,6 +50,7 @@ const (
 	CryptoWebApp_UpdateTransactionStatus_FullMethodName    = "/pb.CryptoWebApp/UpdateTransactionStatus"
 	CryptoWebApp_DeleteTransaction_FullMethodName          = "/pb.CryptoWebApp/DeleteTransaction"
 	CryptoWebApp_GoogleLogin_FullMethodName                = "/pb.CryptoWebApp/GoogleLogin"
+	CryptoWebApp_RenewAccessToken_FullMethodName           = "/pb.CryptoWebApp/RenewAccessToken"
 )
 
 // CryptoWebAppClient is the client API for CryptoWebApp service.
@@ -86,6 +87,7 @@ type CryptoWebAppClient interface {
 	UpdateTransactionStatus(ctx context.Context, in *UpdateTransactionStatusRequest, opts ...grpc.CallOption) (*UpdateTransactionStatusResponse, error)
 	DeleteTransaction(ctx context.Context, in *DeleteTransactionRequest, opts ...grpc.CallOption) (*DeleteTransactionResponse, error)
 	GoogleLogin(ctx context.Context, in *GoogleLoginRequest, opts ...grpc.CallOption) (*GoogleLoginResponse, error)
+	RenewAccessToken(ctx context.Context, in *RenewAccessTokenRequest, opts ...grpc.CallOption) (*RenewAccessTokenResponse, error)
 }
 
 type cryptoWebAppClient struct {
@@ -405,6 +407,16 @@ func (c *cryptoWebAppClient) GoogleLogin(ctx context.Context, in *GoogleLoginReq
 	return out, nil
 }
 
+func (c *cryptoWebAppClient) RenewAccessToken(ctx context.Context, in *RenewAccessTokenRequest, opts ...grpc.CallOption) (*RenewAccessTokenResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(RenewAccessTokenResponse)
+	err := c.cc.Invoke(ctx, CryptoWebApp_RenewAccessToken_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CryptoWebAppServer is the server API for CryptoWebApp service.
 // All implementations must embed UnimplementedCryptoWebAppServer
 // for forward compatibility.
@@ -439,6 +451,7 @@ type CryptoWebAppServer interface {
 	UpdateTransactionStatus(context.Context, *UpdateTransactionStatusRequest) (*UpdateTransactionStatusResponse, error)
 	DeleteTransaction(context.Context, *DeleteTransactionRequest) (*DeleteTransactionResponse, error)
 	GoogleLogin(context.Context, *GoogleLoginRequest) (*GoogleLoginResponse, error)
+	RenewAccessToken(context.Context, *RenewAccessTokenRequest) (*RenewAccessTokenResponse, error)
 	mustEmbedUnimplementedCryptoWebAppServer()
 }
 
@@ -538,6 +551,9 @@ func (UnimplementedCryptoWebAppServer) DeleteTransaction(context.Context, *Delet
 }
 func (UnimplementedCryptoWebAppServer) GoogleLogin(context.Context, *GoogleLoginRequest) (*GoogleLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GoogleLogin not implemented")
+}
+func (UnimplementedCryptoWebAppServer) RenewAccessToken(context.Context, *RenewAccessTokenRequest) (*RenewAccessTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RenewAccessToken not implemented")
 }
 func (UnimplementedCryptoWebAppServer) mustEmbedUnimplementedCryptoWebAppServer() {}
 func (UnimplementedCryptoWebAppServer) testEmbeddedByValue()                      {}
@@ -1093,6 +1109,24 @@ func _CryptoWebApp_GoogleLogin_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CryptoWebApp_RenewAccessToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RenewAccessTokenRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CryptoWebAppServer).RenewAccessToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CryptoWebApp_RenewAccessToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CryptoWebAppServer).RenewAccessToken(ctx, req.(*RenewAccessTokenRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CryptoWebApp_ServiceDesc is the grpc.ServiceDesc for CryptoWebApp service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1215,6 +1249,10 @@ var CryptoWebApp_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GoogleLogin",
 			Handler:    _CryptoWebApp_GoogleLogin_Handler,
+		},
+		{
+			MethodName: "RenewAccessToken",
+			Handler:    _CryptoWebApp_RenewAccessToken_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{

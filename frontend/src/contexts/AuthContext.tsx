@@ -19,6 +19,7 @@ interface Client {
   role : string;
   provider : string;
   created_at : string;
+  is_verified : boolean;
 }
 
 interface LoginResponse {
@@ -76,13 +77,31 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
 
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      localStorage.removeItem('user');
+      const refreshToken = localStorage.getItem('refresh_token');
+      if (!refreshToken) {
+        localStorage.clear();
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
 
-      window.location.href = '/login';
+      try {
+        const res = await api.post('/v1/renew_access_token', {
+          refresh_token: refreshToken,
+        });
+
+        const { access_token, access_token_expires_at } = res.data;
+
+        localStorage.setItem('access_token', access_token);
+        localStorage.setItem('access_token_expiration', access_token_expires_at);
+
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        return api(originalRequest);
+      } catch (refreshErr) {
+        localStorage.clear();
+        window.location.href = '/login';
+        return Promise.reject(refreshErr);
+      }
     }
-    
     return Promise.reject(error);
   }
 );

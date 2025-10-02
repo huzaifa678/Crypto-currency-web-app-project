@@ -3,6 +3,7 @@ package gapi
 import (
 	"context"
 	"errors"
+	"log"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/oauth2"
@@ -67,6 +68,24 @@ func (server *server) GoogleLogin(ctx context.Context, req *pb.GoogleLoginReques
         	return nil, status.Errorf(codes.Internal, "failed to create user: %s", err)
     	}
 	}
+
+    mtdt := server.extractMetadata(ctx)
+
+    _, err = server.store.CreateSession(ctx, db.CreateSessionParams{
+        ID:           refreshPayload.ID,
+        Username:     user.Username,
+        RefreshToken: refreshToken,
+        UserAgent:    mtdt.UserAgent,
+        ClientIp:     mtdt.ClientIP,
+        IsBlocked:    false,
+        ExpiresAt:    refreshPayload.ExpiredAt,
+    })
+
+    if err != nil {
+        return nil, status.Errorf(codes.Internal, "failed to create session: %s", err)
+    }
+
+    log.Println("token duration", timestamppb.New(accessPayload.ExpiredAt), timestamppb.New(refreshPayload.ExpiredAt))
 
     return &pb.GoogleLoginResponse{
         AccessToken:  accessToken,

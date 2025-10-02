@@ -57,6 +57,26 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     setLoading(false)
 
+    if (!trades || trades.length === 0) return;
+
+    const newPoint: any = {
+      time: new Date().toLocaleTimeString(),
+    };
+
+
+    trades.forEach((m: any ) => {
+      if (m.base_currency === "BTC") {
+        newPoint.BTC = parseFloat(m.current_price);
+      } else if (m.base_currency === "ETH") {
+        newPoint.ETH = parseFloat(m.current_price);
+      }
+    });
+
+    setPriceData((prev) => {
+      const updated = [...prev, newPoint];
+      return updated.slice(-50); // keep last 50 points
+    });
+
   }, [trades]);
 
   const formatCurrency = (amount: string, currency: string = 'USD') => {
@@ -86,7 +106,7 @@ const Dashboard: React.FC = () => {
   return (
     <div className="fixed top-20 left-30 right-30 bottom-0 px-5 py-5 bg-animated-gradient min-h-2 overflow-y-auto h-[calc(100vh-5rem)]">
       {/* Welcome Section */}
-      <div className="bg-white rounded-lg sticky shadow p-6">
+      <div className="sticky bg-white rounded-lg shadow p-6">
         <TypeAnimation sequence={[
           `Welcome back, ${user?.username}! 👋`,
           1500,
@@ -197,10 +217,10 @@ const Dashboard: React.FC = () => {
               {/* Background grid */}
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="time" />
-              <YAxis />
+              <YAxis domain={['auto', 'auto']} />
               <Tooltip />
-              <Line dataKey="BTC" stroke="#3B82F6" dot={false} />
-              <Line dataKey="ETH" stroke="#10B981" dot={false} />
+              <Line type="monotone" dataKey="BTC" stroke="#3B82F6" strokeWidth={2} dot={false} />
+              <Line type="monotone" dataKey="ETH" stroke="#10B981" strokeWidth={2} dot={false} />
             </LineChart>
           </ResponsiveContainer>
         </div>

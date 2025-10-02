@@ -33,6 +33,7 @@ import "rpc_update_order_status_and_filled_amount.proto";
 import "rpc_list_order.proto";
 import "rpc_google_login.proto";
 import "rpc_get_wallets.proto";
+import "rpc_renew_access_token.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -399,6 +400,18 @@ service CryptoWebApp {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Login or register using Google OAuth and get access token and refresh token";
             summary: "Google Login";
+        };
+    }
+
+    rpc RenewAccessToken(RenewAccessTokenRequest) returns (RenewAccessTokenResponse) {
+        option (google.api.http) = {
+            post: "/v1/renew_access_token"
+            body: "*"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Renew access token using refresh token";
+            summary: "Renew Access Token";
         };
     }
 }

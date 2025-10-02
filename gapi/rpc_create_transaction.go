@@ -34,28 +34,30 @@ func (server *server) CreateTransaction(ctx context.Context, req *pb.CreateTrans
 
 	log.Println("TYPE", pbType)
 
-	args := db.CreateTransactionParams {
-		Username: authPayload.Username,
-		UserEmail: req.GetUserEmail(),
-		Type: db.TransactionType(pbType),
-		Currency: req.GetCurrency(),
-		Amount: amount,
-		Address: req.GetAddress(),
-		TxHash: req.TxHash,
+	args := db.UpdateBalanceForTransactionTypeTxParams {
+		CreateTransactionParams: db.CreateTransactionParams {
+			Username: authPayload.Username,
+			UserEmail: req.GetUserEmail(),
+			Type: db.TransactionType(pbType),
+			Currency: req.GetCurrency(),
+			Amount: amount,
+			Address: req.GetAddress(),
+			TxHash: req.TxHash,
+		},
 	}
 	
-	transaction, err := server.store.CreateTransaction(ctx, args)
+	transaction, err := server.store.CreateTransactionForTransactionTypeTx(ctx, args)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create transaction: %v", err)
 	}
 
-	transaction.Status = db.TransactionStatus("completed")
+	transaction.CreateTransactionRow.Status = db.TransactionStatus("completed")
 
-	log.Println("STATUS", transaction.Status)
+	log.Println("STATUS", transaction.CreateTransactionRow.Status)
 
 	res := &pb.CreateTransactionResponse{
-		Transaction: convertCreateTransaction(req.GetUsername(), transaction),
+		Transaction: convertCreateTransaction(req.GetUsername(), transaction.CreateTransactionRow),
 	}
 
 	log.Println("PB STATUS", res.Transaction.Status)

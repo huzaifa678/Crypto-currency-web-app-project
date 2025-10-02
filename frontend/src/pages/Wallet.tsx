@@ -3,6 +3,13 @@ import { api } from '../contexts/AuthContext';
 import { Wallet as WalletIcon, Plus, Minus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
+interface WalletResponse {
+  id: string;
+  currency: string;
+  balance: string;
+  locked_balance: string;
+}
+
 interface Wallet {
   id: string;
   currency: string;
@@ -21,12 +28,12 @@ const WalletPage: React.FC = () => {
   useEffect(() => {
     const fetchWallets = async () => {
       try {
-        const res = await api.get<{ wallets: Wallet[] }>('/v1/wallets');
+        const res = await api.get<{ wallets: WalletResponse[] }>('/v1/wallets');
         const normalized = (res.data.wallets || []).filter(Boolean).map(w => ({
           id: w.id,
           currency: w.currency,
-          balance: Number(w.balance),
-          locked_balance: Number(w.locked_balance),
+          balance: parseFloat(w.balance ?? "0"),
+          locked_balance: parseFloat(w.locked_balance ?? "0")
         }));
         setWallets(normalized);
         console.log(res.data.wallets);

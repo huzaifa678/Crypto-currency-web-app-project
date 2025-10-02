@@ -96,8 +96,8 @@ func convertWallet(wallet db.Wallet) *pb.Wallet {
 		Id:            wallet.ID.String(),
 		UserEmail:     wallet.UserEmail,
 		Currency:      wallet.Currency,
-		Balance:       wallet.Balance.IntPart(),
-		LockedBalance: wallet.LockedBalance.IntPart(),
+		Balance:       wallet.Balance.String(),
+		LockedBalance: wallet.LockedBalance.String(),
 		CreatedAt:     timestamppb.New(wallet.CreatedAt),
 	}
 }
@@ -184,7 +184,7 @@ func convertTransaction(transaction db.Transaction) (*pb.Transaction) {
 		UserEmail: transaction.UserEmail,
 		Type: convertTransactionType(transaction.Type),
 		Currency: transaction.Currency,
-		Amount: transaction.Amount.IntPart(),
+		Amount: transaction.Amount.String(),
 		Status: convertTransactionStatus(transaction.Status),
 		Address: transaction.Address,
 		TxHash: transaction.TxHash,
@@ -201,7 +201,7 @@ func convertTransactionList(transactions []db.Transaction) ([] *pb.Transaction) 
 			UserEmail: 	   tx.UserEmail,
 			Type: 		   convertTransactionType(tx.Type),
 			Currency: 	   tx.Currency,	
-			Amount:    	   tx.Amount.IntPart(),
+			Amount:    	   tx.Amount.String(),
 			Status:    	   convertTransactionStatus(tx.Status),
 			Address: 	   tx.Address,	
 			CreatedAt: 	   timestamppb.New(tx.CreatedAt),
@@ -219,7 +219,7 @@ func convertCreateTransaction(userName string, transaction db.CreateTransactionR
 		UserEmail: transaction.UserEmail,
 		Type: convertTransactionType(transaction.Type),
 		Currency: transaction.Currency,
-		Amount: transaction.Amount.IntPart(),
+		Amount: transaction.Amount.String(),
 		Status: convertTransactionStatus(transaction.Status),
 		Address: transaction.Address,
 		TxHash: transaction.TxHash,
@@ -259,8 +259,8 @@ func convertGetWallets(wallets []db.Wallet) *pb.GetWalletsResponse {
 			Id:            wallet.ID.String(),
 			UserEmail:     wallet.UserEmail,
 			Currency:      wallet.Currency,
-			Balance:       wallet.Balance.IntPart(),
-			LockedBalance: wallet.LockedBalance.IntPart(),
+			Balance:       wallet.Balance.String(),
+			LockedBalance: wallet.LockedBalance.String(),
 			CreatedAt:     timestamppb.New(wallet.CreatedAt),
 		}
 	}

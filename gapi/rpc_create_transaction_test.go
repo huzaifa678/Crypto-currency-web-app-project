@@ -43,20 +43,24 @@ func TestCreateTransactionRPC(t *testing.T) {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
+				result := db.UpdateBalanceForTransactionTypeTxResult{
+        			CreateTransactionRow: transactionRow,
+    			}
 				store.EXPECT().
-					CreateTransaction(gomock.Any(), gomock.Any()).
-					DoAndReturn(func(ctx context.Context, arg db.CreateTransactionParams) (db.CreateTransactionRow, error) {
-						require.True(t, createTxParams.Amount.Equal(arg.Amount))
-						require.Equal(t, createTxParams.UserEmail, arg.UserEmail)
-						require.Equal(t, createTxParams.Type, arg.Type)
-						require.Equal(t, createTxParams.Currency, arg.Currency)
-						require.Equal(t, createTxParams.Address, arg.Address)
-						require.Equal(t, createTxParams.TxHash, arg.TxHash)
-						return transactionRow, nil
+					CreateTransactionForTransactionTypeTx(gomock.Any(), gomock.Any()).
+					DoAndReturn(func(ctx context.Context, arg db.UpdateBalanceForTransactionTypeTxParams) (db.UpdateBalanceForTransactionTypeTxResult, error) {
+						require.True(t, createTxParams.Amount.Equal(arg.CreateTransactionParams.Amount))
+						require.Equal(t, createTxParams.UserEmail, arg.CreateTransactionParams.UserEmail)
+						require.Equal(t, createTxParams.Type, arg.CreateTransactionParams.Type)
+						require.Equal(t, createTxParams.Currency, arg.CreateTransactionParams.Currency)
+						require.Equal(t, createTxParams.Address, arg.CreateTransactionParams.Address)
+						require.Equal(t, createTxParams.TxHash, arg.CreateTransactionParams.TxHash)
+						return result, nil
 					}).
 					Times(1)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateTransactionResponse, err error) {
+				log.Println("transaction response", res.GetTransaction())
 				require.NoError(t, err)
 				require.NotNil(t, res)
 				require.NotNil(t, res.Transaction)
@@ -129,9 +133,14 @@ func TestCreateTransactionRPC(t *testing.T) {
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
 				store.EXPECT().
-					CreateTransaction(gomock.Any(), gomock.Any()).
+					CreateTransactionForTransactionTypeTx(gomock.Any(), gomock.Any()).
 					Times(1).
-					Return(transactionRow, db.ErrRecordNotFound)
+					Return(
+						db.UpdateBalanceForTransactionTypeTxResult{
+                    	CreateTransactionRow: transactionRow,
+                		},
+                		db.ErrRecordNotFound,
+					)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateTransactionResponse, err error) {
 				require.Error(t, err)

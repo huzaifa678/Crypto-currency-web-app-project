@@ -83,6 +83,11 @@ func TestGoogleLogin(t *testing.T) {
 						UpdatedAt: 	  time.Now(),
 						Role:         db.UserRole("user"),
 					}, nil)
+				
+				store.EXPECT().
+        			CreateSession(gomock.Any(), gomock.Any()).
+        			Times(1).
+        			Return(db.Session{}, nil)
 			},
 			checkResponse: func(t *testing.T, res *pb.GoogleLoginResponse, err error) {
 				require.NoError(t, err)

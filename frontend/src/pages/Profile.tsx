@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { User, Mail, Shield, Calendar } from 'lucide-react';
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, client } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     username: user?.username || '',
@@ -123,7 +123,7 @@ const Profile: React.FC = () => {
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-900">Member Since</p>
-                <p className="text-sm text-gray-500">{formatDate(user?.created_at || '')}</p>
+                <p className="text-sm text-gray-500">{formatDate(user?.created_at || client?.created_at || '')}</p>
               </div>
             </div>
 
@@ -134,7 +134,7 @@ const Profile: React.FC = () => {
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-900">Status</p>
                 <p className="text-sm text-gray-500">
-                  {user?.is_verified ? 'Verified' : 'Unverified'}
+                  {user?.is_verified || client?.is_verified ? 'Verified' : 'Unverified'}
                 </p>
               </div>
             </div>
