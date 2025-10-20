@@ -15,6 +15,7 @@ type Store_interface interface {
 	CreateUserTx(ctx context.Context, arg CreateUserTxParams) (CreateUserTxResult, error)
 	VerifyEmailTx(ctx context.Context, arg VerifyEmailTxParams) (VerifyEmailTxResult, error)
 	CreateTransactionForTransactionTypeTx(ctx context.Context, arg UpdateBalanceForTransactionTypeTxParams) (UpdateBalanceForTransactionTypeTxResult, error)
+	CreateTradeTx(ctx context.Context, arg CreateTradeTxParams) (CreateTradeTxResult, error)
 }
 
 // Defining the SQLStore struct to execute the queries and transactions defined

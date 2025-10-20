@@ -43,23 +43,40 @@ func (server *server) CreateTrade(ctx context.Context, req *pb.CreateTradeReques
 		return nil, status.Errorf(codes.InvalidArgument, "invalid market ID: %v", err)
 	}
 
-	args := db.CreateTradeParams {
-		Username: authPayload.Username,
-		BuyOrderID: buyOrderId,
-		SellOrderID: sellOrderId,
-		MarketID: marketID,
-		Price: decimal.NewFromFloat(float64(req.GetPrice())),
-		Amount: decimal.NewFromFloat(float64(req.GetAmount())),
-		Fee: decimal.NewFromFloat(float64(req.GetFee())),
+	price, err := decimal.NewFromString(req.GetPrice())
+	if err != nil {
+    	return nil, status.Errorf(codes.InvalidArgument, "invalid price: %v", err)
 	}
 
-	trade, err := server.store.CreateTrade(ctx, args)
+	amount, err := decimal.NewFromString(req.GetAmount())
+	if err != nil {
+    	return nil, status.Errorf(codes.InvalidArgument, "invalid amount: %v", err)
+	}
+
+	fee, err := decimal.NewFromString(req.GetFee())
+	if err != nil {
+    	return nil, status.Errorf(codes.InvalidArgument, "invalid fee: %v", err)
+	}
+
+	args := db.CreateTradeTxParams{
+		TradeParams: db.CreateTradeParams{	
+			Username: authPayload.Username,
+			BuyOrderID: buyOrderId,
+			SellOrderID: sellOrderId,
+			MarketID: marketID,
+			Price: price,
+			Amount: amount,
+			Fee: fee,
+		},
+	}
+
+	trade, err := server.store.CreateTradeTx(ctx, args)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to create trade: %v", err)
 	}
 
-	convertToPb := convertTrade(trade)
+	convertToPb := convertTrade(trade.Trade)
 
 	res := &pb.CreateTradeResponse{
 		Trade: convertToPb,
@@ -69,14 +86,38 @@ func (server *server) CreateTrade(ctx context.Context, req *pb.CreateTradeReques
 }
 
 func validateCreateTradeRequest(req *pb.CreateTradeRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateCreateTradeRequest(req.GetBuyOrderId(), req.GetSellOrderId(), req.GetMarketId(), decimal.NewFromFloat(float64(req.GetPrice())), decimal.NewFromFloat(float64(req.GetAmount())), decimal.NewFromFloat(float64(req.GetFee()))); err != nil {
-		log.Println("ERROR", err)
-		violations = append(violations, fieldViolation("buy_order_id", err))
-		violations = append(violations, fieldViolation("sell_order_id", err))
-		violations = append(violations, fieldViolation("market_id", err))
+	price, err := decimal.NewFromString(req.GetPrice())
+	if err != nil {
 		violations = append(violations, fieldViolation("price", err))
+	}
+
+	amount, err := decimal.NewFromString(req.GetAmount())
+	if err != nil {
 		violations = append(violations, fieldViolation("amount", err))
+	}
+
+	fee, err := decimal.NewFromString(req.GetFee())
+	if err != nil {
 		violations = append(violations, fieldViolation("fee", err))
+	}
+
+	if len(violations) == 0 {
+		if err := val.ValidateCreateTradeRequest(
+			req.GetBuyOrderId(),
+			req.GetSellOrderId(),
+			req.GetMarketId(),
+			price,
+			amount,
+			fee,
+		); err != nil {
+			log.Println("ERROR", err)
+			violations = append(violations, fieldViolation("buy_order_id", err))
+			violations = append(violations, fieldViolation("sell_order_id", err))
+			violations = append(violations, fieldViolation("market_id", err))
+			violations = append(violations, fieldViolation("price", err))
+			violations = append(violations, fieldViolation("amount", err))
+			violations = append(violations, fieldViolation("fee", err))
+		}
 	}
 
 	return violations

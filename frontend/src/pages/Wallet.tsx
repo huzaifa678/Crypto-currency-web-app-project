@@ -28,7 +28,9 @@ const WalletPage: React.FC = () => {
   useEffect(() => {
     const fetchWallets = async () => {
       try {
-        const res = await api.get<{ wallets: WalletResponse[] }>('/v1/wallets');
+        const res = await api.get<{ wallets: WalletResponse[] }>('/v1/wallets', {
+          params: { user_email: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).email : '' }
+        });
         const normalized = (res.data.wallets || []).filter(Boolean).map(w => ({
           id: w.id,
           currency: w.currency,
@@ -39,7 +41,6 @@ const WalletPage: React.FC = () => {
         console.log(res.data.wallets);
       } catch (err) {
         console.error(err);
-        toast.error('Failed to load wallets');
       } finally {
       setLoading(false);
       }
@@ -222,7 +223,7 @@ const WalletPage: React.FC = () => {
             <div className="flex space-x-2 mt-4">
               <button
                 type="button"
-                onClick={() => handleUpdateWallet(wallet.id, 100)}
+                onClick={() => handleUpdateWallet(wallet.id, 10)}
                 className="flex-1 flex items-center justify-center px-2 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
               >
                 <Plus className="h-4 w-4 mr-2" />
@@ -230,7 +231,7 @@ const WalletPage: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={() => handleUpdateWallet(wallet.id, -100)}
+                onClick={() => handleUpdateWallet(wallet.id, -10)}
                 className="flex-1 flex items-center justify-center px-2 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 transition-colors"
               >
                 <Minus className="h-4 w-4 mr-1" />

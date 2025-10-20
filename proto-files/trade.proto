@@ -12,8 +12,8 @@ message Trades {
   string buy_order_id = 3;
   string sell_order_id = 4;
   string market_id = 5;
-  int64 price = 6;
-  int64 amount = 7;
-  int64 fee = 8;
+  string price = 6;
+  string amount = 7;
+  string fee = 8;
   google.protobuf.Timestamp created_at = 9;
 }

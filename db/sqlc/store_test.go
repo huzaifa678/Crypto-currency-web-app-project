@@ -47,7 +47,7 @@ func TestCreateTransactionTx(t *testing.T) {
 		Username: market.Username,
 		MarketID: market.ID,
 		MakerFee: decimal.NewFromFloat(0.0100),
-		TakerFee: decimal.NewFromFloat(0.0500),
+		TakerFee: decimal.NewFromFloat(0.0200),
 	}
 
 	feeParams := FeeParams{
@@ -55,6 +55,7 @@ func TestCreateTransactionTx(t *testing.T) {
 		Amount:   feeArgs.MakerFee,
 		TakerFee: feeArgs.TakerFee,
 	}
+
 	err = testStore.CreateTransactionTx(context.Background(), transactionArgs, feeParams)
 	require.NoError(t, err, "Failed to create transaction")
 	transaction, err := testStore.GetTransactionsByUserEmail(context.Background(), transactionArgs.UserEmail)
@@ -72,11 +73,12 @@ func TestCreateTransactionTx(t *testing.T) {
 	fee, err := testStore.GetFeeByMarketID(context.Background(), feeArgs.MarketID)
 	log.Println("Fee:", fee)
 	log.Println("FeeArgs:", feeArgs)
+	log.Printf("fee.TakerFee: %s, feeArgs.TakerFee: %s", fee.TakerFee.String(), feeArgs.TakerFee.String())
 	require.NoError(t, err, "Failed to get fee")
 	require.NotEmpty(t, fee, "Fee should not be empty")
 	require.Equal(t, feeArgs.MarketID, fee.MarketID, "MarketID should match")
-	require.True(t, feeArgs.MakerFee.Equal(fee.MakerFee), fee.MakerFee, "MakerFee should match")
-	require.True(t, feeArgs.TakerFee.Equal(fee.TakerFee), fee.TakerFee, "TakerFee should match")
+	require.True(t, feeArgs.MakerFee.Equal(fee.MakerFee), "MakerFee should match")
+	require.True(t, feeArgs.TakerFee.Equal(fee.TakerFee), "TakerFee should match")
 }
 
 func TestDeadlockDetectionForCreateTransaction(t *testing.T) {

@@ -25,9 +25,9 @@ message Order {
   string market_id = 4;
   OrderType type = 5;
   Status status = 6;
-  int64 price = 7;
-  int64 amount = 8;
-  int64 filled_amount = 9;
+  string price = 7;
+  string amount = 8;
+  string filled_amount = 9;
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
 }

@@ -11,7 +11,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -44,6 +43,7 @@ const (
 	CryptoWebApp_CreateTrade_FullMethodName                = "/pb.CryptoWebApp/CreateTrade"
 	CryptoWebApp_GetTrade_FullMethodName                   = "/pb.CryptoWebApp/GetTrade"
 	CryptoWebApp_DeleteTrade_FullMethodName                = "/pb.CryptoWebApp/DeleteTrade"
+	CryptoWebApp_ListTrades_FullMethodName                 = "/pb.CryptoWebApp/ListTrades"
 	CryptoWebApp_CreateTransaction_FullMethodName          = "/pb.CryptoWebApp/CreateTransaction"
 	CryptoWebApp_GetTransaction_FullMethodName             = "/pb.CryptoWebApp/GetTransaction"
 	CryptoWebApp_GetTransactionsByUserEmail_FullMethodName = "/pb.CryptoWebApp/GetTransactionsByUserEmail"
@@ -65,22 +65,23 @@ type CryptoWebAppClient interface {
 	CreateMarket(ctx context.Context, in *CreateMarketRequest, opts ...grpc.CallOption) (*CreateMarketResponse, error)
 	DeleteMarket(ctx context.Context, in *DeleteMarketRequest, opts ...grpc.CallOption) (*DeleteMarketResponse, error)
 	GetMarket(ctx context.Context, in *GetMarketRequest, opts ...grpc.CallOption) (*GetMarketResponse, error)
-	ListMarkets(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MarketListResponse, error)
+	ListMarkets(ctx context.Context, in *MarketListRequest, opts ...grpc.CallOption) (*MarketListResponse, error)
 	CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error)
 	DeleteOrder(ctx context.Context, in *DeleteOrderRequest, opts ...grpc.CallOption) (*DeleteOrderResponse, error)
 	GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*GetOrderResponse, error)
 	UpdateOrder(ctx context.Context, in *UpdateOrderStatusAndFilledAmountRequest, opts ...grpc.CallOption) (*UpdateOrderStatusAndFilledAmountResponse, error)
-	ListOrder(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OrderListResponse, error)
+	ListOrder(ctx context.Context, in *OrderListRequest, opts ...grpc.CallOption) (*OrderListResponse, error)
 	CreateWallet(ctx context.Context, in *CreateWalletRequest, opts ...grpc.CallOption) (*CreateWalletResponse, error)
 	DeleteWallet(ctx context.Context, in *DeleteWalletRequest, opts ...grpc.CallOption) (*DeleteWalletResponse, error)
 	UpdateWallet(ctx context.Context, in *UpdateWalletRequest, opts ...grpc.CallOption) (*UpdateWalletResponse, error)
 	GetWallet(ctx context.Context, in *GetWalletRequest, opts ...grpc.CallOption) (*GetWalletResponse, error)
-	GetWallets(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetWalletsResponse, error)
+	GetWallets(ctx context.Context, in *GetWalletsRequest, opts ...grpc.CallOption) (*GetWalletsResponse, error)
 	VerifyEmail(ctx context.Context, in *VerifyEmailRequest, opts ...grpc.CallOption) (*VerifyEmailResponse, error)
 	StreamTrades(ctx context.Context, in *TradeStreamRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[Trade], error)
 	CreateTrade(ctx context.Context, in *CreateTradeRequest, opts ...grpc.CallOption) (*CreateTradeResponse, error)
 	GetTrade(ctx context.Context, in *GetTradeByIDRequest, opts ...grpc.CallOption) (*GetTradeByIDResponse, error)
 	DeleteTrade(ctx context.Context, in *DeleteTradeRequest, opts ...grpc.CallOption) (*DeleteTradeResponse, error)
+	ListTrades(ctx context.Context, in *TradeListRequest, opts ...grpc.CallOption) (*TradeListResponse, error)
 	CreateTransaction(ctx context.Context, in *CreateTransactionRequest, opts ...grpc.CallOption) (*CreateTransactionResponse, error)
 	GetTransaction(ctx context.Context, in *GetTransactionByIDRequest, opts ...grpc.CallOption) (*GetTransactionByIDResponse, error)
 	GetTransactionsByUserEmail(ctx context.Context, in *GetTransactionsByUserEmailRequest, opts ...grpc.CallOption) (*GetTransactionsByUserEmailResponse, error)
@@ -178,7 +179,7 @@ func (c *cryptoWebAppClient) GetMarket(ctx context.Context, in *GetMarketRequest
 	return out, nil
 }
 
-func (c *cryptoWebAppClient) ListMarkets(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*MarketListResponse, error) {
+func (c *cryptoWebAppClient) ListMarkets(ctx context.Context, in *MarketListRequest, opts ...grpc.CallOption) (*MarketListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(MarketListResponse)
 	err := c.cc.Invoke(ctx, CryptoWebApp_ListMarkets_FullMethodName, in, out, cOpts...)
@@ -228,7 +229,7 @@ func (c *cryptoWebAppClient) UpdateOrder(ctx context.Context, in *UpdateOrderSta
 	return out, nil
 }
 
-func (c *cryptoWebAppClient) ListOrder(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*OrderListResponse, error) {
+func (c *cryptoWebAppClient) ListOrder(ctx context.Context, in *OrderListRequest, opts ...grpc.CallOption) (*OrderListResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(OrderListResponse)
 	err := c.cc.Invoke(ctx, CryptoWebApp_ListOrder_FullMethodName, in, out, cOpts...)
@@ -278,7 +279,7 @@ func (c *cryptoWebAppClient) GetWallet(ctx context.Context, in *GetWalletRequest
 	return out, nil
 }
 
-func (c *cryptoWebAppClient) GetWallets(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetWalletsResponse, error) {
+func (c *cryptoWebAppClient) GetWallets(ctx context.Context, in *GetWalletsRequest, opts ...grpc.CallOption) (*GetWalletsResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetWalletsResponse)
 	err := c.cc.Invoke(ctx, CryptoWebApp_GetWallets_FullMethodName, in, out, cOpts...)
@@ -341,6 +342,16 @@ func (c *cryptoWebAppClient) DeleteTrade(ctx context.Context, in *DeleteTradeReq
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteTradeResponse)
 	err := c.cc.Invoke(ctx, CryptoWebApp_DeleteTrade_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cryptoWebAppClient) ListTrades(ctx context.Context, in *TradeListRequest, opts ...grpc.CallOption) (*TradeListResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(TradeListResponse)
+	err := c.cc.Invoke(ctx, CryptoWebApp_ListTrades_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -429,22 +440,23 @@ type CryptoWebAppServer interface {
 	CreateMarket(context.Context, *CreateMarketRequest) (*CreateMarketResponse, error)
 	DeleteMarket(context.Context, *DeleteMarketRequest) (*DeleteMarketResponse, error)
 	GetMarket(context.Context, *GetMarketRequest) (*GetMarketResponse, error)
-	ListMarkets(context.Context, *emptypb.Empty) (*MarketListResponse, error)
+	ListMarkets(context.Context, *MarketListRequest) (*MarketListResponse, error)
 	CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error)
 	DeleteOrder(context.Context, *DeleteOrderRequest) (*DeleteOrderResponse, error)
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error)
 	UpdateOrder(context.Context, *UpdateOrderStatusAndFilledAmountRequest) (*UpdateOrderStatusAndFilledAmountResponse, error)
-	ListOrder(context.Context, *emptypb.Empty) (*OrderListResponse, error)
+	ListOrder(context.Context, *OrderListRequest) (*OrderListResponse, error)
 	CreateWallet(context.Context, *CreateWalletRequest) (*CreateWalletResponse, error)
 	DeleteWallet(context.Context, *DeleteWalletRequest) (*DeleteWalletResponse, error)
 	UpdateWallet(context.Context, *UpdateWalletRequest) (*UpdateWalletResponse, error)
 	GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error)
-	GetWallets(context.Context, *emptypb.Empty) (*GetWalletsResponse, error)
+	GetWallets(context.Context, *GetWalletsRequest) (*GetWalletsResponse, error)
 	VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error)
 	StreamTrades(*TradeStreamRequest, grpc.ServerStreamingServer[Trade]) error
 	CreateTrade(context.Context, *CreateTradeRequest) (*CreateTradeResponse, error)
 	GetTrade(context.Context, *GetTradeByIDRequest) (*GetTradeByIDResponse, error)
 	DeleteTrade(context.Context, *DeleteTradeRequest) (*DeleteTradeResponse, error)
+	ListTrades(context.Context, *TradeListRequest) (*TradeListResponse, error)
 	CreateTransaction(context.Context, *CreateTransactionRequest) (*CreateTransactionResponse, error)
 	GetTransaction(context.Context, *GetTransactionByIDRequest) (*GetTransactionByIDResponse, error)
 	GetTransactionsByUserEmail(context.Context, *GetTransactionsByUserEmailRequest) (*GetTransactionsByUserEmailResponse, error)
@@ -486,7 +498,7 @@ func (UnimplementedCryptoWebAppServer) DeleteMarket(context.Context, *DeleteMark
 func (UnimplementedCryptoWebAppServer) GetMarket(context.Context, *GetMarketRequest) (*GetMarketResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetMarket not implemented")
 }
-func (UnimplementedCryptoWebAppServer) ListMarkets(context.Context, *emptypb.Empty) (*MarketListResponse, error) {
+func (UnimplementedCryptoWebAppServer) ListMarkets(context.Context, *MarketListRequest) (*MarketListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListMarkets not implemented")
 }
 func (UnimplementedCryptoWebAppServer) CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error) {
@@ -501,7 +513,7 @@ func (UnimplementedCryptoWebAppServer) GetOrder(context.Context, *GetOrderReques
 func (UnimplementedCryptoWebAppServer) UpdateOrder(context.Context, *UpdateOrderStatusAndFilledAmountRequest) (*UpdateOrderStatusAndFilledAmountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateOrder not implemented")
 }
-func (UnimplementedCryptoWebAppServer) ListOrder(context.Context, *emptypb.Empty) (*OrderListResponse, error) {
+func (UnimplementedCryptoWebAppServer) ListOrder(context.Context, *OrderListRequest) (*OrderListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListOrder not implemented")
 }
 func (UnimplementedCryptoWebAppServer) CreateWallet(context.Context, *CreateWalletRequest) (*CreateWalletResponse, error) {
@@ -516,7 +528,7 @@ func (UnimplementedCryptoWebAppServer) UpdateWallet(context.Context, *UpdateWall
 func (UnimplementedCryptoWebAppServer) GetWallet(context.Context, *GetWalletRequest) (*GetWalletResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWallet not implemented")
 }
-func (UnimplementedCryptoWebAppServer) GetWallets(context.Context, *emptypb.Empty) (*GetWalletsResponse, error) {
+func (UnimplementedCryptoWebAppServer) GetWallets(context.Context, *GetWalletsRequest) (*GetWalletsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWallets not implemented")
 }
 func (UnimplementedCryptoWebAppServer) VerifyEmail(context.Context, *VerifyEmailRequest) (*VerifyEmailResponse, error) {
@@ -533,6 +545,9 @@ func (UnimplementedCryptoWebAppServer) GetTrade(context.Context, *GetTradeByIDRe
 }
 func (UnimplementedCryptoWebAppServer) DeleteTrade(context.Context, *DeleteTradeRequest) (*DeleteTradeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTrade not implemented")
+}
+func (UnimplementedCryptoWebAppServer) ListTrades(context.Context, *TradeListRequest) (*TradeListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListTrades not implemented")
 }
 func (UnimplementedCryptoWebAppServer) CreateTransaction(context.Context, *CreateTransactionRequest) (*CreateTransactionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTransaction not implemented")
@@ -721,7 +736,7 @@ func _CryptoWebApp_GetMarket_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _CryptoWebApp_ListMarkets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(MarketListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -733,7 +748,7 @@ func _CryptoWebApp_ListMarkets_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: CryptoWebApp_ListMarkets_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CryptoWebAppServer).ListMarkets(ctx, req.(*emptypb.Empty))
+		return srv.(CryptoWebAppServer).ListMarkets(ctx, req.(*MarketListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -811,7 +826,7 @@ func _CryptoWebApp_UpdateOrder_Handler(srv interface{}, ctx context.Context, dec
 }
 
 func _CryptoWebApp_ListOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(OrderListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -823,7 +838,7 @@ func _CryptoWebApp_ListOrder_Handler(srv interface{}, ctx context.Context, dec f
 		FullMethod: CryptoWebApp_ListOrder_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CryptoWebAppServer).ListOrder(ctx, req.(*emptypb.Empty))
+		return srv.(CryptoWebAppServer).ListOrder(ctx, req.(*OrderListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -901,7 +916,7 @@ func _CryptoWebApp_GetWallet_Handler(srv interface{}, ctx context.Context, dec f
 }
 
 func _CryptoWebApp_GetWallets_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(GetWalletsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -913,7 +928,7 @@ func _CryptoWebApp_GetWallets_Handler(srv interface{}, ctx context.Context, dec 
 		FullMethod: CryptoWebApp_GetWallets_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CryptoWebAppServer).GetWallets(ctx, req.(*emptypb.Empty))
+		return srv.(CryptoWebAppServer).GetWallets(ctx, req.(*GetWalletsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -997,6 +1012,24 @@ func _CryptoWebApp_DeleteTrade_Handler(srv interface{}, ctx context.Context, dec
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CryptoWebAppServer).DeleteTrade(ctx, req.(*DeleteTradeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CryptoWebApp_ListTrades_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TradeListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CryptoWebAppServer).ListTrades(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CryptoWebApp_ListTrades_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CryptoWebAppServer).ListTrades(ctx, req.(*TradeListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1225,6 +1258,10 @@ var CryptoWebApp_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteTrade",
 			Handler:    _CryptoWebApp_DeleteTrade_Handler,
+		},
+		{
+			MethodName: "ListTrades",
+			Handler:    _CryptoWebApp_ListTrades_Handler,
 		},
 		{
 			MethodName: "CreateTransaction",

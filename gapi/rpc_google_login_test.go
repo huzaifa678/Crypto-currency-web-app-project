@@ -82,6 +82,7 @@ func TestGoogleLogin(t *testing.T) {
 						CreatedAt: 	  time.Now(),
 						UpdatedAt: 	  time.Now(),
 						Role:         db.UserRole("user"),
+						IsVerified:   true,
 					}, nil)
 				
 				store.EXPECT().

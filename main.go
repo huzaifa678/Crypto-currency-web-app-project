@@ -181,6 +181,7 @@ func runGatewayServer(
         MarshalOptions: protojson.MarshalOptions{
             UseProtoNames:   true,
             UseEnumNumbers:  false,
+			EmitUnpopulated: true,
         },
         UnmarshalOptions: protojson.UnmarshalOptions{
             DiscardUnknown: true,

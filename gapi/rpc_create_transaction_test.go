@@ -35,7 +35,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 				UserEmail: createTxParams.UserEmail,
 				Type:      pb.TransactionType_DEPOSIT,
 				Currency:  transaction.Currency,
-				Amount:    transaction.Amount.Mul(decimal.New(1, scale)).IntPart(),
+				Amount:    transaction.Amount.String(),
 				Address:   transaction.Address,
 				TxHash:    transaction.TxHash,
 			},
@@ -73,7 +73,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 				UserEmail: transaction.UserEmail,
 				Type:      pb.TransactionType_DEPOSIT,
 				Currency:  transaction.Currency,
-				Amount:    transaction.Amount.IntPart(),
+				Amount:    transaction.Amount.String(),
 				Address:   transaction.Address,
 				TxHash:    transaction.TxHash,
 			},
@@ -98,7 +98,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 				UserEmail: "invalid-email",
 				Type:      pb.TransactionType_DEPOSIT,
 				Currency:  "BTC",
-				Amount:    10,
+				Amount:    "10",
 				Address:   "1BitcoinAddress",
 				TxHash:    uuid.New().String(),
 			},
@@ -124,7 +124,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 				UserEmail: transaction.UserEmail,
 				Type:      pb.TransactionType_DEPOSIT,
 				Currency:  transaction.Currency,
-				Amount:    transaction.Amount.IntPart(),
+				Amount:    transaction.Amount.String(),
 				Address:   transaction.Address,
 				TxHash:    transaction.TxHash,
 			},
@@ -137,7 +137,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 					Times(1).
 					Return(
 						db.UpdateBalanceForTransactionTypeTxResult{
-                    	CreateTransactionRow: transactionRow,
+                    		CreateTransactionRow: transactionRow,
                 		},
                 		db.ErrRecordNotFound,
 					)

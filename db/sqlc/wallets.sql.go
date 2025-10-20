@@ -76,14 +76,15 @@ func (q *Queries) GetWalletByID(ctx context.Context, id uuid.UUID) (Wallet, erro
 	return i, err
 }
 
-const getWallets = `-- name: GetWallets :many
+const getWalletsByUserEmail = `-- name: GetWalletsByUserEmail :many
 SELECT id, username, user_email, currency, balance, locked_balance, created_at
 FROM wallets
+WHERE user_email = $1
 ORDER BY created_at DESC
 `
 
-func (q *Queries) GetWallets(ctx context.Context) ([]Wallet, error) {
-	rows, err := q.db.Query(ctx, getWallets)
+func (q *Queries) GetWalletsByUserEmail(ctx context.Context, userEmail string) ([]Wallet, error) {
+	rows, err := q.db.Query(ctx, getWalletsByUserEmail, userEmail)
 	if err != nil {
 		return nil, err
 	}

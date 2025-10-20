@@ -128,9 +128,9 @@ type Order struct {
 	MarketId      string                 `protobuf:"bytes,4,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
 	Type          OrderType              `protobuf:"varint,5,opt,name=type,proto3,enum=pb.OrderType" json:"type,omitempty"`
 	Status        Status                 `protobuf:"varint,6,opt,name=status,proto3,enum=pb.Status" json:"status,omitempty"`
-	Price         int64                  `protobuf:"varint,7,opt,name=price,proto3" json:"price,omitempty"`
-	Amount        int64                  `protobuf:"varint,8,opt,name=amount,proto3" json:"amount,omitempty"`
-	FilledAmount  int64                  `protobuf:"varint,9,opt,name=filled_amount,json=filledAmount,proto3" json:"filled_amount,omitempty"`
+	Price         string                 `protobuf:"bytes,7,opt,name=price,proto3" json:"price,omitempty"`
+	Amount        string                 `protobuf:"bytes,8,opt,name=amount,proto3" json:"amount,omitempty"`
+	FilledAmount  string                 `protobuf:"bytes,9,opt,name=filled_amount,json=filledAmount,proto3" json:"filled_amount,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -209,25 +209,25 @@ func (x *Order) GetStatus() Status {
 	return Status_OPEN
 }
 
-func (x *Order) GetPrice() int64 {
+func (x *Order) GetPrice() string {
 	if x != nil {
 		return x.Price
 	}
-	return 0
+	return ""
 }
 
-func (x *Order) GetAmount() int64 {
+func (x *Order) GetAmount() string {
 	if x != nil {
 		return x.Amount
 	}
-	return 0
+	return ""
 }
 
-func (x *Order) GetFilledAmount() int64 {
+func (x *Order) GetFilledAmount() string {
 	if x != nil {
 		return x.FilledAmount
 	}
-	return 0
+	return ""
 }
 
 func (x *Order) GetCreatedAt() *timestamppb.Timestamp {
@@ -258,9 +258,9 @@ const file_order_proto_rawDesc = "" +
 	"\x04type\x18\x05 \x01(\x0e2\r.pb.OrderTypeR\x04type\x12\"\n" +
 	"\x06status\x18\x06 \x01(\x0e2\n" +
 	".pb.StatusR\x06status\x12\x14\n" +
-	"\x05price\x18\a \x01(\x03R\x05price\x12\x16\n" +
-	"\x06amount\x18\b \x01(\x03R\x06amount\x12#\n" +
-	"\rfilled_amount\x18\t \x01(\x03R\ffilledAmount\x129\n" +
+	"\x05price\x18\a \x01(\tR\x05price\x12\x16\n" +
+	"\x06amount\x18\b \x01(\tR\x06amount\x12#\n" +
+	"\rfilled_amount\x18\t \x01(\tR\ffilledAmount\x129\n" +
 	"\n" +
 	"created_at\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +

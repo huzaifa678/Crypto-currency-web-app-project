@@ -142,6 +142,14 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "tags": [
           "CryptoWebApp"
         ]
@@ -260,6 +268,14 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "tags": [
           "CryptoWebApp"
         ]
@@ -503,6 +519,38 @@
             "schema": {
               "$ref": "#/definitions/pbCreateTradeRequest"
             }
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
+    "/v1/trades/{marketId}": {
+      "get": {
+        "summary": "List trades",
+        "description": "List all trades",
+        "operationId": "CryptoWebApp_ListTrades",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbTradeListResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "marketId",
+            "in": "path",
+            "required": true,
+            "type": "string"
           }
         ],
         "tags": [
@@ -902,6 +950,14 @@
             }
           }
         },
+        "parameters": [
+          {
+            "name": "userEmail",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
         "tags": [
           "CryptoWebApp"
         ]
@@ -1177,16 +1233,13 @@
           "type": "string"
         },
         "price": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "amount": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "fee": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         }
       }
     },
@@ -1214,8 +1267,7 @@
           "type": "string"
         },
         "amount": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "address": {
           "type": "string"
@@ -1440,12 +1492,10 @@
           "type": "string"
         },
         "minOrderAmount": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "pricePrecision": {
-          "type": "integer",
-          "format": "int32"
+          "type": "string"
         },
         "createdAt": {
           "type": "string",
@@ -1529,12 +1579,10 @@
           "type": "string"
         },
         "minOrderAmount": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "pricePrecision": {
-          "type": "integer",
-          "format": "int32"
+          "type": "string"
         },
         "createdAt": {
           "type": "string",
@@ -1576,16 +1624,13 @@
           "$ref": "#/definitions/pbStatus"
         },
         "price": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "amount": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "filledAmount": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "createdAt": {
           "type": "string",
@@ -1681,6 +1726,18 @@
         }
       }
     },
+    "pbTradeListResponse": {
+      "type": "object",
+      "properties": {
+        "trades": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbTrades"
+          }
+        }
+      }
+    },
     "pbTrades": {
       "type": "object",
       "properties": {
@@ -1700,16 +1757,13 @@
           "type": "string"
         },
         "price": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "amount": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "fee": {
-          "type": "string",
-          "format": "int64"
+          "type": "string"
         },
         "createdAt": {
           "type": "string",

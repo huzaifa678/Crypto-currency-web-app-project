@@ -6,6 +6,10 @@ import "order.proto";
 
 option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
 
+message OrderListRequest {
+  string username = 1;
+}
+
 message OrderListResponse {
   repeated Order orders = 1;
 }

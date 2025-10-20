@@ -343,7 +343,7 @@ func TestListMarketsAPI(t *testing.T) {
     _, market2, _ := createRandomMarket()
     _, market3, _ := createRandomMarket()
 
-    markets := []db.ListMarketsRow{
+    markets := []db.ListMarketsByUsernameRow{
         {
             ID:            market1.ID,
             BaseCurrency:  market1.BaseCurrency,
@@ -379,7 +379,7 @@ func TestListMarketsAPI(t *testing.T) {
             name: "OK",
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
-                    ListMarkets(gomock.Any()).
+                    ListMarketsByUsername(gomock.Any(), market1.Username).
                     Times(1).
                     Return(markets, nil)
             },
@@ -403,7 +403,7 @@ func TestListMarketsAPI(t *testing.T) {
             name: "InternalError",
             buildStubs: func(store *mockdb.MockStore_interface) {
                 store.EXPECT().
-                    ListMarkets(gomock.Any()).
+                    ListMarketsByUsername(gomock.Any(), market1.Username).
                     Times(1).
                     Return(nil, sql.ErrConnDone)
             },

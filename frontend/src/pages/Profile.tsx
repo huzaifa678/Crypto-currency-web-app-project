@@ -122,8 +122,8 @@ const Profile: React.FC = () => {
                 <Calendar className="h-5 w-5 text-green-600" />
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">Member Since</p>
-                <p className="text-sm text-gray-500">{formatDate(user?.created_at || client?.created_at || '')}</p>
+                <p className="text-sm font-medium text-gray-900 mr-7">Member Since</p>
+                <p className="text-sm text-gray-500 mr-4">{formatDate(user?.created_at || client?.created_at || '')}</p>
               </div>
             </div>
 

@@ -2,18 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../contexts/AuthContext';
 import { useMarkets } from '../contexts/MarketContext';
-import { Search, TrendingUp, TrendingDown, ArrowUpRight, Plus } from 'lucide-react';
+import { Search, ArrowUpRight, Plus } from 'lucide-react';
 
 export interface Market {
   market_id: string;
   name: string;
   base_currency: string;
   quote_currency: string;
-  current_price: string;
-  price_change_24h: string;
-  volume_24h: string;
-  high_24h: string;
-  low_24h: string;
+  min_order_amount?: number;
+  price_precision?: number;
+  created_at?: string;
 }
 
 const Markets: React.FC = () => {
@@ -22,7 +20,7 @@ const Markets: React.FC = () => {
   const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const [sortBy, setSortBy] = useState<'name' | 'price' | 'change' | 'volume'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'base_currency' | 'quote_currency' | 'created_at'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [marketId, setMarketId] = useState('');
 
@@ -35,13 +33,25 @@ const Markets: React.FC = () => {
     const fetchMarkets = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/v1/markets');
-        console.log("Markets response:", response.data);
-        setMarket(response.data.markets || []);
-        setMarkets(response.data.markets || []);
-        setFilteredMarkets(response.data.markets || []);
+        const user = localStorage.getItem('user');
+        const username = user ? JSON.parse(user).username : '';
+        const response = await api.get('/v1/markets', {
+          params: { username: username }
+        });
 
-        console.log("market", market);
+        const normalizedMarkets = (response.data.markets || []).filter(Boolean).map((m: any) => ({
+          market_id: m.market_id,
+          name: m.name,
+          base_currency: m.base_currency,
+          quote_currency: m.quote_currency,
+          min_order_amount: parseFloat(m.min_order_amount ?? '0'),
+          price_precision: parseFloat(m.price_precision ?? '2'),
+          created_at: m.created_at,
+        }));
+
+        setMarket(normalizedMarkets);
+        setMarkets(normalizedMarkets);
+        setFilteredMarkets(normalizedMarkets);
       } catch (error) {
         console.error('Error fetching markets:', error);
       } finally {
@@ -54,7 +64,7 @@ const Markets: React.FC = () => {
 
   const fetchMarketById = async (marketId: string) => {
     try {
-      const response = await api.get(`/v1/markets/${marketId}`); 
+      const response = await api.get(`/v1/markets/${marketId}`);
       return response.data.market;
     } catch (error) {
       console.error(`Error fetching market ${marketId}:`, error);
@@ -70,7 +80,7 @@ const Markets: React.FC = () => {
     } catch (error) {
       console.error('Error deleting market:', error);
     }
-  }
+  };
 
   const createMarket = async () => {
     try {
@@ -83,7 +93,6 @@ const Markets: React.FC = () => {
 
       const response = await api.post('/v1/markets', payload);
       const newMarketId = response.data.market_id;
-
       setMarketId(newMarketId);
 
       const newMarket = await fetchMarketById(newMarketId);
@@ -96,83 +105,64 @@ const Markets: React.FC = () => {
       setQuoteCurrency('');
       setMinOrderAmount('');
       setPricePrecision(2);
-
     } catch (error) {
       console.error('Error creating market:', error);
     }
   };
 
   useEffect(() => {
-    const query = (searchTerm ?? "").toLowerCase();
+    const query = (searchTerm ?? '').toLowerCase();
 
-    const filtered = markets.filter(market =>
-      (market.name ?? "").toLowerCase().includes(query) ||
-      (market.base_currency ?? "").toLowerCase().includes(query) ||
-      (market.quote_currency ?? "").toLowerCase().includes(query)
+    const filtered = markets.filter((market) =>
+      (market.name ?? '').toLowerCase().includes(query) ||
+      (market.base_currency ?? '').toLowerCase().includes(query) ||
+      (market.quote_currency ?? '').toLowerCase().includes(query)
     );
 
     setFilteredMarkets(filtered);
   }, [searchTerm, markets]);
 
   const sortMarkets = (markets: Market[]) => {
-    return [...markets].sort((a, b) => {
-      let aValue: string | number;
-      let bValue: string | number;
+    const sorted = [...markets].sort((a, b) => {
+      let aValue: string | number = '';
+      let bValue: string | number = '';
 
       switch (sortBy) {
         case 'name':
-          aValue = a.name;
-          bValue = b.name;
+          aValue = a.name || '';
+          bValue = b.name || '';
           break;
-        case 'price':
-          aValue = parseFloat(a.current_price);
-          bValue = parseFloat(b.current_price);
+        case 'base_currency':
+          aValue = a.base_currency || '';
+          bValue = b.base_currency || '';
           break;
-        case 'change':
-          aValue = parseFloat(a.price_change_24h);
-          bValue = parseFloat(b.price_change_24h);
+        case 'quote_currency':
+          aValue = a.quote_currency || '';
+          bValue = b.quote_currency || '';
           break;
-        case 'volume':
-          aValue = parseFloat(a.volume_24h);
-          bValue = parseFloat(b.volume_24h);
+        case 'created_at':
+          aValue = new Date(a.created_at ?? 0).getTime();
+          bValue = new Date(b.created_at ?? 0).getTime();
           break;
-        default:
-          aValue = a.name;
-          bValue = b.name;
       }
 
-      if (sortOrder === 'asc') {
-        return aValue > bValue ? 1 : -1;
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        return sortOrder === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
       } else {
-        return aValue < bValue ? 1 : -1;
+        return sortOrder === 'asc'
+          ? (aValue as number) - (bValue as number)
+          : (bValue as number) - (aValue as number);
       }
     });
+
+    return sorted;
   };
 
-  const formatCurrency = (amount: string, currency: string = 'USD') => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 8
-    }).format(parseFloat(amount));
-  };
-
-  const formatVolume = (volume: string) => {
-    const num = parseFloat(volume);
-    if (num >= 1e9) {
-      return `$${(num / 1e9).toFixed(2)}B`;
-    } else if (num >= 1e6) {
-      return `$${(num / 1e6).toFixed(2)}M`;
-    } else if (num >= 1e3) {
-      return `$${(num / 1e3).toFixed(2)}K`;
-    }
-    return formatCurrency(volume);
-  };
-
-  const handleSort = (column: 'name' | 'price' | 'change' | 'volume') => {
+  const handleSort = (column: 'name' | 'base_currency' | 'quote_currency' | 'created_at') => {
     if (sortBy === column) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'));
     } else {
       setSortBy(column);
       setSortOrder('asc');
@@ -198,7 +188,7 @@ const Markets: React.FC = () => {
           </div>
           <div className="mt-4 sm:mt-0 flex space-x-2">
             <Link
-              to="/trading/btc-usd"
+              to="/trading"
               className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition-colors"
             >
               <ArrowUpRight className="h-4 w-4 mr-2" />
@@ -262,26 +252,6 @@ const Markets: React.FC = () => {
               className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
             />
           </div>
-          <div className="flex items-center space-x-4">
-            <select
-              value={`${sortBy}-${sortOrder}`}
-              onChange={(e) => {
-                const [column, order] = e.target.value.split('-');
-                setSortBy(column as any);
-                setSortOrder(order as any);
-              }}
-              className="block w-full sm:w-auto px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-            >
-              <option value="name-asc">Name (A-Z)</option>
-              <option value="name-desc">Name (Z-A)</option>
-              <option value="price-asc">Price (Low-High)</option>
-              <option value="price-desc">Price (High-Low)</option>
-              <option value="change-asc">Change (Low-High)</option>
-              <option value="change-desc">Change (High-Low)</option>
-              <option value="volume-asc">Volume (Low-High)</option>
-              <option value="volume-desc">Volume (High-Low)</option>
-            </select>
-          </div>
         </div>
       </div>
 
@@ -291,39 +261,34 @@ const Markets: React.FC = () => {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th onClick={() => handleSort('name')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">Market</th>
-                <th onClick={() => handleSort('price')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">Price</th>
-                <th onClick={() => handleSort('change')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">24h Change</th>
-                <th onClick={() => handleSort('volume')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">24h Volume</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">24h High</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">24h Low</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+                <th onClick={() => handleSort('base_currency')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                  Base
+                </th>
+                <th onClick={() => handleSort('quote_currency')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                  Quote
+                </th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                  Min Order Amount
+                </th>
+                <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                  Price Precision
+                </th>
+                <th onClick={() => handleSort('created_at')} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+                  Created At
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Action
+                </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {sortMarkets(filteredMarkets).map((market) => (
                 <tr key={market.market_id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-sm font-medium text-blue-600">{market.base_currency.charAt(0)}</span>
-                      </div>
-                      <div className="ml-4">
-                        <div className="text-sm font-medium text-gray-900">{market.name}</div>
-                        <div className="text-sm text-gray-500">{market.base_currency}/{market.quote_currency}</div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">{formatCurrency(market.current_price)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className={`flex items-center text-sm ${parseFloat(market.price_change_24h) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {parseFloat(market.price_change_24h) >= 0 ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
-                      {parseFloat(market.price_change_24h) >= 0 ? '+' : ''}{market.price_change_24h}%
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatVolume(market.volume_24h)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatCurrency(market.high_24h)}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatCurrency(market.low_24h)}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{market.base_currency}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{market.quote_currency}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{market.min_order_amount ?? '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{market.price_precision ?? '-'}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{market.created_at ? new Date(market.created_at).toLocaleString() : '-'}</td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     <button
                       className="text-red-600 hover:text-red-900 font-medium"
@@ -340,6 +305,7 @@ const Markets: React.FC = () => {
             </tbody>
           </table>
         </div>
+
         {filteredMarkets.length === 0 && (
           <div className="text-center py-12">
             <p className="text-gray-500">No markets found matching your search.</p>

@@ -9,15 +9,15 @@ interface Trade {
   buyOrderId: string;
   sellOrderId: string;
   marketId: string;
-  price: string;
-  amount: string;
-  fee: string;
+  price: number;
+  amount: number;
+  fee: number;
   createdAt: string;
 }
 
 const Trades: React.FC = () => {
   const { user } = useAuth();
-  const { order } = useOrder();
+  const { order, setOrder } = useOrder();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,16 +45,16 @@ const Trades: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await api.get("/v1/trades");
+        const res = await api.get("/v1/trades/{formData.market_id}");
         const trades = res.data.trades.map((t: any) => ({
           tradeId: t.trade_id,
           username: t.username,
           buyOrderId: t.buy_order_id,
           sellOrderId: t.sell_order_id,
           marketId: t.market_id,
-          price: t.price,
-          amount: t.amount,
-          fee: t.fee,
+          price: parseFloat(t.price),
+          amount: parseFloat(t.amount),
+          fee: parseFloat(t.fee),
           createdAt: t.created_at,
         }));
         setTrades(trades);
@@ -108,15 +108,38 @@ const Trades: React.FC = () => {
       setLoading(true);
       setError(null);
 
+      console.log("Creating trade with formData:", formData, "and order:", order);
+
+      let activeOrder = order;
+
+      if (!activeOrder) {
+        const res = await api.get('/v1/orders', {
+          params: { username: formData.username }
+        });
+
+        const orders = res.data.orders;
+        if (!orders || orders.length === 0) {
+          setError("No order available to create trade");
+          return;
+        }
+        activeOrder = orders[orders.length - 1]; 
+        setOrder(activeOrder); 
+      }
+
+      console.log("Using activeOrder for trade creation:", activeOrder);
+      console.log("Active order type", activeOrder?.type);
+
       const payload = {
         username: formData.username,
-        buy_order_id: order?.type === "BUY" ? order.id : "",
-        sell_order_id: order?.type === "SELL" ? order.id : "",
-        market_id: order?.market_id,
+        buy_order_id: activeOrder?.type === "BUY" ? activeOrder.id : '',
+        sell_order_id: activeOrder?.type === "SELL" ? activeOrder.id : '',
+        market_id: activeOrder?.market_id,
         price: formData.price,
         amount: formData.amount,
         fee: formData.fee,
       };
+
+      console.log("Payload for creating trade:", payload);
 
       const res = await api.post("/v1/trades", payload);
       const t = res.data.trade;
@@ -262,15 +285,15 @@ const Trades: React.FC = () => {
                     </td>
 
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {formatCurrency(t.price)}
+                      {formatCurrency(String(t.price))}
                     </td>
 
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {formatAmount(t.amount)}
+                      {formatAmount(String(t.amount))}
                     </td>
 
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {formatAmount(t.fee)}
+                      {formatAmount(String(t.fee))}
                     </td>
 
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

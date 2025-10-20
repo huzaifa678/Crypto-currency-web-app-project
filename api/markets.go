@@ -57,7 +57,7 @@ func (server *server) createMarket(ctx *gin.Context) {
         return
     }
 
-    ctx.JSON(http.StatusOK, gin.H{"id": market.ID})
+    ctx.JSON(http.StatusOK, gin.H{"id": market.ID, "username": market.Username})
 }
 
 func (server *server) getMarket(ctx *gin.Context) {
@@ -129,7 +129,8 @@ func (server *server) deleteMarket(ctx *gin.Context) {
 }
 
 func (server *server) listMarkets(ctx *gin.Context) {
-    markets, err := server.store.ListMarkets(ctx)
+    username := ctx.Query("username")
+    markets, err := server.store.ListMarketsByUsername(ctx, username)
     if err != nil {
         ctx.JSON(http.StatusInternalServerError, errorResponse(err))
         return

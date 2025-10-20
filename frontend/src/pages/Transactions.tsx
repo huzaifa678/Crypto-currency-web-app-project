@@ -6,7 +6,7 @@ interface Transaction {
   transactionId: string;
   type: string;
   currency: string;
-  amount: string;
+  amount: number;
   status: string;
   createdAt: string;
 }
@@ -20,14 +20,20 @@ const Transactions: React.FC = () => {
   const [formData, setFormData] = useState({
     type: "deposit",
     currency: "USD",
-    amount: "",
+    amount: "0",
     address: "",
   });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
-  ) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    let newValue: string | number = value;
+    if (name === "amount") newValue = Number(value);
+    if (name === "type") newValue = value.toUpperCase();
+    console.log("Updated formData:", { ...formData, [name]: newValue });
+    setFormData({
+      ...formData,
+      [name]: newValue,
+    });
   };
 
   const fetchTransactions = async (email?: string) => {
@@ -37,12 +43,12 @@ const Transactions: React.FC = () => {
 
       const res = await api.get(`/v1/transactions/list/${email}`); 
       const mapped = (res.data.transactions || []).map((t: any) => ({
-      transactionId: t.transaction_id,
-      type: t.type.toLowerCase(),
-      currency: t.currency,
-      amount: t.amount,
-      status: t.status.toLowerCase() || "pending",
-      createdAt: t.created_at,
+        transactionId: t.transaction_id,
+        type: t.type.toLowerCase(),
+        currency: t.currency,
+        amount: parseFloat(t.amount),
+        status: t.status.toLowerCase() || "pending",
+        createdAt: t.created_at,
       }));
 
       setTransactions(mapped);
@@ -104,7 +110,7 @@ const Transactions: React.FC = () => {
         user_email: user?.email,
         type: formData.type,
         currency: formData.currency,
-        amount: formData.amount,
+        amount: String(formData.amount),
         address: formData.address,
         tx_hash: crypto.randomUUID(),
       });
@@ -112,6 +118,7 @@ const Transactions: React.FC = () => {
       const createdTx = res.data.transaction;
 
       console.log(createdTx.transaction_id)
+      console.log(createdTx.type)
 
       await api.patch(`/v1/transactions/${createdTx.transaction_id}`, {
         status: "COMPLETED",
@@ -179,7 +186,10 @@ const Transactions: React.FC = () => {
           <select
             name="type"
             value={formData.type}
-            onChange={handleChange}
+            onChange={(e) => {
+              console.log("select changed:", e.target.value);
+              handleChange(e);
+            }}
             className="border px-3 py-2 rounded"
           >
             <option value="deposit">Deposit</option>
@@ -256,7 +266,7 @@ const Transactions: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                     {transaction.type === "deposit" ? "+" : "-"}
-                    {formatCurrency(transaction.amount, transaction.currency)}
+                    {formatCurrency(String(transaction.amount), transaction.currency)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {transaction.currency}

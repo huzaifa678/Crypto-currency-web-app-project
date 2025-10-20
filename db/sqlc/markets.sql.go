@@ -111,13 +111,14 @@ func (q *Queries) GetMarketByID(ctx context.Context, id uuid.UUID) (Market, erro
 	return i, err
 }
 
-const listMarkets = `-- name: ListMarkets :many
+const listMarketsByUsername = `-- name: ListMarketsByUsername :many
 SELECT id, base_currency, quote_currency, min_order_amount, price_precision, created_at
 FROM markets
+WHERE username = $1
 ORDER BY created_at DESC
 `
 
-type ListMarketsRow struct {
+type ListMarketsByUsernameRow struct {
 	ID             uuid.UUID       `json:"id"`
 	BaseCurrency   string          `json:"base_currency"`
 	QuoteCurrency  string          `json:"quote_currency"`
@@ -126,15 +127,15 @@ type ListMarketsRow struct {
 	CreatedAt      time.Time       `json:"created_at"`
 }
 
-func (q *Queries) ListMarkets(ctx context.Context) ([]ListMarketsRow, error) {
-	rows, err := q.db.Query(ctx, listMarkets)
+func (q *Queries) ListMarketsByUsername(ctx context.Context, username string) ([]ListMarketsByUsernameRow, error) {
+	rows, err := q.db.Query(ctx, listMarketsByUsername, username)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []ListMarketsRow
+	var items []ListMarketsByUsernameRow
 	for rows.Next() {
-		var i ListMarketsRow
+		var i ListMarketsByUsernameRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.BaseCurrency,

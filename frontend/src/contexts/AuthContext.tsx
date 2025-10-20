@@ -75,12 +75,16 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     
     if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
 
       const refreshToken = localStorage.getItem('refresh_token');
+
       if (!refreshToken) {
         localStorage.clear();
         window.location.href = '/login';
+        return Promise.reject(error);
+      }
+
+      if (originalRequest.url.includes('/v1/renew_access_token')) {
         return Promise.reject(error);
       }
 
@@ -96,10 +100,11 @@ api.interceptors.response.use(
 
         originalRequest.headers.Authorization = `Bearer ${access_token}`;
         return api(originalRequest);
-      } catch (refreshErr) {
-        localStorage.clear();
-        window.location.href = '/login';
-        return Promise.reject(refreshErr);
+      } catch (refreshErr: any) {
+          if (refreshErr.response?.status === 401) {
+            localStorage.clear();
+            window.location.href = '/login';
+          }
       }
     }
     return Promise.reject(error);

@@ -27,7 +27,7 @@ type CreateTransactionRequest struct {
 	UserEmail     string                 `protobuf:"bytes,2,opt,name=user_email,json=userEmail,proto3" json:"user_email,omitempty"`
 	Type          TransactionType        `protobuf:"varint,3,opt,name=type,proto3,enum=pb.TransactionType" json:"type,omitempty"`
 	Currency      string                 `protobuf:"bytes,4,opt,name=currency,proto3" json:"currency,omitempty"`
-	Amount        int64                  `protobuf:"varint,5,opt,name=amount,proto3" json:"amount,omitempty"`
+	Amount        string                 `protobuf:"bytes,5,opt,name=amount,proto3" json:"amount,omitempty"`
 	Address       string                 `protobuf:"bytes,6,opt,name=address,proto3" json:"address,omitempty"`
 	TxHash        string                 `protobuf:"bytes,7,opt,name=tx_hash,json=txHash,proto3" json:"tx_hash,omitempty"`
 	unknownFields protoimpl.UnknownFields
@@ -92,11 +92,11 @@ func (x *CreateTransactionRequest) GetCurrency() string {
 	return ""
 }
 
-func (x *CreateTransactionRequest) GetAmount() int64 {
+func (x *CreateTransactionRequest) GetAmount() string {
 	if x != nil {
 		return x.Amount
 	}
-	return 0
+	return ""
 }
 
 func (x *CreateTransactionRequest) GetAddress() string {
@@ -168,7 +168,7 @@ const file_rpc_create_transaction_proto_rawDesc = "" +
 	"user_email\x18\x02 \x01(\tR\tuserEmail\x12'\n" +
 	"\x04type\x18\x03 \x01(\x0e2\x13.pb.TransactionTypeR\x04type\x12\x1a\n" +
 	"\bcurrency\x18\x04 \x01(\tR\bcurrency\x12\x16\n" +
-	"\x06amount\x18\x05 \x01(\x03R\x06amount\x12\x18\n" +
+	"\x06amount\x18\x05 \x01(\tR\x06amount\x12\x18\n" +
 	"\aaddress\x18\x06 \x01(\tR\aaddress\x12\x17\n" +
 	"\atx_hash\x18\a \x01(\tR\x06txHash\"N\n" +
 	"\x19CreateTransactionResponse\x121\n" +

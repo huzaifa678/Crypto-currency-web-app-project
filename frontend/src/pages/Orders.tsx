@@ -33,7 +33,12 @@ const Orders: React.FC = () => {
     const fetchOrders = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/v1/orders');
+        const user = localStorage.getItem('user')
+        const username = user ? JSON.parse(user).username : '';
+        const response = await api.get('/v1/orders' , {
+          params: { username: username }
+        });
+        
         setOrders(response.data.orders ?? []);
         console.log('Fetched orders:', response.data.orders);
         console.log('data', response.data);
@@ -53,7 +58,6 @@ const Orders: React.FC = () => {
     console.log("Marketid ", market[0]);
     try {
       setCreating(true);
-
 
       const response = await api.post<{ order_id: string }>('/v1/orders', {
         user_email: localStorage.getItem('user')
@@ -133,7 +137,7 @@ const Orders: React.FC = () => {
         <p className="text-gray-600 mt-1">Manage your trading orders</p>
 
         {/* Create Order Form */}
-        <div className="mt-4 grid grid-cols-2 md:grid-cols-6 gap-3">
+        <div className="mt-4 grid grid-cols-2 md:grid-cols-6 gap-3 ml-10">
           <select
             value={type}
             onChange={(e) => setType(e.target.value as 'BUY' | 'SELL')}

@@ -8,9 +8,10 @@ SELECT id, username, base_currency, quote_currency, min_order_amount, price_prec
 FROM markets
 WHERE id = $1;
 
--- name: ListMarkets :many
+-- name: ListMarketsByUsername :many
 SELECT id, base_currency, quote_currency, min_order_amount, price_precision, created_at
 FROM markets
+WHERE username = $1
 ORDER BY created_at DESC;
 
 -- name: DeleteMarket :exec

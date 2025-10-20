@@ -29,9 +29,9 @@ type Trades struct {
 	BuyOrderId    string                 `protobuf:"bytes,3,opt,name=buy_order_id,json=buyOrderId,proto3" json:"buy_order_id,omitempty"`
 	SellOrderId   string                 `protobuf:"bytes,4,opt,name=sell_order_id,json=sellOrderId,proto3" json:"sell_order_id,omitempty"`
 	MarketId      string                 `protobuf:"bytes,5,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
-	Price         int64                  `protobuf:"varint,6,opt,name=price,proto3" json:"price,omitempty"`
-	Amount        int64                  `protobuf:"varint,7,opt,name=amount,proto3" json:"amount,omitempty"`
-	Fee           int64                  `protobuf:"varint,8,opt,name=fee,proto3" json:"fee,omitempty"`
+	Price         string                 `protobuf:"bytes,6,opt,name=price,proto3" json:"price,omitempty"`
+	Amount        string                 `protobuf:"bytes,7,opt,name=amount,proto3" json:"amount,omitempty"`
+	Fee           string                 `protobuf:"bytes,8,opt,name=fee,proto3" json:"fee,omitempty"`
 	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -102,25 +102,25 @@ func (x *Trades) GetMarketId() string {
 	return ""
 }
 
-func (x *Trades) GetPrice() int64 {
+func (x *Trades) GetPrice() string {
 	if x != nil {
 		return x.Price
 	}
-	return 0
+	return ""
 }
 
-func (x *Trades) GetAmount() int64 {
+func (x *Trades) GetAmount() string {
 	if x != nil {
 		return x.Amount
 	}
-	return 0
+	return ""
 }
 
-func (x *Trades) GetFee() int64 {
+func (x *Trades) GetFee() string {
 	if x != nil {
 		return x.Fee
 	}
-	return 0
+	return ""
 }
 
 func (x *Trades) GetCreatedAt() *timestamppb.Timestamp {
@@ -142,9 +142,9 @@ const file_trade_proto_rawDesc = "" +
 	"buyOrderId\x12\"\n" +
 	"\rsell_order_id\x18\x04 \x01(\tR\vsellOrderId\x12\x1b\n" +
 	"\tmarket_id\x18\x05 \x01(\tR\bmarketId\x12\x14\n" +
-	"\x05price\x18\x06 \x01(\x03R\x05price\x12\x16\n" +
-	"\x06amount\x18\a \x01(\x03R\x06amount\x12\x10\n" +
-	"\x03fee\x18\b \x01(\x03R\x03fee\x129\n" +
+	"\x05price\x18\x06 \x01(\tR\x05price\x12\x16\n" +
+	"\x06amount\x18\a \x01(\tR\x06amount\x12\x10\n" +
+	"\x03fee\x18\b \x01(\tR\x03fee\x129\n" +
 	"\n" +
 	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAtB:Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"
 

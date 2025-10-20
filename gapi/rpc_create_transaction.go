@@ -17,7 +17,11 @@ import (
 func (server *server) CreateTransaction(ctx context.Context, req *pb.CreateTransactionRequest) (*pb.CreateTransactionResponse, error) {
 	log.Println("req", req)
 
-	amount := decimal.NewFromInt(req.GetAmount()).Div(decimal.New(1, scale))
+	amount, err := decimal.NewFromString(req.GetAmount())
+
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid amount: %v", err)
+	}
 
 	violations := validateCreateTransactionRequest(req)
 
@@ -66,7 +70,13 @@ func (server *server) CreateTransaction(ctx context.Context, req *pb.CreateTrans
 }
 
 func validateCreateTransactionRequest(req *pb.CreateTransactionRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateCreateTransactionRequest(req.UserEmail, decimal.NewFromFloat(float64(req.Amount)), req.Type); err != nil {
+
+	amount, err := decimal.NewFromString(req.GetAmount())
+	if err != nil {
+		violations = append(violations, fieldViolation("amount", err))
+	}
+
+	if err := val.ValidateCreateTransactionRequest(req.UserEmail, amount, req.Type); err != nil {
 		violations = append(violations, fieldViolation("user_email", err))
 		violations = append(violations, fieldViolation("amount", err))
 		violations = append(violations, fieldViolation("type", err))

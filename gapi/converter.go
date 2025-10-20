@@ -1,6 +1,7 @@
 package gapi
 
 import (
+	"strconv"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
@@ -50,13 +51,13 @@ func convertMarket(market db.Market) *pb.Market {
 		UserName:     market.Username,
 		BaseCurrency: market.BaseCurrency,
 		QuoteCurrency: market.QuoteCurrency,
-		MinOrderAmount: market.MinOrderAmount.IntPart(),
-		PricePrecision: int32(market.PricePrecision),
+		MinOrderAmount: market.MinOrderAmount.String(),
+		PricePrecision: strconv.Itoa(int(market.PricePrecision)),
 		CreatedAt:     timestamppb.New(market.CreatedAt),
 	}
 }
 
-func convertListMarkets(markets []db.ListMarketsRow) *pb.MarketListResponse {
+func convertListMarkets(markets []db.ListMarketsByUsernameRow) *pb.MarketListResponse {
 	listMarkets := make([]*pb.ListMarket, len(markets))
 
 	for i, market := range markets {
@@ -64,8 +65,8 @@ func convertListMarkets(markets []db.ListMarketsRow) *pb.MarketListResponse {
 			MarketId:      market.ID.String(),
 			BaseCurrency:  market.BaseCurrency,
 			QuoteCurrency: market.QuoteCurrency,
-			MinOrderAmount: market.MinOrderAmount.IntPart(),
-			PricePrecision: int32(market.PricePrecision),
+			MinOrderAmount: market.MinOrderAmount.String(),
+			PricePrecision: strconv.Itoa(int(market.PricePrecision)),
 			CreatedAt:      timestamppb.New(market.CreatedAt),
 		}
 	}
@@ -83,9 +84,9 @@ func convertOrder(order db.Order) *pb.Order {
 		MarketId:     order.MarketID.String(),
 		Type:         convertOrderType(order.Type),
 		Status:       convertOrderStatus(order.Status),
-		Price:        order.Price.IntPart(),
-		Amount:       order.Amount.IntPart(),
-		FilledAmount: order.FilledAmount.IntPart(),
+		Price:        order.Price.String(),
+		Amount:       order.Amount.String(),
+		FilledAmount: order.FilledAmount.String(),
 		CreatedAt:    timestamppb.New(order.CreatedAt),
 		UpdatedAt:    timestamppb.New(order.UpdatedAt),
 	}
@@ -170,9 +171,9 @@ func convertTrade(trade db.Trade) (*pb.Trades) {
 		BuyOrderId: trade.BuyOrderID.String(),
 		SellOrderId: trade.SellOrderID.String(),
 		MarketId:   trade.MarketID.String(),
-		Price:      trade.Price.IntPart(),
-		Amount:     trade.Amount.IntPart(),
-		Fee:        trade.Fee.IntPart(),
+		Price:      trade.Price.String(),
+		Amount:     trade.Amount.String(),
+		Fee:        trade.Fee.String(),
 		CreatedAt:  timestamppb.New(trade.CreatedAt), 
 	}
 }
@@ -238,9 +239,9 @@ func convertListOrders(orders []db.Order) *pb.OrderListResponse {
 			MarketId:     order.MarketID.String(),
 			Type:         convertOrderType(order.Type),
 			Status:       convertOrderStatus(order.Status),
-			Price:        order.Price.IntPart(),
-			Amount:       order.Amount.IntPart(),
-			FilledAmount: order.FilledAmount.IntPart(),
+			Price:        order.Price.String(),
+			Amount:       order.Amount.String(),
+			FilledAmount: order.FilledAmount.String(),
 			CreatedAt:    timestamppb.New(order.CreatedAt),
 			UpdatedAt:    timestamppb.New(order.UpdatedAt),
 		}

@@ -28,8 +28,8 @@ type Market struct {
 	UserName       string                 `protobuf:"bytes,2,opt,name=user_name,json=userName,proto3" json:"user_name,omitempty"`
 	BaseCurrency   string                 `protobuf:"bytes,3,opt,name=base_currency,json=baseCurrency,proto3" json:"base_currency,omitempty"`
 	QuoteCurrency  string                 `protobuf:"bytes,4,opt,name=quote_currency,json=quoteCurrency,proto3" json:"quote_currency,omitempty"`
-	MinOrderAmount int64                  `protobuf:"varint,5,opt,name=min_order_amount,json=minOrderAmount,proto3" json:"min_order_amount,omitempty"`
-	PricePrecision int32                  `protobuf:"varint,6,opt,name=price_precision,json=pricePrecision,proto3" json:"price_precision,omitempty"`
+	MinOrderAmount string                 `protobuf:"bytes,5,opt,name=min_order_amount,json=minOrderAmount,proto3" json:"min_order_amount,omitempty"`
+	PricePrecision string                 `protobuf:"bytes,6,opt,name=price_precision,json=pricePrecision,proto3" json:"price_precision,omitempty"`
 	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -93,18 +93,18 @@ func (x *Market) GetQuoteCurrency() string {
 	return ""
 }
 
-func (x *Market) GetMinOrderAmount() int64 {
+func (x *Market) GetMinOrderAmount() string {
 	if x != nil {
 		return x.MinOrderAmount
 	}
-	return 0
+	return ""
 }
 
-func (x *Market) GetPricePrecision() int32 {
+func (x *Market) GetPricePrecision() string {
 	if x != nil {
 		return x.PricePrecision
 	}
-	return 0
+	return ""
 }
 
 func (x *Market) GetCreatedAt() *timestamppb.Timestamp {
@@ -119,8 +119,8 @@ type ListMarket struct {
 	MarketId       string                 `protobuf:"bytes,1,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
 	BaseCurrency   string                 `protobuf:"bytes,2,opt,name=base_currency,json=baseCurrency,proto3" json:"base_currency,omitempty"`
 	QuoteCurrency  string                 `protobuf:"bytes,3,opt,name=quote_currency,json=quoteCurrency,proto3" json:"quote_currency,omitempty"`
-	MinOrderAmount int64                  `protobuf:"varint,4,opt,name=min_order_amount,json=minOrderAmount,proto3" json:"min_order_amount,omitempty"`
-	PricePrecision int32                  `protobuf:"varint,5,opt,name=price_precision,json=pricePrecision,proto3" json:"price_precision,omitempty"`
+	MinOrderAmount string                 `protobuf:"bytes,4,opt,name=min_order_amount,json=minOrderAmount,proto3" json:"min_order_amount,omitempty"`
+	PricePrecision string                 `protobuf:"bytes,5,opt,name=price_precision,json=pricePrecision,proto3" json:"price_precision,omitempty"`
 	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
@@ -177,18 +177,18 @@ func (x *ListMarket) GetQuoteCurrency() string {
 	return ""
 }
 
-func (x *ListMarket) GetMinOrderAmount() int64 {
+func (x *ListMarket) GetMinOrderAmount() string {
 	if x != nil {
 		return x.MinOrderAmount
 	}
-	return 0
+	return ""
 }
 
-func (x *ListMarket) GetPricePrecision() int32 {
+func (x *ListMarket) GetPricePrecision() string {
 	if x != nil {
 		return x.PricePrecision
 	}
-	return 0
+	return ""
 }
 
 func (x *ListMarket) GetCreatedAt() *timestamppb.Timestamp {
@@ -208,8 +208,8 @@ const file_market_proto_rawDesc = "" +
 	"\tuser_name\x18\x02 \x01(\tR\buserName\x12#\n" +
 	"\rbase_currency\x18\x03 \x01(\tR\fbaseCurrency\x12%\n" +
 	"\x0equote_currency\x18\x04 \x01(\tR\rquoteCurrency\x12(\n" +
-	"\x10min_order_amount\x18\x05 \x01(\x03R\x0eminOrderAmount\x12'\n" +
-	"\x0fprice_precision\x18\x06 \x01(\x05R\x0epricePrecision\x129\n" +
+	"\x10min_order_amount\x18\x05 \x01(\tR\x0eminOrderAmount\x12'\n" +
+	"\x0fprice_precision\x18\x06 \x01(\tR\x0epricePrecision\x129\n" +
 	"\n" +
 	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"\x83\x02\n" +
 	"\n" +
@@ -217,8 +217,8 @@ const file_market_proto_rawDesc = "" +
 	"\tmarket_id\x18\x01 \x01(\tR\bmarketId\x12#\n" +
 	"\rbase_currency\x18\x02 \x01(\tR\fbaseCurrency\x12%\n" +
 	"\x0equote_currency\x18\x03 \x01(\tR\rquoteCurrency\x12(\n" +
-	"\x10min_order_amount\x18\x04 \x01(\x03R\x0eminOrderAmount\x12'\n" +
-	"\x0fprice_precision\x18\x05 \x01(\x05R\x0epricePrecision\x129\n" +
+	"\x10min_order_amount\x18\x04 \x01(\tR\x0eminOrderAmount\x12'\n" +
+	"\x0fprice_precision\x18\x05 \x01(\tR\x0epricePrecision\x129\n" +
 	"\n" +
 	"created_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAtB:Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"
 

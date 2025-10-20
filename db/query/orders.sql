@@ -17,7 +17,8 @@ WHERE id = $3;
 DELETE FROM orders
 WHERE id = $1;
 
--- name: ListOrders :many
+-- name: ListOrdersByUsername :many
 SELECT id, username, user_email, market_id, type, status, price, amount, filled_amount, created_at, updated_at
 FROM orders
+WHERE username = $1
 ORDER BY created_at DESC;

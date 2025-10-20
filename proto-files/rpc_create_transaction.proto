@@ -12,7 +12,7 @@ message CreateTransactionRequest {
   string user_email = 2;
   TransactionType type = 3;
   string currency = 4;
-  int64 amount = 5;
+  string amount = 5;
   string address = 6;
   string tx_hash = 7;
 }

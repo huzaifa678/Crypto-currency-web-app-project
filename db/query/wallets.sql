@@ -8,9 +8,10 @@ SELECT id, username, user_email, currency, balance, locked_balance, created_at
 FROM wallets
 WHERE id = $1;
 
--- name: GetWallets :many
+-- name: GetWalletsByUserEmail :many
 SELECT id, username, user_email, currency, balance, locked_balance, created_at
 FROM wallets
+WHERE user_email = $1
 ORDER BY created_at DESC;
 
 -- name: UpdateWalletBalance :exec

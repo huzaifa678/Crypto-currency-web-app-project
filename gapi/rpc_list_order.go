@@ -7,17 +7,29 @@ import (
 	pb "github.com/huzaifa678/Crypto-currency-web-app-project/pb"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 
-func (server *server) ListOrder (ctx context.Context, req *emptypb.Empty) (*pb.OrderListResponse, error) {
+func (server *server) ListOrder (ctx context.Context, req *pb.OrderListRequest) (*pb.OrderListResponse, error) {
 	log.Println("RECEIVED ListOrder request")
 
-	orders, err := server.store.ListOrders(ctx)
+	username := req.GetUsername()
+
+	authPayload, err := server.authorizeUser(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "unauthorized")
+	}
+
+	if authPayload.Username != username {
+		return nil, status.Errorf(codes.Unknown, "Not authorized")
+	}
+
+	orders, err := server.store.ListOrdersByUsername(ctx, username)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list orders: %v", err)
 	}
+
+	log.Printf("Order ID: %s, DB Type: '%s'", orders[0].ID, orders[0].Type)
 
 	pbOrders := convertListOrders(orders)
 

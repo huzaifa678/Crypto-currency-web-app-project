@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"fmt"
 	"sort"
 )
 
@@ -23,7 +24,15 @@ func (store *SQLStore) CreateTransactionForTransactionTypeTx(ctx context.Context
 
 		amount := args.CreateTransactionParams.Amount
 
-		wallets, err := q.GetWallets(ctx)
+		wallets, err := q.GetWalletsByUserEmail(ctx, args.CreateTransactionParams.UserEmail)
+
+		if err != nil {
+			fmt.Println("Error fetching wallets:", err)
+		}
+
+		if len(wallets) == 0 {
+			return fmt.Errorf("no wallets found for user email: %s", args.CreateTransactionParams.UserEmail)
+		}
 
 		sort.Slice(wallets, func(i, j int) bool {
     		return wallets[i].Balance.GreaterThan(wallets[j].Balance)
@@ -41,6 +50,13 @@ func (store *SQLStore) CreateTransactionForTransactionTypeTx(ctx context.Context
 		}
 
 		result.CreateTransactionRow, err = q.CreateTransaction(ctx, args.CreateTransactionParams)
+
+		q.UpdateWalletBalance(ctx, UpdateWalletBalanceParams{
+			Balance: result.CreateTransactionRow.Amount,
+			LockedBalance: wallets[0].LockedBalance,
+			ID: wallets[0].ID,
+
+		})
 
 		if err != nil {
 			return err

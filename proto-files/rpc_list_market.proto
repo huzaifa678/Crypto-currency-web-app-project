@@ -6,6 +6,10 @@ import "market.proto";
 
 option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
 
+message MarketListRequest {
+  string username = 1;
+}
+
 message MarketListResponse {
   repeated ListMarket markets = 1;
 }

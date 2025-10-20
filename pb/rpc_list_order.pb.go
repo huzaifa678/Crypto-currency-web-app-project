@@ -21,6 +21,50 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type OrderListRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *OrderListRequest) Reset() {
+	*x = OrderListRequest{}
+	mi := &file_rpc_list_order_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *OrderListRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*OrderListRequest) ProtoMessage() {}
+
+func (x *OrderListRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_rpc_list_order_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use OrderListRequest.ProtoReflect.Descriptor instead.
+func (*OrderListRequest) Descriptor() ([]byte, []int) {
+	return file_rpc_list_order_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *OrderListRequest) GetUsername() string {
+	if x != nil {
+		return x.Username
+	}
+	return ""
+}
+
 type OrderListResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Orders        []*Order               `protobuf:"bytes,1,rep,name=orders,proto3" json:"orders,omitempty"`
@@ -30,7 +74,7 @@ type OrderListResponse struct {
 
 func (x *OrderListResponse) Reset() {
 	*x = OrderListResponse{}
-	mi := &file_rpc_list_order_proto_msgTypes[0]
+	mi := &file_rpc_list_order_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +86,7 @@ func (x *OrderListResponse) String() string {
 func (*OrderListResponse) ProtoMessage() {}
 
 func (x *OrderListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_rpc_list_order_proto_msgTypes[0]
+	mi := &file_rpc_list_order_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +99,7 @@ func (x *OrderListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OrderListResponse.ProtoReflect.Descriptor instead.
 func (*OrderListResponse) Descriptor() ([]byte, []int) {
-	return file_rpc_list_order_proto_rawDescGZIP(), []int{0}
+	return file_rpc_list_order_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *OrderListResponse) GetOrders() []*Order {
@@ -69,7 +113,9 @@ var File_rpc_list_order_proto protoreflect.FileDescriptor
 
 const file_rpc_list_order_proto_rawDesc = "" +
 	"\n" +
-	"\x14rpc_list_order.proto\x12\x02pb\x1a\vorder.proto\"6\n" +
+	"\x14rpc_list_order.proto\x12\x02pb\x1a\vorder.proto\".\n" +
+	"\x10OrderListRequest\x12\x1a\n" +
+	"\busername\x18\x01 \x01(\tR\busername\"6\n" +
 	"\x11OrderListResponse\x12!\n" +
 	"\x06orders\x18\x01 \x03(\v2\t.pb.OrderR\x06ordersB:Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"
 
@@ -85,13 +131,14 @@ func file_rpc_list_order_proto_rawDescGZIP() []byte {
 	return file_rpc_list_order_proto_rawDescData
 }
 
-var file_rpc_list_order_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_rpc_list_order_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_rpc_list_order_proto_goTypes = []any{
-	(*OrderListResponse)(nil), // 0: pb.OrderListResponse
-	(*Order)(nil),             // 1: pb.Order
+	(*OrderListRequest)(nil),  // 0: pb.OrderListRequest
+	(*OrderListResponse)(nil), // 1: pb.OrderListResponse
+	(*Order)(nil),             // 2: pb.Order
 }
 var file_rpc_list_order_proto_depIdxs = []int32{
-	1, // 0: pb.OrderListResponse.orders:type_name -> pb.Order
+	2, // 0: pb.OrderListResponse.orders:type_name -> pb.Order
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -111,7 +158,7 @@ func file_rpc_list_order_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_rpc_list_order_proto_rawDesc), len(file_rpc_list_order_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   1,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   0,
 		},

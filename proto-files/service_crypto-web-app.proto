@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package pb;
 
-import "google/protobuf/empty.proto";
 import "rpc_create_market.proto";
 import "rpc_delete_market.proto";
 import "rpc_get_market.proto";
@@ -34,6 +33,7 @@ import "rpc_list_order.proto";
 import "rpc_google_login.proto";
 import "rpc_get_wallets.proto";
 import "rpc_renew_access_token.proto";
+import "rpc_list_trades.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -143,7 +143,7 @@ service CryptoWebApp {
         };
     }
 
-    rpc ListMarkets (google.protobuf.Empty) returns (MarketListResponse) {
+    rpc ListMarkets (MarketListRequest) returns (MarketListResponse) {
         option (google.api.http) = {
             get: "/v1/markets"
         };
@@ -200,7 +200,7 @@ service CryptoWebApp {
         };
     }
 
-    rpc ListOrder (google.protobuf.Empty) returns (OrderListResponse) {
+    rpc ListOrder (OrderListRequest) returns (OrderListResponse) {
         option (google.api.http) = {
             get: "/v1/orders"
         };
@@ -257,7 +257,7 @@ service CryptoWebApp {
         };
     }
 
-    rpc GetWallets (google.protobuf.Empty) returns (GetWalletsResponse) {
+    rpc GetWallets (GetWalletsRequest) returns (GetWalletsResponse) {
         option (google.api.http) = {
             get: "/v1/wallets"
         };
@@ -325,6 +325,18 @@ service CryptoWebApp {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Delete trade by the trade id"
             summary: "Delete trade"
+        };
+    }
+
+    rpc ListTrades(TradeListRequest) returns (TradeListResponse) {
+
+        option (google.api.http) = {
+            get: "/v1/trades/{market_id}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "List all trades"
+            summary: "List trades"
         };
     }
 

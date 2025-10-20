@@ -103,14 +103,15 @@ func (q *Queries) GetOrderByID(ctx context.Context, id uuid.UUID) (Order, error)
 	return i, err
 }
 
-const listOrders = `-- name: ListOrders :many
+const listOrdersByUsername = `-- name: ListOrdersByUsername :many
 SELECT id, username, user_email, market_id, type, status, price, amount, filled_amount, created_at, updated_at
 FROM orders
+WHERE username = $1
 ORDER BY created_at DESC
 `
 
-func (q *Queries) ListOrders(ctx context.Context) ([]Order, error) {
-	rows, err := q.db.Query(ctx, listOrders)
+func (q *Queries) ListOrdersByUsername(ctx context.Context, username string) ([]Order, error) {
+	rows, err := q.db.Query(ctx, listOrdersByUsername, username)
 	if err != nil {
 		return nil, err
 	}

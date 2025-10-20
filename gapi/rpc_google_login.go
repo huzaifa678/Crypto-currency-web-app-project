@@ -60,6 +60,7 @@ func (server *server) GoogleLogin(ctx context.Context, req *pb.GoogleLoginReques
         	    Email:     user.Email,
         	    PasswordHash: password,
         	    Role: db.UserRole(user.Role.String),
+                IsVerified: user.CreatedAt.Valid,
     	    })
         }
 
@@ -95,6 +96,7 @@ func (server *server) GoogleLogin(ctx context.Context, req *pb.GoogleLoginReques
             Email:    user.Email,
             Username: user.Username,
             Role:     user.Role.String,
+            CreatedAt: timestamppb.New(user.CreatedAt.Time),
         },
         AccessTokenExpiresAt:  timestamppb.New(accessPayload.ExpiredAt),
         RefreshTokenExpiresAt: timestamppb.New(refreshPayload.ExpiredAt),
