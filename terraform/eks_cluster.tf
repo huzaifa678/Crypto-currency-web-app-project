@@ -142,7 +142,7 @@ resource "aws_launch_template" "eks_nodes" {
 
   image_id = data.aws_ssm_parameter.eks_al2023_ami.value
 
-  user_data = base64encode(file("${path.module}/user_data.tpl", {
+  user_data = base64encode(templatefile("${path.module}/user_data.tpl", {
     cluster_name     = aws_eks_cluster.eks_cluster.name
     cluster_endpoint = data.aws_eks_cluster.this.endpoint
     cluster_ca       = data.aws_eks_cluster.this.certificate_authority[0].data
