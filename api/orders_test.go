@@ -257,7 +257,7 @@ func TestGetOrderAPI(t *testing.T) {
 }
 
 func TestDeleteOrderAPI(t *testing.T) {
-    trade, _ := createRandomTrade()
+    trade, _, getTrade := createRandomTrade()
 
     testCases := []struct {
         name          string
@@ -273,7 +273,7 @@ func TestDeleteOrderAPI(t *testing.T) {
                 store.EXPECT().
                     GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
                     Times(1).
-                    Return(trade, nil)
+                    Return(getTrade, nil)
 
 				store.EXPECT().
                     DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
@@ -294,7 +294,7 @@ func TestDeleteOrderAPI(t *testing.T) {
                 store.EXPECT().
                     GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
                     Times(1).
-                    Return(trade, sql.ErrNoRows)
+                    Return(getTrade, sql.ErrNoRows)
 
 				store.EXPECT().
                     DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
@@ -333,7 +333,7 @@ func TestDeleteOrderAPI(t *testing.T) {
                 store.EXPECT().
                     GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
                     Times(1).
-                    Return(trade, nil)
+                    Return(getTrade, nil)
 
 				store.EXPECT().
                     DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).

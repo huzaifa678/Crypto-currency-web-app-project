@@ -103,6 +103,44 @@ func (q *Queries) GetOrderByID(ctx context.Context, id uuid.UUID) (Order, error)
 	return i, err
 }
 
+const listOrdersByMarketID = `-- name: ListOrdersByMarketID :many
+SELECT id, username, user_email, market_id, type, status, price, amount, filled_amount, created_at, updated_at
+FROM orders
+WHERE market_id = $1
+`
+
+func (q *Queries) ListOrdersByMarketID(ctx context.Context, marketID uuid.UUID) ([]Order, error) {
+	rows, err := q.db.Query(ctx, listOrdersByMarketID, marketID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Order
+	for rows.Next() {
+		var i Order
+		if err := rows.Scan(
+			&i.ID,
+			&i.Username,
+			&i.UserEmail,
+			&i.MarketID,
+			&i.Type,
+			&i.Status,
+			&i.Price,
+			&i.Amount,
+			&i.FilledAmount,
+			&i.CreatedAt,
+			&i.UpdatedAt,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const listOrdersByUsername = `-- name: ListOrdersByUsername :many
 SELECT id, username, user_email, market_id, type, status, price, amount, filled_amount, created_at, updated_at
 FROM orders

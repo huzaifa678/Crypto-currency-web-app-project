@@ -72,34 +72,6 @@ const Transactions: React.FC = () => {
     return () => clearInterval(interval);
   }, [user?.email]);
 
-  const fetchTransactionById = async (id: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-      const res = await api.get(`/v1/transactions/${id}`);
-      const t = res.data.transaction;
-
-      if (t) {
-      const mapped = {
-        transactionId: t.transaction_id,
-        type: t.type,
-        currency: t.currency,
-        amount: t.amount,
-        status: t.status || "pending",
-        createdAt: t.created_at,
-      };
-
-      setTransactions((prev) => [...prev, mapped]);
-    }
-
-    } catch (err) {
-      console.error("Error fetching transaction:", err);
-      setError("Failed to fetch transaction");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const createTransaction = async () => {
     try {
       setLoading(true);
@@ -288,13 +260,6 @@ const Transactions: React.FC = () => {
                     {formatDate(transaction.createdAt)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm">
-                    <button
-                      onClick={() => fetchTransactionById(transaction.transactionId)}
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                        Fetch
-                    </button>
-
                     <button
                       onClick={() => deleteTransaction(transaction.transactionId)}
                       className="text-red-600 hover:text-red-800"

@@ -70,6 +70,8 @@ func TestCreateTrade(t *testing.T) {
 
 	tradeArgs := CreateTradeParams{
 		Username:    market.Username,
+		BuyerUserEmail: buyer.Email,
+		SellerUserEmail: seller.Email,
 		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID:    market.ID,
@@ -146,6 +148,8 @@ func TestDeleteTrade(t *testing.T) {
 
 	tradeArgs := CreateTradeParams{
 		Username:    market.Username,
+		BuyerUserEmail: buyer.Email,
+		SellerUserEmail: seller.Email,
 		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID:    market.ID,
@@ -220,6 +224,8 @@ func TestGetTradeById(t *testing.T) {
 
 	tradeArgs := CreateTradeParams{
 		Username:    market.Username,
+		BuyerUserEmail: buyer.Email,
+		SellerUserEmail: seller.Email,
 		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID:    market.ID,
@@ -297,6 +303,8 @@ func TestGetTradeByMarketID(t *testing.T) {
 
 	tradeArgs := CreateTradeParams{
 		Username:    market.Username,
+		BuyerUserEmail: buyer.Email,
+		SellerUserEmail: seller.Email,
 		BuyOrderID:  buyOrder.ID,
 		SellOrderID: sellOrder.ID,
 		MarketID:    market.ID,

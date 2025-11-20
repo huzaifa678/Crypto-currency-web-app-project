@@ -493,10 +493,10 @@ func (mr *MockStore_interfaceMockRecorder) GetSession(arg0, arg1 interface{}) *g
 }
 
 // GetTradeByID mocks base method.
-func (m *MockStore_interface) GetTradeByID(arg0 context.Context, arg1 uuid.UUID) (db.Trade, error) {
+func (m *MockStore_interface) GetTradeByID(arg0 context.Context, arg1 uuid.UUID) (db.GetTradeByIDRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTradeByID", arg0, arg1)
-	ret0, _ := ret[0].(db.Trade)
+	ret0, _ := ret[0].(db.GetTradeByIDRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -508,10 +508,10 @@ func (mr *MockStore_interfaceMockRecorder) GetTradeByID(arg0, arg1 interface{}) 
 }
 
 // GetTradesByMarketID mocks base method.
-func (m *MockStore_interface) GetTradesByMarketID(arg0 context.Context, arg1 uuid.UUID) ([]db.Trade, error) {
+func (m *MockStore_interface) GetTradesByMarketID(arg0 context.Context, arg1 uuid.UUID) ([]db.GetTradesByMarketIDRow, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetTradesByMarketID", arg0, arg1)
-	ret0, _ := ret[0].([]db.Trade)
+	ret0, _ := ret[0].([]db.GetTradesByMarketIDRow)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -627,6 +627,21 @@ func (mr *MockStore_interfaceMockRecorder) ListMarketsByUsername(arg0, arg1 inte
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListMarketsByUsername", reflect.TypeOf((*MockStore_interface)(nil).ListMarketsByUsername), arg0, arg1)
 }
 
+// ListOrdersByMarketID mocks base method.
+func (m *MockStore_interface) ListOrdersByMarketID(arg0 context.Context, arg1 uuid.UUID) ([]db.Order, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListOrdersByMarketID", arg0, arg1)
+	ret0, _ := ret[0].([]db.Order)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListOrdersByMarketID indicates an expected call of ListOrdersByMarketID.
+func (mr *MockStore_interfaceMockRecorder) ListOrdersByMarketID(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListOrdersByMarketID", reflect.TypeOf((*MockStore_interface)(nil).ListOrdersByMarketID), arg0, arg1)
+}
+
 // ListOrdersByUsername mocks base method.
 func (m *MockStore_interface) ListOrdersByUsername(arg0 context.Context, arg1 string) ([]db.Order, error) {
 	m.ctrl.T.Helper()
@@ -640,6 +655,20 @@ func (m *MockStore_interface) ListOrdersByUsername(arg0 context.Context, arg1 st
 func (mr *MockStore_interfaceMockRecorder) ListOrdersByUsername(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListOrdersByUsername", reflect.TypeOf((*MockStore_interface)(nil).ListOrdersByUsername), arg0, arg1)
+}
+
+// OrderForCurrencyTx mocks base method.
+func (m *MockStore_interface) OrderForCurrencyTx(arg0 context.Context, arg1 db.OrderForCurrencyTxParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "OrderForCurrencyTx", arg0, arg1)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// OrderForCurrencyTx indicates an expected call of OrderForCurrencyTx.
+func (mr *MockStore_interfaceMockRecorder) OrderForCurrencyTx(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "OrderForCurrencyTx", reflect.TypeOf((*MockStore_interface)(nil).OrderForCurrencyTx), arg0, arg1)
 }
 
 // UpdateOrderStatusAndFilledAmount mocks base method.

@@ -26,12 +26,16 @@ const Layout: React.FC = () => {
 
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Markets', href: '/markets', icon: TrendingUp },
+      ...(user?.role === 'admin'
+      ? [{ name: 'Markets', href: '/markets', icon: TrendingUp }]
+    : []),
     { name: 'Orders', href: '/orders', icon: BarChart3 },
     { name: 'Wallet', href: '/wallet', icon: Wallet },
     { name: 'Transactions', href: '/transactions', icon: FileText },
     { name: 'Profile', href: '/profile', icon: User },
+    { name: 'Trading', href: '/trading', icon: TrendingUp },
     { name: 'WebSocket', href: '/websocket', icon: TrendingUp },
+
   ];
 
   return (

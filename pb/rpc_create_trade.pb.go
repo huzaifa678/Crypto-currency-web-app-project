@@ -22,16 +22,18 @@ const (
 )
 
 type CreateTradeRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Username      string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	BuyOrderId    string                 `protobuf:"bytes,2,opt,name=buy_order_id,json=buyOrderId,proto3" json:"buy_order_id,omitempty"`
-	SellOrderId   string                 `protobuf:"bytes,3,opt,name=sell_order_id,json=sellOrderId,proto3" json:"sell_order_id,omitempty"`
-	MarketId      string                 `protobuf:"bytes,4,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
-	Price         string                 `protobuf:"bytes,5,opt,name=price,proto3" json:"price,omitempty"`
-	Amount        string                 `protobuf:"bytes,6,opt,name=amount,proto3" json:"amount,omitempty"`
-	Fee           string                 `protobuf:"bytes,7,opt,name=fee,proto3" json:"fee,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Username        string                 `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
+	BuyerUserEmail  string                 `protobuf:"bytes,2,opt,name=buyer_user_email,json=buyerUserEmail,proto3" json:"buyer_user_email,omitempty"`
+	SellerUserEmail string                 `protobuf:"bytes,3,opt,name=seller_user_email,json=sellerUserEmail,proto3" json:"seller_user_email,omitempty"`
+	BuyOrderId      string                 `protobuf:"bytes,4,opt,name=buy_order_id,json=buyOrderId,proto3" json:"buy_order_id,omitempty"`
+	SellOrderId     string                 `protobuf:"bytes,5,opt,name=sell_order_id,json=sellOrderId,proto3" json:"sell_order_id,omitempty"`
+	MarketId        string                 `protobuf:"bytes,6,opt,name=market_id,json=marketId,proto3" json:"market_id,omitempty"`
+	Price           string                 `protobuf:"bytes,7,opt,name=price,proto3" json:"price,omitempty"`
+	Amount          string                 `protobuf:"bytes,8,opt,name=amount,proto3" json:"amount,omitempty"`
+	Fee             string                 `protobuf:"bytes,9,opt,name=fee,proto3" json:"fee,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
 }
 
 func (x *CreateTradeRequest) Reset() {
@@ -67,6 +69,20 @@ func (*CreateTradeRequest) Descriptor() ([]byte, []int) {
 func (x *CreateTradeRequest) GetUsername() string {
 	if x != nil {
 		return x.Username
+	}
+	return ""
+}
+
+func (x *CreateTradeRequest) GetBuyerUserEmail() string {
+	if x != nil {
+		return x.BuyerUserEmail
+	}
+	return ""
+}
+
+func (x *CreateTradeRequest) GetSellerUserEmail() string {
+	if x != nil {
+		return x.SellerUserEmail
 	}
 	return ""
 }
@@ -161,16 +177,18 @@ var File_rpc_create_trade_proto protoreflect.FileDescriptor
 
 const file_rpc_create_trade_proto_rawDesc = "" +
 	"\n" +
-	"\x16rpc_create_trade.proto\x12\x02pb\x1a\vtrade.proto\"\xd3\x01\n" +
+	"\x16rpc_create_trade.proto\x12\x02pb\x1a\vtrade.proto\"\xa9\x02\n" +
 	"\x12CreateTradeRequest\x12\x1a\n" +
-	"\busername\x18\x01 \x01(\tR\busername\x12 \n" +
-	"\fbuy_order_id\x18\x02 \x01(\tR\n" +
+	"\busername\x18\x01 \x01(\tR\busername\x12(\n" +
+	"\x10buyer_user_email\x18\x02 \x01(\tR\x0ebuyerUserEmail\x12*\n" +
+	"\x11seller_user_email\x18\x03 \x01(\tR\x0fsellerUserEmail\x12 \n" +
+	"\fbuy_order_id\x18\x04 \x01(\tR\n" +
 	"buyOrderId\x12\"\n" +
-	"\rsell_order_id\x18\x03 \x01(\tR\vsellOrderId\x12\x1b\n" +
-	"\tmarket_id\x18\x04 \x01(\tR\bmarketId\x12\x14\n" +
-	"\x05price\x18\x05 \x01(\tR\x05price\x12\x16\n" +
-	"\x06amount\x18\x06 \x01(\tR\x06amount\x12\x10\n" +
-	"\x03fee\x18\a \x01(\tR\x03fee\"7\n" +
+	"\rsell_order_id\x18\x05 \x01(\tR\vsellOrderId\x12\x1b\n" +
+	"\tmarket_id\x18\x06 \x01(\tR\bmarketId\x12\x14\n" +
+	"\x05price\x18\a \x01(\tR\x05price\x12\x16\n" +
+	"\x06amount\x18\b \x01(\tR\x06amount\x12\x10\n" +
+	"\x03fee\x18\t \x01(\tR\x03fee\"7\n" +
 	"\x13CreateTradeResponse\x12 \n" +
 	"\x05trade\x18\x01 \x01(\v2\n" +
 	".pb.TradesR\x05tradeB:Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"

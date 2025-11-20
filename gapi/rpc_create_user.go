@@ -18,6 +18,7 @@ import (
 
 func (server *server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.CreateUserResponse, error) {
 	log.Println("CreateUser called with request:", req)
+	log.Println("role", req.GetRole())
 	violations := validateCreateUserRequest(req)
 	if violations != nil {
 		return nil, invalidArgumentError(violations)

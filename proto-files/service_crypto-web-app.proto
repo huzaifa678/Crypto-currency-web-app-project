@@ -34,6 +34,8 @@ import "rpc_google_login.proto";
 import "rpc_get_wallets.proto";
 import "rpc_renew_access_token.proto";
 import "rpc_list_trades.proto";
+import "rpc_get_market_by_currencies.proto";
+import "rpc_get_order_by_market_id.proto";
 import "google/api/annotations.proto";
 import "protoc-gen-openapiv2/options/annotations.proto";
 
@@ -154,6 +156,17 @@ service CryptoWebApp {
         };
     }
 
+    rpc GetMarketByCurrencies (GetMarketByCurrenciesRequest) returns (GetMarketByCurrenciesResponse) {
+        option (google.api.http) = {
+            get: "/v1/markets_by_currencies"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Get market by base and quote currencies";
+            summary: "Get a market by currencies";
+        };
+    }
+
     rpc CreateOrder (CreateOrderRequest) returns (CreateOrderResponse) {
         option (google.api.http) = {
             post: "/v1/orders"
@@ -185,6 +198,17 @@ service CryptoWebApp {
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
             description: "Get order details by order ID";
             summary: "Get order";
+        };
+    }
+
+    rpc GetOrderByMarketID (GetOrderByMarketIDRequest) returns (GetOrderByMarketIDResponse) {
+        option (google.api.http) = {
+            get: "/v1/orders_by_market/{market_id}"
+        };
+
+        option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {
+            description: "Get orders by market ID";
+            summary: "Get orders by market ID";
         };
     }
 
@@ -331,7 +355,7 @@ service CryptoWebApp {
     rpc ListTrades(TradeListRequest) returns (TradeListResponse) {
 
         option (google.api.http) = {
-            get: "/v1/trades/{market_id}"
+            get: "/v1/trades/all/{market_id}"
         };
 
         option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_operation) = {

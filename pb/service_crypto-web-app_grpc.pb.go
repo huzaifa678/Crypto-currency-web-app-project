@@ -28,9 +28,11 @@ const (
 	CryptoWebApp_DeleteMarket_FullMethodName               = "/pb.CryptoWebApp/DeleteMarket"
 	CryptoWebApp_GetMarket_FullMethodName                  = "/pb.CryptoWebApp/GetMarket"
 	CryptoWebApp_ListMarkets_FullMethodName                = "/pb.CryptoWebApp/ListMarkets"
+	CryptoWebApp_GetMarketByCurrencies_FullMethodName      = "/pb.CryptoWebApp/GetMarketByCurrencies"
 	CryptoWebApp_CreateOrder_FullMethodName                = "/pb.CryptoWebApp/CreateOrder"
 	CryptoWebApp_DeleteOrder_FullMethodName                = "/pb.CryptoWebApp/DeleteOrder"
 	CryptoWebApp_GetOrder_FullMethodName                   = "/pb.CryptoWebApp/GetOrder"
+	CryptoWebApp_GetOrderByMarketID_FullMethodName         = "/pb.CryptoWebApp/GetOrderByMarketID"
 	CryptoWebApp_UpdateOrder_FullMethodName                = "/pb.CryptoWebApp/UpdateOrder"
 	CryptoWebApp_ListOrder_FullMethodName                  = "/pb.CryptoWebApp/ListOrder"
 	CryptoWebApp_CreateWallet_FullMethodName               = "/pb.CryptoWebApp/CreateWallet"
@@ -66,9 +68,11 @@ type CryptoWebAppClient interface {
 	DeleteMarket(ctx context.Context, in *DeleteMarketRequest, opts ...grpc.CallOption) (*DeleteMarketResponse, error)
 	GetMarket(ctx context.Context, in *GetMarketRequest, opts ...grpc.CallOption) (*GetMarketResponse, error)
 	ListMarkets(ctx context.Context, in *MarketListRequest, opts ...grpc.CallOption) (*MarketListResponse, error)
+	GetMarketByCurrencies(ctx context.Context, in *GetMarketByCurrenciesRequest, opts ...grpc.CallOption) (*GetMarketByCurrenciesResponse, error)
 	CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error)
 	DeleteOrder(ctx context.Context, in *DeleteOrderRequest, opts ...grpc.CallOption) (*DeleteOrderResponse, error)
 	GetOrder(ctx context.Context, in *GetOrderRequest, opts ...grpc.CallOption) (*GetOrderResponse, error)
+	GetOrderByMarketID(ctx context.Context, in *GetOrderByMarketIDRequest, opts ...grpc.CallOption) (*GetOrderByMarketIDResponse, error)
 	UpdateOrder(ctx context.Context, in *UpdateOrderStatusAndFilledAmountRequest, opts ...grpc.CallOption) (*UpdateOrderStatusAndFilledAmountResponse, error)
 	ListOrder(ctx context.Context, in *OrderListRequest, opts ...grpc.CallOption) (*OrderListResponse, error)
 	CreateWallet(ctx context.Context, in *CreateWalletRequest, opts ...grpc.CallOption) (*CreateWalletResponse, error)
@@ -189,6 +193,16 @@ func (c *cryptoWebAppClient) ListMarkets(ctx context.Context, in *MarketListRequ
 	return out, nil
 }
 
+func (c *cryptoWebAppClient) GetMarketByCurrencies(ctx context.Context, in *GetMarketByCurrenciesRequest, opts ...grpc.CallOption) (*GetMarketByCurrenciesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMarketByCurrenciesResponse)
+	err := c.cc.Invoke(ctx, CryptoWebApp_GetMarketByCurrencies_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *cryptoWebAppClient) CreateOrder(ctx context.Context, in *CreateOrderRequest, opts ...grpc.CallOption) (*CreateOrderResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateOrderResponse)
@@ -213,6 +227,16 @@ func (c *cryptoWebAppClient) GetOrder(ctx context.Context, in *GetOrderRequest, 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(GetOrderResponse)
 	err := c.cc.Invoke(ctx, CryptoWebApp_GetOrder_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *cryptoWebAppClient) GetOrderByMarketID(ctx context.Context, in *GetOrderByMarketIDRequest, opts ...grpc.CallOption) (*GetOrderByMarketIDResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetOrderByMarketIDResponse)
+	err := c.cc.Invoke(ctx, CryptoWebApp_GetOrderByMarketID_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -441,9 +465,11 @@ type CryptoWebAppServer interface {
 	DeleteMarket(context.Context, *DeleteMarketRequest) (*DeleteMarketResponse, error)
 	GetMarket(context.Context, *GetMarketRequest) (*GetMarketResponse, error)
 	ListMarkets(context.Context, *MarketListRequest) (*MarketListResponse, error)
+	GetMarketByCurrencies(context.Context, *GetMarketByCurrenciesRequest) (*GetMarketByCurrenciesResponse, error)
 	CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error)
 	DeleteOrder(context.Context, *DeleteOrderRequest) (*DeleteOrderResponse, error)
 	GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error)
+	GetOrderByMarketID(context.Context, *GetOrderByMarketIDRequest) (*GetOrderByMarketIDResponse, error)
 	UpdateOrder(context.Context, *UpdateOrderStatusAndFilledAmountRequest) (*UpdateOrderStatusAndFilledAmountResponse, error)
 	ListOrder(context.Context, *OrderListRequest) (*OrderListResponse, error)
 	CreateWallet(context.Context, *CreateWalletRequest) (*CreateWalletResponse, error)
@@ -501,6 +527,9 @@ func (UnimplementedCryptoWebAppServer) GetMarket(context.Context, *GetMarketRequ
 func (UnimplementedCryptoWebAppServer) ListMarkets(context.Context, *MarketListRequest) (*MarketListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListMarkets not implemented")
 }
+func (UnimplementedCryptoWebAppServer) GetMarketByCurrencies(context.Context, *GetMarketByCurrenciesRequest) (*GetMarketByCurrenciesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMarketByCurrencies not implemented")
+}
 func (UnimplementedCryptoWebAppServer) CreateOrder(context.Context, *CreateOrderRequest) (*CreateOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateOrder not implemented")
 }
@@ -509,6 +538,9 @@ func (UnimplementedCryptoWebAppServer) DeleteOrder(context.Context, *DeleteOrder
 }
 func (UnimplementedCryptoWebAppServer) GetOrder(context.Context, *GetOrderRequest) (*GetOrderResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetOrder not implemented")
+}
+func (UnimplementedCryptoWebAppServer) GetOrderByMarketID(context.Context, *GetOrderByMarketIDRequest) (*GetOrderByMarketIDResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetOrderByMarketID not implemented")
 }
 func (UnimplementedCryptoWebAppServer) UpdateOrder(context.Context, *UpdateOrderStatusAndFilledAmountRequest) (*UpdateOrderStatusAndFilledAmountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateOrder not implemented")
@@ -753,6 +785,24 @@ func _CryptoWebApp_ListMarkets_Handler(srv interface{}, ctx context.Context, dec
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CryptoWebApp_GetMarketByCurrencies_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMarketByCurrenciesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CryptoWebAppServer).GetMarketByCurrencies(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CryptoWebApp_GetMarketByCurrencies_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CryptoWebAppServer).GetMarketByCurrencies(ctx, req.(*GetMarketByCurrenciesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _CryptoWebApp_CreateOrder_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateOrderRequest)
 	if err := dec(in); err != nil {
@@ -803,6 +853,24 @@ func _CryptoWebApp_GetOrder_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CryptoWebAppServer).GetOrder(ctx, req.(*GetOrderRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CryptoWebApp_GetOrderByMarketID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetOrderByMarketIDRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CryptoWebAppServer).GetOrderByMarketID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CryptoWebApp_GetOrderByMarketID_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CryptoWebAppServer).GetOrderByMarketID(ctx, req.(*GetOrderByMarketIDRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1204,6 +1272,10 @@ var CryptoWebApp_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CryptoWebApp_ListMarkets_Handler,
 		},
 		{
+			MethodName: "GetMarketByCurrencies",
+			Handler:    _CryptoWebApp_GetMarketByCurrencies_Handler,
+		},
+		{
 			MethodName: "CreateOrder",
 			Handler:    _CryptoWebApp_CreateOrder_Handler,
 		},
@@ -1214,6 +1286,10 @@ var CryptoWebApp_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetOrder",
 			Handler:    _CryptoWebApp_GetOrder_Handler,
+		},
+		{
+			MethodName: "GetOrderByMarketID",
+			Handler:    _CryptoWebApp_GetOrderByMarketID_Handler,
 		},
 		{
 			MethodName: "UpdateOrder",

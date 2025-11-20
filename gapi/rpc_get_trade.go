@@ -45,7 +45,7 @@ func (server *server) GetTrade(ctx context.Context, req *pb.GetTradeByIDRequest)
 		return nil, status.Errorf(codes.Unknown, "Not authorized")
 	}
 
-	convertToPb := convertTrade(trade)
+	convertToPb := convertTradeFromGetTradeByIDRow(trade)
 
 	res := &pb.GetTradeByIDResponse{
 		Trade: convertToPb,

@@ -31,12 +31,12 @@ func (store *SQLStore) CreateTradeTx(ctx context.Context, arg CreateTradeTxParam
 		fee := trade.Fee
 		total := amount.Mul(price)
 
-		buyerWallets, err := q.GetWalletsByUserEmail(ctx, trade.Username)
+		buyerWallets, err := q.GetWalletsByUserEmail(ctx, trade.BuyerUserEmail)
 		if err != nil || len(buyerWallets) == 0 {
-			return fmt.Errorf("buyer wallets not found for %s: %w", trade.Username, err)
+			return fmt.Errorf("buyer wallets not found for %s: %w", trade.BuyerUserEmail, err)
 		}
 
-		sellerWallets, err := q.GetWalletsByUserEmail(ctx, trade.Username) // replace later with seller's email
+		sellerWallets, err := q.GetWalletsByUserEmail(ctx, trade.SellerUserEmail) // replace later with seller's email
 		if err != nil || len(sellerWallets) == 0 {
 			return fmt.Errorf("seller wallets not found: %w", err)
 		}

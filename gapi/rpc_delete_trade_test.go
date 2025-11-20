@@ -3,6 +3,8 @@ package gapi
 import (
 	"context"
 	"database/sql"
+	"fmt"
+	"math/rand"
 	"testing"
 	"time"
 
@@ -20,7 +22,7 @@ import (
 
 func TestDeleteTradeRPC(t *testing.T) {
 
-	trade, _ := createRandomTrade()
+	trade, _, getTrade := createRandomTrade()
 
 	testCases := []struct {
 		name          string
@@ -41,7 +43,7 @@ func TestDeleteTradeRPC(t *testing.T) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
-					Return(trade, nil)
+					Return(getTrade, nil)
 
 				store.EXPECT().
 					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
@@ -114,7 +116,7 @@ func TestDeleteTradeRPC(t *testing.T) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
-					Return(db.Trade{}, db.ErrRecordNotFound)
+					Return(db.GetTradeByIDRow{}, db.ErrRecordNotFound)
 
 				store.EXPECT().
 					DeleteTrade(gomock.Any(), gomock.Any()).
@@ -139,7 +141,7 @@ func TestDeleteTradeRPC(t *testing.T) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
-					Return(trade, nil)
+					Return(getTrade, nil)
 
 				store.EXPECT().
 					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
@@ -174,13 +176,17 @@ func TestDeleteTradeRPC(t *testing.T) {
 	}
 }
 
-func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams) {
+func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams, getTradeParams db.GetTradeByIDRow) {
 
+	BuyerUserEmail := fmt.Sprintf("testing%d@buyer.com", rand.Intn(1000))
+	SellerUserEmail := fmt.Sprintf("testing%d@seller.com", rand.Intn(1000))
 	_, sellOrder, _, _ := createRandomOrder()
 	_, BuyOrder, _, _ := createRandomOrder()
 	_, market, _ := createRandomMarket()
 
 	createTradeParams = db.CreateTradeParams {
+		BuyerUserEmail: BuyerUserEmail,
+		SellerUserEmail: SellerUserEmail,
 		BuyOrderID: BuyOrder.ID,
     	SellOrderID: sellOrder.ID,   
     	MarketID:    market.ID,      
@@ -200,5 +206,16 @@ func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams
 		CreatedAt:   time.Now(),
 	}
 
-	return Trade, createTradeParams
+	getTrade := db.GetTradeByIDRow {
+		ID: Trade.ID,
+		BuyOrderID: Trade.BuyOrderID,
+		SellOrderID: Trade.SellOrderID,
+		MarketID: Trade.MarketID,
+		Price: Trade.Price,
+		Amount: Trade.Amount,
+		Fee: Trade.Fee,
+		CreatedAt: Trade.CreatedAt,
+	}
+
+	return Trade, createTradeParams, getTrade
 }

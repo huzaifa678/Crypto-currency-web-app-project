@@ -17,7 +17,7 @@ import (
 )
 
 func TestCreateTradeRPC(t *testing.T) {
-	trade, createTradeParams := createRandomTrade()
+	trade, createTradeParams, _ := createRandomTrade()
 
 	testCases := []struct {
 		name          string
@@ -29,6 +29,8 @@ func TestCreateTradeRPC(t *testing.T) {
 		{
 			name: "OK",
 			req: &pb.CreateTradeRequest{
+				BuyerUserEmail: createTradeParams.BuyerUserEmail,
+				SellerUserEmail: createTradeParams.SellerUserEmail,
 				BuyOrderId:  createTradeParams.BuyOrderID.String(),
 				SellOrderId: createTradeParams.SellOrderID.String(),
 				MarketId:    createTradeParams.MarketID.String(),
@@ -59,6 +61,8 @@ func TestCreateTradeRPC(t *testing.T) {
 		{
 			name: "Unauthorized",
 			req: &pb.CreateTradeRequest{
+				BuyerUserEmail: createTradeParams.BuyerUserEmail,
+				SellerUserEmail: createTradeParams.SellerUserEmail,
 				BuyOrderId:  createTradeParams.BuyOrderID.String(),
 				SellOrderId: createTradeParams.SellOrderID.String(),
 				MarketId:    createTradeParams.MarketID.String(),
@@ -84,6 +88,8 @@ func TestCreateTradeRPC(t *testing.T) {
 		{
 			name: "InvalidBuyOrderID",
 			req: &pb.CreateTradeRequest{
+				BuyerUserEmail: createTradeParams.BuyerUserEmail,
+				SellerUserEmail: createTradeParams.SellerUserEmail,
 				BuyOrderId:  "invalid-uuid",
 				SellOrderId: createTradeParams.SellOrderID.String(),
 				MarketId:    createTradeParams.MarketID.String(),
@@ -110,6 +116,8 @@ func TestCreateTradeRPC(t *testing.T) {
 		{
 			name: "InternalError",
 			req: &pb.CreateTradeRequest{
+				BuyerUserEmail: createTradeParams.BuyerUserEmail,
+				SellerUserEmail: createTradeParams.SellerUserEmail,
 				BuyOrderId:  createTradeParams.BuyOrderID.String(),
 				SellOrderId: createTradeParams.SellOrderID.String(),
 				MarketId:    createTradeParams.MarketID.String(),

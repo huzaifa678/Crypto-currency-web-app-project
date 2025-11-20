@@ -29,8 +29,6 @@ func (server *server) ListOrder (ctx context.Context, req *pb.OrderListRequest) 
 		return nil, status.Errorf(codes.Internal, "failed to list orders: %v", err)
 	}
 
-	log.Printf("Order ID: %s, DB Type: '%s'", orders[0].ID, orders[0].Type)
-
 	pbOrders := convertListOrders(orders)
 
 	res := &pb.OrderListResponse{

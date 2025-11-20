@@ -1,6 +1,7 @@
 package gapi
 
 import (
+	"log"
 	"strconv"
 
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
@@ -104,10 +105,11 @@ func convertWallet(wallet db.Wallet) *pb.Wallet {
 }
 
 func convertUserRole(role db.UserRole) pb.UserRole {
+	log.Printf("convertUserRole input: %q, matches db.UserRoleAdmin? %v", role, role == db.UserRoleAdmin)
     switch role {
-    	case db.UserRoleAdmin:
+    	case "USER_ROLE_ADMIN":
         	return pb.UserRole_USER_ROLE_ADMIN
-   		case db.UserRoleUser:
+   		case "USER_ROLE_USER":
         	return pb.UserRole_USER_ROLE_USER
     	default:
         	return pb.UserRole_USER_ROLE_USER 
@@ -178,6 +180,20 @@ func convertTrade(trade db.Trade) (*pb.Trades) {
 	}
 }
 
+func convertTradeFromGetTradeByIDRow(trade db.GetTradeByIDRow) (*pb.Trades) {
+	return &pb.Trades{
+		TradeId:     trade.ID.String(),
+		Username:   trade.Username,
+		BuyOrderId: trade.BuyOrderID.String(),
+		SellOrderId: trade.SellOrderID.String(),
+		MarketId:   trade.MarketID.String(),
+		Price:      trade.Price.String(),
+		Amount:     trade.Amount.String(),
+		Fee:        trade.Fee.String(),
+		CreatedAt:  timestamppb.New(trade.CreatedAt), 
+	}
+}
+
 func convertTransaction(transaction db.Transaction) (*pb.Transaction) {
 	return &pb.Transaction{
 		TransactionId: transaction.ID.String(),
@@ -191,6 +207,25 @@ func convertTransaction(transaction db.Transaction) (*pb.Transaction) {
 		TxHash: transaction.TxHash,
 		CreatedAt: timestamppb.New(transaction.CreatedAt),
 	}
+}
+
+func convertListTrades(trades []db.GetTradesByMarketIDRow) []*pb.Trades {
+	var pbTrades []*pb.Trades
+	for _, trade := range trades {
+		pbTrade := &pb.Trades{
+			TradeId:     trade.ID.String(),
+			Username:   trade.Username,
+			BuyOrderId: trade.BuyOrderID.String(),
+			SellOrderId: trade.SellOrderID.String(),
+			MarketId:   trade.MarketID.String(),
+			Price:      trade.Price.String(),
+			Amount:     trade.Amount.String(),
+			Fee:        trade.Fee.String(),
+			CreatedAt:  timestamppb.New(trade.CreatedAt), 
+		}
+		pbTrades = append(pbTrades, pbTrade)
+	}
+	return pbTrades
 }
 
 func convertTransactionList(transactions []db.Transaction) ([] *pb.Transaction) {

@@ -47,6 +47,11 @@ func TestCreateOrderRPC(t *testing.T) {
 			buildStubs: func(store *mockdb.MockStore_interface) {
 
 				store.EXPECT().
+					OrderForCurrencyTx(gomock.Any(), gomock.Any()).
+					Return(nil).
+					Times(1)
+
+				store.EXPECT().
 					CreateOrder(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(ctx context.Context, arg db.CreateOrderParams) (db.Order, error) {
 						require.Equal(t, createOrderParams.UserEmail, arg.UserEmail)
@@ -77,6 +82,11 @@ func TestCreateOrderRPC(t *testing.T) {
 				return context.Background()
 			},
 			buildStubs: func(store *mockdb.MockStore_interface) {
+
+				store.EXPECT().
+					OrderForCurrencyTx(gomock.Any(), gomock.Any()).
+					Times(0)
+
 				store.EXPECT().
 					CreateOrder(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -102,6 +112,11 @@ func TestCreateOrderRPC(t *testing.T) {
                 return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
             },
 			buildStubs: func(store *mockdb.MockStore_interface) {
+
+				store.EXPECT().
+					OrderForCurrencyTx(gomock.Any(), gomock.Any()).
+					Times(0)
+
 				store.EXPECT().
 					CreateOrder(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -153,6 +168,12 @@ func TestCreateOrderRPC(t *testing.T) {
                 return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
             },
 			buildStubs: func(store *mockdb.MockStore_interface) {
+
+				store.EXPECT().
+					OrderForCurrencyTx(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(nil)
+
 				store.EXPECT().
 					CreateOrder(gomock.Any(), gomock.Any()).
 					Times(1).

@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pb;
+
+import "market.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message GetMarketByCurrenciesRequest {
+  string username = 1;
+  string base_currency = 2;
+  string quote_currency = 3;
+}
+
+message GetMarketByCurrenciesResponse {
+  Market market = 1;
+}
+

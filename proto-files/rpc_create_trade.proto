@@ -8,12 +8,14 @@ option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
 
 message CreateTradeRequest {
   string username = 1;
-  string buy_order_id = 2;
-  string sell_order_id = 3;
-  string market_id = 4;
-  string price = 5;
-  string amount = 6;
-  string fee = 7;
+  string buyer_user_email = 2;
+  string seller_user_email = 3;
+  string buy_order_id = 4;
+  string sell_order_id = 5;
+  string market_id = 6;
+  string price = 7;
+  string amount = 8;
+  string fee = 9;
 }
 
 message CreateTradeResponse {

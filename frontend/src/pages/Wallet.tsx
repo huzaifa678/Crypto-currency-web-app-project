@@ -31,11 +31,11 @@ const WalletPage: React.FC = () => {
         const res = await api.get<{ wallets: WalletResponse[] }>('/v1/wallets', {
           params: { user_email: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).email : '' }
         });
-        const normalized = (res.data.wallets || []).filter(Boolean).map(w => ({
-          id: w.id,
-          currency: w.currency,
-          balance: parseFloat(w.balance ?? "0"),
-          locked_balance: parseFloat(w.locked_balance ?? "0")
+        const normalized = (res.data.wallets || []).filter(Boolean).map((w: WalletResponse) => ({
+            id: w.id,
+            currency: w.currency,
+            balance: parseFloat(w.balance?.toString() ?? "0"),
+            locked_balance: parseFloat(w.locked_balance?.toString() ?? "0")
         }));
         setWallets(normalized);
         console.log(res.data.wallets);

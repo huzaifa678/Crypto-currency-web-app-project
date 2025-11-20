@@ -127,8 +127,8 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_creator_admin" {
   role       = aws_iam_role.eks_cluster_role.name
 }
 
-data "aws_ssm_parameter" "eks_al2_ami" {
-  name = "/aws/service/eks/optimized-ami/1.31/amazon-linux-2/recommended/image_id"
+data "aws_ssm_parameter" "eks_al2023_ami" {
+  name = "/aws/service/eks/optimized-ami/1.32/amazon-linux-2023/x86_64/standard/recommended/image_id"
 }
 
 resource "aws_launch_template" "eks_nodes" {
@@ -140,9 +140,14 @@ resource "aws_launch_template" "eks_nodes" {
     aws_eks_cluster.eks_cluster.vpc_config[0].cluster_security_group_id
   ]
 
-  image_id = data.aws_ssm_parameter.eks_al2_ami.value
+  image_id = data.aws_ssm_parameter.eks_al2023_ami.value
 
-  user_data = base64encode(file("${path.module}/user_data.sh"))
+  user_data = base64encode(file("${path.module}/user_data.tpl", {
+    cluster_name     = aws_eks_cluster.eks_cluster.name
+    cluster_endpoint = data.aws_eks_cluster.this.endpoint
+    cluster_ca       = data.aws_eks_cluster.this.certificate_authority[0].data
+    cidr             = "10.100.0.0/16"
+  }))
 
   tag_specifications {
     resource_type = "instance"

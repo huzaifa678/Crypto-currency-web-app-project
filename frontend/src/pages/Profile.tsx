@@ -43,7 +43,7 @@ const Profile: React.FC = () => {
             </button>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} data-testid="profile-form" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -87,6 +87,7 @@ const Profile: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsEditing(false)}
+                  data-testid="cancel-edit-btn"
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50"
                 >
                   Cancel
@@ -113,7 +114,7 @@ const Profile: React.FC = () => {
               </div>
               <div className="ml-3">
                 <p className="text-sm font-medium text-gray-900">Role</p>
-                <p className="text-sm text-gray-500 capitalize">{user?.role}</p>
+                <p className="text-sm text-gray-500 capitalize">{user?.role || client?.role}</p>
               </div>
             </div>
 

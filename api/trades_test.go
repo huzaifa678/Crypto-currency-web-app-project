@@ -22,7 +22,7 @@ import (
 )
 
 func TestCreateTradeAPI(t *testing.T) {
-	trade, createTradeParams := createRandomTrade()
+	trade, createTradeParams, _ := createRandomTrade()
 
 	testCases := []struct {
 		name          string
@@ -131,7 +131,7 @@ func TestCreateTradeAPI(t *testing.T) {
 }
 
 func TestGetTradeAPI(t *testing.T) {
-	trade, _ := createRandomTrade()
+	trade, _, getTrade := createRandomTrade()
 
 	testCases := []struct {
 		name          string
@@ -150,7 +150,7 @@ func TestGetTradeAPI(t *testing.T) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
-					Return(trade, nil)
+					Return(getTrade, nil)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
@@ -167,7 +167,7 @@ func TestGetTradeAPI(t *testing.T) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
-					Return(trade, sql.ErrNoRows)
+					Return(getTrade, sql.ErrNoRows)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusNotFound, recorder.Code)
@@ -198,7 +198,7 @@ func TestGetTradeAPI(t *testing.T) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
-					Return(trade, sql.ErrConnDone)
+					Return(getTrade, sql.ErrConnDone)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusInternalServerError, recorder.Code)
@@ -232,7 +232,7 @@ func TestGetTradeAPI(t *testing.T) {
 }
 
 func TestDeleteTradeAPI(t *testing.T) {
-    trade, _ := createRandomTrade()
+    trade, _, getTrade := createRandomTrade()
 
     testCases := []struct {
         name          string
@@ -248,7 +248,7 @@ func TestDeleteTradeAPI(t *testing.T) {
                 store.EXPECT().
                     GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
                     Times(1).
-                    Return(trade, nil)
+                    Return(getTrade, nil)
 				
 				store.EXPECT().
                     DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
@@ -269,7 +269,7 @@ func TestDeleteTradeAPI(t *testing.T) {
                 store.EXPECT().
                     GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
                     Times(1).
-                    Return(db.Trade{}, sql.ErrNoRows)
+                    Return(getTrade, sql.ErrNoRows)
 				
 				store.EXPECT().
                     DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
@@ -308,7 +308,7 @@ func TestDeleteTradeAPI(t *testing.T) {
                 store.EXPECT().
                     GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
                     Times(1).
-                    Return(trade, nil)
+                    Return(getTrade, nil)
 
 					store.EXPECT().
                     DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
@@ -352,7 +352,7 @@ func TestListTradesByMarketIDAPI(t *testing.T) {
 	marketID := uuid.New()
 	trade1 := createRandomTradeWithMarketID(marketID)
 	trade2 := createRandomTradeWithMarketID(marketID)
-	trades := []db.Trade{trade1, trade2}
+	trades := []db.GetTradesByMarketIDRow{trade1, trade2}
 
 	testCases := []struct {
 		name          string
@@ -394,11 +394,11 @@ func TestListTradesByMarketIDAPI(t *testing.T) {
 				store.EXPECT().
 					GetTradesByMarketID(gomock.Any(), gomock.Eq(marketID)).
 					Times(1).
-					Return([]db.Trade{}, nil)
+					Return([]db.GetTradesByMarketIDRow{}, nil)
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)
-				requireBodyMatchTradesList(t, recorder.Body, []db.Trade{})
+				requireBodyMatchTradesList(t, recorder.Body, []db.GetTradesByMarketIDRow{})
 			},
 		},
 	}
@@ -455,7 +455,7 @@ func requireBodyMatchTradeForGet(t *testing.T, body *bytes.Buffer, trade db.Trad
 	require.WithinDuration(t, trade.CreatedAt, gotTrade.CreatedAt, time.Second)
 }
 
-func requireBodyMatchTradesList(t *testing.T, body *bytes.Buffer, trades []db.Trade) {
+func requireBodyMatchTradesList(t *testing.T, body *bytes.Buffer, trades []db.GetTradesByMarketIDRow) {
 	data, err := io.ReadAll(body)
 	require.NoError(t, err)
 
@@ -466,6 +466,7 @@ func requireBodyMatchTradesList(t *testing.T, body *bytes.Buffer, trades []db.Tr
 	require.Equal(t, len(trades), len(gotTrades))
 	for i := range trades {
 		require.Equal(t, trades[i].ID, gotTrades[i].ID)
+		require.Equal(t, trades[i].Username, gotTrades[i].Username)
 		require.Equal(t, trades[i].BuyOrderID, gotTrades[i].BuyOrderID)
 		require.Equal(t, trades[i].SellOrderID, gotTrades[i].SellOrderID)
 		require.Equal(t, trades[i].MarketID, gotTrades[i].MarketID)
@@ -476,7 +477,7 @@ func requireBodyMatchTradesList(t *testing.T, body *bytes.Buffer, trades []db.Tr
 	}
 }
 
-func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams) {
+func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams, getTradeParams db.GetTradeByIDRow) {
 
 	_, sellOrder, _, _ := createRandomOrder()
 	_, BuyOrder, _, _ := createRandomOrder()
@@ -502,13 +503,33 @@ func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams
 		CreatedAt:   time.Now(),
 	}
 
-	return Trade, createTradeParams
+	getTrade := db.GetTradeByIDRow {
+		ID: Trade.ID,
+		BuyOrderID: Trade.BuyOrderID,
+		SellOrderID: Trade.SellOrderID,   
+		MarketID:    Trade.MarketID,
+		Price:       Trade.Price,
+		Amount:      Trade.Amount,
+		Fee:         Trade.Fee,
+		CreatedAt:   Trade.CreatedAt,
+
+	}
+
+	return Trade, createTradeParams, getTrade
 }
 
-func createRandomTradeWithMarketID(marketID uuid.UUID) db.Trade {
-	trade, _ := createRandomTrade()
-	trade.MarketID = marketID
-	return trade
+func createRandomTradeWithMarketID(marketID uuid.UUID) db.GetTradesByMarketIDRow {
+    return db.GetTradesByMarketIDRow{
+        ID:          uuid.New(),
+        Username:    fmt.Sprintf("user-%s", uuid.New().String()),
+        BuyOrderID:  uuid.New(),
+        SellOrderID: uuid.New(),
+        MarketID:    marketID,
+        Price:       decimal.NewFromFloat(0.5),
+        Amount:      decimal.NewFromFloat(0.0),
+        Fee:         decimal.NewFromFloat(0.1),
+        CreatedAt:   time.Now(),
+    }
 }
 
 

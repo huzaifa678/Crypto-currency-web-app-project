@@ -169,7 +169,16 @@ func ValidateUpdateWalletRequest(walletID string, balance, lockedBalance decimal
 	return validateDecimal(lockedBalance)
 }
 
-func ValidateCreateTradeRequest(buyOrderId, sellOrderId, marketID string, price, amount, fee decimal.Decimal) error {
+func ValidateCreateTradeRequest(BuyerUserEmail, SellerUserEmail, buyOrderId, sellOrderId, marketID string, price, amount, fee decimal.Decimal) error {
+
+	if err := ValidateEmail(BuyerUserEmail); err != nil {
+		return err
+	}
+
+	if err := ValidateEmail(SellerUserEmail); err != nil {
+		return err
+	}
+
 	if err := ValidateString(buyOrderId, 1, 50); err != nil {
 		return err
 	}

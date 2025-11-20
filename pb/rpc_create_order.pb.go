@@ -29,6 +29,8 @@ type CreateOrderRequest struct {
 	Status        Status                 `protobuf:"varint,4,opt,name=status,proto3,enum=pb.Status" json:"status,omitempty"`
 	Price         int64                  `protobuf:"varint,5,opt,name=price,proto3" json:"price,omitempty"`
 	Amount        int64                  `protobuf:"varint,6,opt,name=amount,proto3" json:"amount,omitempty"`
+	BaseCurrency  string                 `protobuf:"bytes,7,opt,name=base_currency,json=baseCurrency,proto3" json:"base_currency,omitempty"`
+	QuoteCurrency string                 `protobuf:"bytes,8,opt,name=quote_currency,json=quoteCurrency,proto3" json:"quote_currency,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -105,6 +107,20 @@ func (x *CreateOrderRequest) GetAmount() int64 {
 	return 0
 }
 
+func (x *CreateOrderRequest) GetBaseCurrency() string {
+	if x != nil {
+		return x.BaseCurrency
+	}
+	return ""
+}
+
+func (x *CreateOrderRequest) GetQuoteCurrency() string {
+	if x != nil {
+		return x.QuoteCurrency
+	}
+	return ""
+}
+
 type CreateOrderResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	OrderId       string                 `protobuf:"bytes,1,opt,name=order_id,json=orderId,proto3" json:"order_id,omitempty"`
@@ -153,7 +169,7 @@ var File_rpc_create_order_proto protoreflect.FileDescriptor
 
 const file_rpc_create_order_proto_rawDesc = "" +
 	"\n" +
-	"\x16rpc_create_order.proto\x12\x02pb\x1a\vorder.proto\"\xc5\x01\n" +
+	"\x16rpc_create_order.proto\x12\x02pb\x1a\vorder.proto\"\x91\x02\n" +
 	"\x12CreateOrderRequest\x12\x1d\n" +
 	"\n" +
 	"user_email\x18\x01 \x01(\tR\tuserEmail\x12\x1b\n" +
@@ -162,7 +178,9 @@ const file_rpc_create_order_proto_rawDesc = "" +
 	"\x06status\x18\x04 \x01(\x0e2\n" +
 	".pb.StatusR\x06status\x12\x14\n" +
 	"\x05price\x18\x05 \x01(\x03R\x05price\x12\x16\n" +
-	"\x06amount\x18\x06 \x01(\x03R\x06amount\"0\n" +
+	"\x06amount\x18\x06 \x01(\x03R\x06amount\x12#\n" +
+	"\rbase_currency\x18\a \x01(\tR\fbaseCurrency\x12%\n" +
+	"\x0equote_currency\x18\b \x01(\tR\rquoteCurrency\"0\n" +
 	"\x13CreateOrderResponse\x12\x19\n" +
 	"\border_id\x18\x01 \x01(\tR\aorderIdB:Z8github.com/huzaifa678/Crypto-currency-web-app-project/pbb\x06proto3"
 

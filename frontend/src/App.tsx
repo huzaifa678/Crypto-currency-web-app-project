@@ -14,8 +14,8 @@ import Wallet from './pages/Wallet';
 import Transactions from './pages/Transactions';
 import Profile from './pages/Profile';
 import MarketsTable from './pages/websocket';
-import './App.css';
 import { OrderProvider } from './contexts/OrderContext';
+import "./index.css";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -28,11 +28,24 @@ const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   return isAuthenticated ? <Navigate to="/dashboard" replace /> : <>{children}</>;
 };
 
+const AdminRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isAuthenticated, user } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (user?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return <>{children}</>;
+};
+
 function App() {
   return (
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID || ''}>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ''}>
       <AuthProvider>
-        <Router>
           <div className="App">
             <Toaster 
               position="top-right"
@@ -63,7 +76,13 @@ function App() {
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="websocket" element={<MarketsTable />} />
-                <Route path="markets" element={<MarketsProvider> <Markets /> </MarketsProvider>} />
+                <Route path="markets" element={
+                  <AdminRoute>
+                    <MarketsProvider> 
+                      <Markets /> 
+                    </MarketsProvider>
+                  </AdminRoute>
+                } />
                 <Route path="trading" element={<OrderProvider> <Trading /> </OrderProvider>} />
                 <Route path="orders" element={
                   <MarketsProvider>
@@ -77,7 +96,6 @@ function App() {
               </Route>
             </Routes>
           </div>
-        </Router>
       </AuthProvider>
     </GoogleOAuthProvider>
   );

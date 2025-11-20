@@ -21,6 +21,10 @@ var scale int32 = 8
 func (server *server) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
 	log.Println("RECEIVED CreateOrder request:", req)
 
+	userEmail := req.GetUserEmail()
+	baseCurrency := req.GetBaseCurrency()
+	quoteCurrency := req.GetQuoteCurrency()
+
 	price := decimal.NewFromInt(req.GetPrice()).Div(decimal.New(1, scale))
 
 	amount := decimal.NewFromInt(req.GetAmount()).Div(decimal.New(1, scale))
@@ -38,6 +42,16 @@ func (server *server) CreateOrder(ctx context.Context, req *pb.CreateOrderReques
 	marketID, err := uuid.Parse(req.GetMarketId())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid market ID: %v", err)
+	}
+
+	err = server.store.OrderForCurrencyTx(ctx, db.OrderForCurrencyTxParams{
+		UserEmail:     userEmail,
+		BaseCurrency:  baseCurrency,
+		QuoteCurrency: quoteCurrency,
+	})
+
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "user cannot place order for the given currencies: %v", err)
 	}
 
 	pbType := strings.ToLower(req.GetType().String())

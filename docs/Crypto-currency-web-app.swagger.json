@@ -249,6 +249,50 @@
         ]
       }
     },
+    "/v1/markets_by_currencies": {
+      "get": {
+        "summary": "Get a market by currencies",
+        "description": "Get market by base and quote currencies",
+        "operationId": "CryptoWebApp_GetMarketByCurrencies",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetMarketByCurrenciesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "baseCurrency",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "quoteCurrency",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
     "/v1/orders": {
       "get": {
         "summary": "List orders",
@@ -413,6 +457,38 @@
         ]
       }
     },
+    "/v1/orders_by_market/{marketId}": {
+      "get": {
+        "summary": "Get orders by market ID",
+        "description": "Get orders by market ID",
+        "operationId": "CryptoWebApp_GetOrderByMarketID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/pbGetOrderByMarketIDResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "marketId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "CryptoWebApp"
+        ]
+      }
+    },
     "/v1/renew_access_token": {
       "post": {
         "summary": "Renew Access Token",
@@ -526,7 +602,7 @@
         ]
       }
     },
-    "/v1/trades/{marketId}": {
+    "/v1/trades/all/{marketId}": {
       "get": {
         "summary": "List trades",
         "description": "List all trades",
@@ -1206,6 +1282,12 @@
         "amount": {
           "type": "string",
           "format": "int64"
+        },
+        "baseCurrency": {
+          "type": "string"
+        },
+        "quoteCurrency": {
+          "type": "string"
         }
       }
     },
@@ -1221,6 +1303,12 @@
       "type": "object",
       "properties": {
         "username": {
+          "type": "string"
+        },
+        "buyerUserEmail": {
+          "type": "string"
+        },
+        "sellerUserEmail": {
           "type": "string"
         },
         "buyOrderId": {
@@ -1377,11 +1465,31 @@
         }
       }
     },
+    "pbGetMarketByCurrenciesResponse": {
+      "type": "object",
+      "properties": {
+        "market": {
+          "$ref": "#/definitions/pbMarket"
+        }
+      }
+    },
     "pbGetMarketResponse": {
       "type": "object",
       "properties": {
         "market": {
           "$ref": "#/definitions/pbMarket"
+        }
+      }
+    },
+    "pbGetOrderByMarketIDResponse": {
+      "type": "object",
+      "properties": {
+        "orders": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/pbOrder"
+          }
         }
       }
     },

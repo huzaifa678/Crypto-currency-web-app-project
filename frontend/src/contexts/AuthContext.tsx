@@ -39,7 +39,7 @@ interface GoogleLoginResponse {
   refresh_token_expires_at : string;
 }
 
-interface AuthContextType {
+export interface AuthContextType {
   user: User | null;
   client: Client | null;
   isAuthenticated: boolean;
@@ -60,6 +60,28 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+const normalizeRole = (role: string) => {
+  switch(role) {
+    case 'USER_ROLE_ADMIN':
+      return 'admin';
+    case 'USER_ROLE_USER':
+      return 'user';
+    default:
+      return 'user';
+  }
+};
+
+const roleMapping = (role: string) => {
+  switch(role) {
+    case 'admin':
+      return 0;
+    case 'user':
+      return 1;
+    default:
+      return 1;
+  }
+}
 
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token');
@@ -120,6 +142,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const initializeAuth = () => {
       const storedUser = localStorage.getItem('user');
       const token = localStorage.getItem('access_token');
+
+      if (storedUser && token) {
+        const parsedUser = JSON.parse(storedUser);
+        parsedUser.role = normalizeRole(parsedUser.role); // normalize on load
+        setUser(parsedUser);
+      }
       
       if (storedUser && token) {
         try {
@@ -147,11 +175,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       const { access_token, refresh_token, user: userData } = response.data;
 
+      userData.role = normalizeRole(userData.role);
+
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('refresh_token', refresh_token);
       localStorage.setItem('user', JSON.stringify(userData));
 
+      console.log("userDataRole", userData.role);
+
       setUser(userData);
+
       toast.success('Login successful!');
     } catch (error: any) {
       const message = error.response?.data?.error || 'Login failed';
@@ -210,11 +243,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (username: string, email: string, password: string, role: string) => {
     try {
       setLoading(true);
+
+      console.log('Registering user with:', { username, email, role });
+
       await api.post('/v1/create_user', {
         username,
         email,
         password,
-        role,
+        role: roleMapping(role),
       });
 
       toast.success('Registration successful! Please login.');

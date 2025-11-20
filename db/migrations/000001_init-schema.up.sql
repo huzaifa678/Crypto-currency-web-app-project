@@ -57,6 +57,8 @@ CREATE TABLE orders (
 CREATE TABLE trades (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     username VARCHAR(150) NOT NULL REFERENCES users(username) ON DELETE CASCADE,
+    buyer_user_email VARCHAR(255) NOT NULL REFERENCES users(email) ON DELETE CASCADE,
+    seller_user_email VARCHAR(255) NOT NULL REFERENCES users(email) ON DELETE CASCADE,
     buy_order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     sell_order_id UUID NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
     market_id UUID NOT NULL REFERENCES markets(id) ON DELETE CASCADE,

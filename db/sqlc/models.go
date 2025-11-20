@@ -298,15 +298,17 @@ type Session struct {
 }
 
 type Trade struct {
-	ID          uuid.UUID       `json:"id"`
-	Username    string          `json:"username"`
-	BuyOrderID  uuid.UUID       `json:"buy_order_id"`
-	SellOrderID uuid.UUID       `json:"sell_order_id"`
-	MarketID    uuid.UUID       `json:"market_id"`
-	Price       decimal.Decimal `json:"price"`
-	Amount      decimal.Decimal `json:"amount"`
-	Fee         decimal.Decimal `json:"fee"`
-	CreatedAt   time.Time       `json:"created_at"`
+	ID              uuid.UUID       `json:"id"`
+	Username        string          `json:"username"`
+	BuyerUserEmail  string          `json:"buyer_user_email"`
+	SellerUserEmail string          `json:"seller_user_email"`
+	BuyOrderID      uuid.UUID       `json:"buy_order_id"`
+	SellOrderID     uuid.UUID       `json:"sell_order_id"`
+	MarketID        uuid.UUID       `json:"market_id"`
+	Price           decimal.Decimal `json:"price"`
+	Amount          decimal.Decimal `json:"amount"`
+	Fee             decimal.Decimal `json:"fee"`
+	CreatedAt       time.Time       `json:"created_at"`
 }
 
 type Transaction struct {

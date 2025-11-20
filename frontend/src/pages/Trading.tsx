@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { useAuth, api } from "../contexts/AuthContext";
 import { useOrder } from '../contexts/OrderContext';
+import { Order } from "../pages/Orders";
 
 interface Trade {
   tradeId: string;
@@ -17,20 +18,26 @@ interface Trade {
 
 const Trades: React.FC = () => {
   const { user } = useAuth();
-  const { order, setOrder } = useOrder();
+  const { orders, setOrders } = useOrder();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(false);
+  const [baseCurrency, setBaseCurrency] = useState("");
+  const [quoteCurrency, setQuoteCurrency] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [marketId, setMarketId] = useState("");
 
   const [formData, setFormData] = useState({
     username: "",
+    email: "",
     buy_order_id: "",
     sell_order_id: "",
-    market_id: "BTC-USDT",
+    base_currency: "",
+    quote_currency: "",
     price: "",
     amount: "",
     fee: "0.001",
     side: "buy" as "buy" | "sell",
+    counterparty_email: "",
   });
 
   useEffect(() => {
@@ -45,7 +52,9 @@ const Trades: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const res = await api.get("/v1/trades/{formData.market_id}");
+        const storedMarketId = localStorage.getItem("marketId");
+        if (storedMarketId === "") return;
+        const res = await api.get(`/v1/trades/all/${storedMarketId}`);
         const trades = res.data.trades.map((t: any) => ({
           tradeId: t.trade_id,
           username: t.username,
@@ -67,7 +76,7 @@ const Trades: React.FC = () => {
     };
 
     fetchTrades();
-  }, []);
+  }, [marketId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -108,32 +117,83 @@ const Trades: React.FC = () => {
       setLoading(true);
       setError(null);
 
-      console.log("Creating trade with formData:", formData, "and order:", order);
+      console.log("Creating trade with formData:", formData, "and order:", orders);
 
-      let activeOrder = order;
+      let currentOrders = orders;
+      let groupedByMarket: Record<string, Order[]> = {};
 
-      if (!activeOrder) {
-        const res = await api.get('/v1/orders', {
-          params: { username: formData.username }
+      const userData = localStorage.getItem('user');
+      const username = userData ? JSON.parse(userData).username : '';
+
+      if (!currentOrders || currentOrders.length === 0) {
+        const marketRes = await api.get<{market: { market_id: string } }>('/v1/markets_by_currencies', {
+          params: {
+            username : username,
+            base_currency: formData.base_currency,
+            quote_currency: formData.quote_currency,
+          }
         });
+
+        const marketId = marketRes.data.market.market_id;
+
+        const res = await api.get(`/v1/orders_by_market/${marketId}`)
 
         const orders = res.data.orders;
         if (!orders || orders.length === 0) {
           setError("No order available to create trade");
           return;
         }
-        activeOrder = orders[orders.length - 1]; 
-        setOrder(activeOrder); 
+
+        const fetchedOrders: Order[] = orders || [];
+        const filtered = fetchedOrders.filter(o => o.status !== "CANCELLED");
+
+        setOrders(filtered);
+        currentOrders = filtered;
+
       }
 
-      console.log("Using activeOrder for trade creation:", activeOrder);
-      console.log("Active order type", activeOrder?.type);
+
+      groupedByMarket = currentOrders.reduce((acc, o) => {
+        if (!acc[o.market_id]) acc[o.market_id] = [];
+        acc[o.market_id].push(o);
+        return acc;
+      }, {} as Record<string, Order[]>);
+
+      const marketId = currentOrders[0]?.market_id;
+      const marketOrders = groupedByMarket[marketId] || [];
+
+      console.log("marketId", marketId)
+      console.log("orders for market", marketOrders)
+
+      const buyOrder = marketOrders.find(o => o.type.toUpperCase() === "BUY");
+      const sellOrder = marketOrders.find(o => o.type.toUpperCase() === "SELL");
+
+      console.log("buyer order", buyOrder)
+      console.log("seller order", sellOrder)
+
+      if (!buyOrder || !sellOrder) {
+        setError("No matching BUY/SELL orders found for this market");
+        return;
+      }
+
+      let buyerEmail = "";
+      let sellerEmail = "";
+
+      if (formData.side === "buy") {
+        buyerEmail = user?.email || "";
+        sellerEmail = formData.counterparty_email;
+      } else {
+        sellerEmail = user?.email || "";
+        buyerEmail = formData.counterparty_email;
+      }
 
       const payload = {
         username: formData.username,
-        buy_order_id: activeOrder?.type === "BUY" ? activeOrder.id : '',
-        sell_order_id: activeOrder?.type === "SELL" ? activeOrder.id : '',
-        market_id: activeOrder?.market_id,
+        buyer_user_email: buyerEmail,
+        seller_user_email: sellerEmail,
+        buy_order_id: buyOrder?.id,
+        sell_order_id: sellOrder?.id,
+        market_id: marketId,
         price: formData.price,
         amount: formData.amount,
         fee: formData.fee,
@@ -143,6 +203,17 @@ const Trades: React.FC = () => {
 
       const res = await api.post("/v1/trades", payload);
       const t = res.data.trade;
+
+      console.log("trade id", t.trade_id);
+
+      const getTrade = await api.get(`/v1/trades/${t.trade_id}`)
+
+      console.log("get trade response", getTrade)
+
+      console.log("Setting marketId to", getTrade.data.trade.market_id);
+
+      setMarketId(getTrade.data.trade.market_id);
+      localStorage.setItem("marketId", getTrade.data.trade.market_id);
 
       const mapped: Trade = {
         tradeId: t.trade_id,
@@ -190,6 +261,13 @@ const Trades: React.FC = () => {
             onChange={handleChange}
             className="border px-3 py-2 rounded"
           />
+          <input
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleChange}
+            className="border px-3 py-2 rounded"
+          />
           <select
             name="side"
             value={formData.side}
@@ -200,9 +278,16 @@ const Trades: React.FC = () => {
             <option value="sell">Sell</option>
           </select>
           <input
-            name="market_id"
-            placeholder="Market ID (e.g. BTC-USDT)"
-            value={formData.market_id}
+            name="base_currency"
+            placeholder=""
+            value={formData.base_currency}
+            onChange={handleChange}
+            className="border px-3 py-2 rounded"
+          />
+          <input
+            name="quote_currency"
+            placeholder=""
+            value={formData.quote_currency}
             onChange={handleChange}
             className="border px-3 py-2 rounded"
           />
@@ -230,6 +315,13 @@ const Trades: React.FC = () => {
             onChange={handleChange}
             className="border px-3 py-2 rounded"
           />
+          <input
+            name="counterparty_email"
+            placeholder="Counterparty Email"
+            value={formData.counterparty_email}
+            onChange={handleChange}
+            className="border px-3 py-2 rounded"
+          />
           <button
             onClick={createTrade}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700"
@@ -240,7 +332,7 @@ const Trades: React.FC = () => {
       </div>
 
       {/* Trades Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden ml-10">
+      <div className="bg-white rounded-lg shadow overflow-hidden ml-10 overflow-y-auto">
         {error && <p className="text-red-500 p-4">{error}</p>}
         {loading && (
           <div className="flex items-center justify-center h-32">
@@ -248,7 +340,7 @@ const Trades: React.FC = () => {
           </div>
         )}
 
-        <div className="overflow-x-auto">
+        <div className="max-h-96 overflow-y-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
@@ -264,7 +356,7 @@ const Trades: React.FC = () => {
               </tr>
             </thead>
 
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white divide-y divide-gray-200 max-h-96">
               {trades.map((t) => {
                 const side = sideOfTrade(t);
                 return (

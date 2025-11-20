@@ -7,30 +7,35 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 )
 
 const createTrade = `-- name: CreateTrade :one
-INSERT INTO trades (username, buy_order_id, sell_order_id, market_id, price, amount, fee)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, username, buy_order_id, sell_order_id, market_id, price, amount, fee, created_at
+INSERT INTO trades (username, buyer_user_email, seller_user_email, buy_order_id, sell_order_id, market_id, price, amount, fee)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+RETURNING id, username, buyer_user_email, seller_user_email, buy_order_id, sell_order_id, market_id, price, amount, fee, created_at
 `
 
 type CreateTradeParams struct {
-	Username    string          `json:"username"`
-	BuyOrderID  uuid.UUID       `json:"buy_order_id"`
-	SellOrderID uuid.UUID       `json:"sell_order_id"`
-	MarketID    uuid.UUID       `json:"market_id"`
-	Price       decimal.Decimal `json:"price"`
-	Amount      decimal.Decimal `json:"amount"`
-	Fee         decimal.Decimal `json:"fee"`
+	Username        string          `json:"username"`
+	BuyerUserEmail  string          `json:"buyer_user_email"`
+	SellerUserEmail string          `json:"seller_user_email"`
+	BuyOrderID      uuid.UUID       `json:"buy_order_id"`
+	SellOrderID     uuid.UUID       `json:"sell_order_id"`
+	MarketID        uuid.UUID       `json:"market_id"`
+	Price           decimal.Decimal `json:"price"`
+	Amount          decimal.Decimal `json:"amount"`
+	Fee             decimal.Decimal `json:"fee"`
 }
 
 func (q *Queries) CreateTrade(ctx context.Context, arg CreateTradeParams) (Trade, error) {
 	row := q.db.QueryRow(ctx, createTrade,
 		arg.Username,
+		arg.BuyerUserEmail,
+		arg.SellerUserEmail,
 		arg.BuyOrderID,
 		arg.SellOrderID,
 		arg.MarketID,
@@ -42,6 +47,8 @@ func (q *Queries) CreateTrade(ctx context.Context, arg CreateTradeParams) (Trade
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
+		&i.BuyerUserEmail,
+		&i.SellerUserEmail,
 		&i.BuyOrderID,
 		&i.SellOrderID,
 		&i.MarketID,
@@ -69,9 +76,21 @@ FROM trades
 WHERE id = $1
 `
 
-func (q *Queries) GetTradeByID(ctx context.Context, id uuid.UUID) (Trade, error) {
+type GetTradeByIDRow struct {
+	ID          uuid.UUID       `json:"id"`
+	Username    string          `json:"username"`
+	BuyOrderID  uuid.UUID       `json:"buy_order_id"`
+	SellOrderID uuid.UUID       `json:"sell_order_id"`
+	MarketID    uuid.UUID       `json:"market_id"`
+	Price       decimal.Decimal `json:"price"`
+	Amount      decimal.Decimal `json:"amount"`
+	Fee         decimal.Decimal `json:"fee"`
+	CreatedAt   time.Time       `json:"created_at"`
+}
+
+func (q *Queries) GetTradeByID(ctx context.Context, id uuid.UUID) (GetTradeByIDRow, error) {
 	row := q.db.QueryRow(ctx, getTradeByID, id)
-	var i Trade
+	var i GetTradeByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.Username,
@@ -93,15 +112,27 @@ WHERE market_id = $1
 ORDER BY created_at DESC
 `
 
-func (q *Queries) GetTradesByMarketID(ctx context.Context, marketID uuid.UUID) ([]Trade, error) {
+type GetTradesByMarketIDRow struct {
+	ID          uuid.UUID       `json:"id"`
+	Username    string          `json:"username"`
+	BuyOrderID  uuid.UUID       `json:"buy_order_id"`
+	SellOrderID uuid.UUID       `json:"sell_order_id"`
+	MarketID    uuid.UUID       `json:"market_id"`
+	Price       decimal.Decimal `json:"price"`
+	Amount      decimal.Decimal `json:"amount"`
+	Fee         decimal.Decimal `json:"fee"`
+	CreatedAt   time.Time       `json:"created_at"`
+}
+
+func (q *Queries) GetTradesByMarketID(ctx context.Context, marketID uuid.UUID) ([]GetTradesByMarketIDRow, error) {
 	rows, err := q.db.Query(ctx, getTradesByMarketID, marketID)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Trade
+	var items []GetTradesByMarketIDRow
 	for rows.Next() {
-		var i Trade
+		var i GetTradesByMarketIDRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Username,

@@ -17,7 +17,7 @@ import (
 )
 
 func TestGetTradeRPC(t *testing.T) {
-	trade, _ := createRandomTrade()
+	trade, _, getTrade := createRandomTrade()
 
 	testCases := []struct {
 		name          string
@@ -38,7 +38,7 @@ func TestGetTradeRPC(t *testing.T) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
-					Return(trade, nil)
+					Return(getTrade, nil)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetTradeByIDResponse, err error) {
 				require.NoError(t, err)
@@ -99,7 +99,7 @@ func TestGetTradeRPC(t *testing.T) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
-					Return(db.Trade{}, db.ErrRecordNotFound)
+					Return(db.GetTradeByIDRow{}, db.ErrRecordNotFound)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetTradeByIDResponse, err error) {
 				require.Error(t, err)
@@ -120,7 +120,7 @@ func TestGetTradeRPC(t *testing.T) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
-					Return(db.Trade{}, sql.ErrConnDone)
+					Return(db.GetTradeByIDRow{}, sql.ErrConnDone)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetTradeByIDResponse, err error) {
 				require.Error(t, err)
@@ -141,7 +141,7 @@ func TestGetTradeRPC(t *testing.T) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
-					Return(trade, nil)
+					Return(getTrade, nil)
 			},
 			checkResponse: func(t *testing.T, res *pb.GetTradeByIDResponse, err error) {
 				require.Error(t, err)

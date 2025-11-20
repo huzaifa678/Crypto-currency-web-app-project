@@ -26,6 +26,8 @@ const Orders: React.FC = () => {
   const [type, setType] = useState<'BUY' | 'SELL'>('BUY');
   const [price, setPrice] = useState('');
   const [amount, setAmount] = useState('');
+  const [baseCurrency, setBaseCurrency] = useState('');
+  const [quoteCurrency, setQuoteCurrency] = useState('');
 
   const [fetchedOrder, setFetchedOrder] = useState<Order | null>(null);
 
@@ -59,11 +61,28 @@ const Orders: React.FC = () => {
     try {
       setCreating(true);
 
+
+      const user = localStorage.getItem('user');
+      const username = user ? JSON.parse(user).username : '';
+
+      const getMarketResponse = await api.get< {market: { market_id: string } }>('/v1/markets_by_currencies', {
+        params: {
+          username : username,
+          base_currency: baseCurrency,
+          quote_currency: quoteCurrency,
+        },
+      });
+
+      const market = getMarketResponse.data.market;
+      console.log("Fetched market:", market);
+
       const response = await api.post<{ order_id: string }>('/v1/orders', {
         user_email: localStorage.getItem('user')
           ? JSON.parse(localStorage.getItem('user')!).email
           : '',
-        market_id: market[0].market_id,
+        market_id: market.market_id,
+        base_currency: baseCurrency,
+        quote_currency: quoteCurrency,
         type,
         price,
         amount,
@@ -138,6 +157,20 @@ const Orders: React.FC = () => {
 
         {/* Create Order Form */}
         <div className="mt-4 grid grid-cols-2 md:grid-cols-6 gap-3 ml-10">
+          <input
+            type="text"
+            placeholder="Base Currency"
+            value={baseCurrency}
+            onChange={(e) => setBaseCurrency(e.target.value)}
+            className="border rounded-md px-3 py-2 text-sm"
+          />
+          <input
+            type="text"
+            placeholder="Quote Currency"
+            value={quoteCurrency}
+            onChange={(e) => setQuoteCurrency(e.target.value)}
+            className="border rounded-md px-3 py-2 text-sm"
+          />
           <select
             value={type}
             onChange={(e) => setType(e.target.value as 'BUY' | 'SELL')}

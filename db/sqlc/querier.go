@@ -38,8 +38,8 @@ type Querier interface {
 	GetMarketByID(ctx context.Context, id uuid.UUID) (Market, error)
 	GetOrderByID(ctx context.Context, id uuid.UUID) (Order, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)
-	GetTradeByID(ctx context.Context, id uuid.UUID) (Trade, error)
-	GetTradesByMarketID(ctx context.Context, marketID uuid.UUID) ([]Trade, error)
+	GetTradeByID(ctx context.Context, id uuid.UUID) (GetTradeByIDRow, error)
+	GetTradesByMarketID(ctx context.Context, marketID uuid.UUID) ([]GetTradesByMarketIDRow, error)
 	GetTransactionByID(ctx context.Context, id uuid.UUID) (Transaction, error)
 	GetTransactionsByUserEmail(ctx context.Context, userEmail string) ([]Transaction, error)
 	GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error)
@@ -47,6 +47,7 @@ type Querier interface {
 	GetWalletByID(ctx context.Context, id uuid.UUID) (Wallet, error)
 	GetWalletsByUserEmail(ctx context.Context, userEmail string) ([]Wallet, error)
 	ListMarketsByUsername(ctx context.Context, username string) ([]ListMarketsByUsernameRow, error)
+	ListOrdersByMarketID(ctx context.Context, marketID uuid.UUID) ([]Order, error)
 	ListOrdersByUsername(ctx context.Context, username string) ([]Order, error)
 	UpdateOrderStatusAndFilledAmount(ctx context.Context, arg UpdateOrderStatusAndFilledAmountParams) error
 	UpdateTransactionStatus(ctx context.Context, arg UpdateTransactionStatusParams) error

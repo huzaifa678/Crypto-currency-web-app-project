@@ -13,6 +13,8 @@ message CreateOrderRequest {
   Status status = 4;
   int64 price = 5;
   int64 amount = 6;
+  string base_currency = 7;
+  string quote_currency = 8;
 }
 
 message CreateOrderResponse {

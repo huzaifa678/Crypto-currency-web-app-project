@@ -330,6 +330,39 @@ func local_request_CryptoWebApp_ListMarkets_0(ctx context.Context, marshaler run
 	return msg, metadata, err
 }
 
+var filter_CryptoWebApp_GetMarketByCurrencies_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+
+func request_CryptoWebApp_GetMarketByCurrencies_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoWebAppClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetMarketByCurrenciesRequest
+		metadata runtime.ServerMetadata
+	)
+	io.Copy(io.Discard, req.Body)
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_CryptoWebApp_GetMarketByCurrencies_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := client.GetMarketByCurrencies(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CryptoWebApp_GetMarketByCurrencies_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoWebAppServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetMarketByCurrenciesRequest
+		metadata runtime.ServerMetadata
+	)
+	if err := req.ParseForm(); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if err := runtime.PopulateQueryParameters(&protoReq, req.Form, filter_CryptoWebApp_GetMarketByCurrencies_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	msg, err := server.GetMarketByCurrencies(ctx, &protoReq)
+	return msg, metadata, err
+}
+
 func request_CryptoWebApp_CreateOrder_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoWebAppClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var (
 		protoReq CreateOrderRequest
@@ -425,6 +458,43 @@ func local_request_CryptoWebApp_GetOrder_0(ctx context.Context, marshaler runtim
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "order_id", err)
 	}
 	msg, err := server.GetOrder(ctx, &protoReq)
+	return msg, metadata, err
+}
+
+func request_CryptoWebApp_GetOrderByMarketID_0(ctx context.Context, marshaler runtime.Marshaler, client CryptoWebAppClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetOrderByMarketIDRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	io.Copy(io.Discard, req.Body)
+	val, ok := pathParams["market_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "market_id")
+	}
+	protoReq.MarketId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "market_id", err)
+	}
+	msg, err := client.GetOrderByMarketID(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+}
+
+func local_request_CryptoWebApp_GetOrderByMarketID_0(ctx context.Context, marshaler runtime.Marshaler, server CryptoWebAppServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var (
+		protoReq GetOrderByMarketIDRequest
+		metadata runtime.ServerMetadata
+		err      error
+	)
+	val, ok := pathParams["market_id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "market_id")
+	}
+	protoReq.MarketId, err = runtime.String(val)
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "market_id", err)
+	}
+	msg, err := server.GetOrderByMarketID(ctx, &protoReq)
 	return msg, metadata, err
 }
 
@@ -1281,6 +1351,26 @@ func RegisterCryptoWebAppHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		}
 		forward_CryptoWebApp_ListMarkets_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_CryptoWebApp_GetMarketByCurrencies_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/GetMarketByCurrencies", runtime.WithHTTPPathPattern("/v1/markets_by_currencies"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoWebApp_GetMarketByCurrencies_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_GetMarketByCurrencies_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodPost, pattern_CryptoWebApp_CreateOrder_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1340,6 +1430,26 @@ func RegisterCryptoWebAppHandlerServer(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 		forward_CryptoWebApp_GetOrder_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_CryptoWebApp_GetOrderByMarketID_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		var stream runtime.ServerTransportStream
+		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/GetOrderByMarketID", runtime.WithHTTPPathPattern("/v1/orders_by_market/{market_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_CryptoWebApp_GetOrderByMarketID_0(annotatedContext, inboundMarshaler, server, req, pathParams)
+		md.HeaderMD, md.TrailerMD = metadata.Join(md.HeaderMD, stream.Header()), metadata.Join(md.TrailerMD, stream.Trailer())
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_GetOrderByMarketID_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodPatch, pattern_CryptoWebApp_UpdateOrder_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -1574,7 +1684,7 @@ func RegisterCryptoWebAppHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		var stream runtime.ServerTransportStream
 		ctx = grpc.NewContextWithServerTransportStream(ctx, &stream)
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/ListTrades", runtime.WithHTTPPathPattern("/v1/trades/{market_id}"))
+		annotatedContext, err := runtime.AnnotateIncomingContext(ctx, mux, req, "/pb.CryptoWebApp/ListTrades", runtime.WithHTTPPathPattern("/v1/trades/all/{market_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -1921,6 +2031,23 @@ func RegisterCryptoWebAppHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		}
 		forward_CryptoWebApp_ListMarkets_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
+	mux.Handle(http.MethodGet, pattern_CryptoWebApp_GetMarketByCurrencies_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/GetMarketByCurrencies", runtime.WithHTTPPathPattern("/v1/markets_by_currencies"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoWebApp_GetMarketByCurrencies_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_GetMarketByCurrencies_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
 	mux.Handle(http.MethodPost, pattern_CryptoWebApp_CreateOrder_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1971,6 +2098,23 @@ func RegisterCryptoWebAppHandlerClient(ctx context.Context, mux *runtime.ServeMu
 			return
 		}
 		forward_CryptoWebApp_GetOrder_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+	})
+	mux.Handle(http.MethodGet, pattern_CryptoWebApp_GetOrderByMarketID_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/GetOrderByMarketID", runtime.WithHTTPPathPattern("/v1/orders_by_market/{market_id}"))
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_CryptoWebApp_GetOrderByMarketID_0(annotatedContext, inboundMarshaler, client, req, pathParams)
+		annotatedContext = runtime.NewServerMetadataContext(annotatedContext, md)
+		if err != nil {
+			runtime.HTTPError(annotatedContext, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		forward_CryptoWebApp_GetOrderByMarketID_0(annotatedContext, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 	})
 	mux.Handle(http.MethodPatch, pattern_CryptoWebApp_UpdateOrder_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
@@ -2180,7 +2324,7 @@ func RegisterCryptoWebAppHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
-		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/ListTrades", runtime.WithHTTPPathPattern("/v1/trades/{market_id}"))
+		annotatedContext, err := runtime.AnnotateContext(ctx, mux, req, "/pb.CryptoWebApp/ListTrades", runtime.WithHTTPPathPattern("/v1/trades/all/{market_id}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -2325,9 +2469,11 @@ var (
 	pattern_CryptoWebApp_DeleteMarket_0               = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "markets", "market_id"}, ""))
 	pattern_CryptoWebApp_GetMarket_0                  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "markets", "market_id"}, ""))
 	pattern_CryptoWebApp_ListMarkets_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "markets"}, ""))
+	pattern_CryptoWebApp_GetMarketByCurrencies_0      = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "markets_by_currencies"}, ""))
 	pattern_CryptoWebApp_CreateOrder_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "orders"}, ""))
 	pattern_CryptoWebApp_DeleteOrder_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "orders", "order_id"}, ""))
 	pattern_CryptoWebApp_GetOrder_0                   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "orders", "order_id"}, ""))
+	pattern_CryptoWebApp_GetOrderByMarketID_0         = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "orders_by_market", "market_id"}, ""))
 	pattern_CryptoWebApp_UpdateOrder_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "orders", "order_id"}, ""))
 	pattern_CryptoWebApp_ListOrder_0                  = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "orders"}, ""))
 	pattern_CryptoWebApp_CreateWallet_0               = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "wallets"}, ""))
@@ -2340,7 +2486,7 @@ var (
 	pattern_CryptoWebApp_CreateTrade_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "trades"}, ""))
 	pattern_CryptoWebApp_GetTrade_0                   = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "trades", "trade_id"}, ""))
 	pattern_CryptoWebApp_DeleteTrade_0                = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "trades", "trade_id"}, ""))
-	pattern_CryptoWebApp_ListTrades_0                 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "trades", "market_id"}, ""))
+	pattern_CryptoWebApp_ListTrades_0                 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "trades", "all", "market_id"}, ""))
 	pattern_CryptoWebApp_CreateTransaction_0          = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"v1", "transactions"}, ""))
 	pattern_CryptoWebApp_GetTransaction_0             = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "transactions", "transaction_id"}, ""))
 	pattern_CryptoWebApp_GetTransactionsByUserEmail_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"v1", "transactions", "list", "user_email"}, ""))
@@ -2360,9 +2506,11 @@ var (
 	forward_CryptoWebApp_DeleteMarket_0               = runtime.ForwardResponseMessage
 	forward_CryptoWebApp_GetMarket_0                  = runtime.ForwardResponseMessage
 	forward_CryptoWebApp_ListMarkets_0                = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_GetMarketByCurrencies_0      = runtime.ForwardResponseMessage
 	forward_CryptoWebApp_CreateOrder_0                = runtime.ForwardResponseMessage
 	forward_CryptoWebApp_DeleteOrder_0                = runtime.ForwardResponseMessage
 	forward_CryptoWebApp_GetOrder_0                   = runtime.ForwardResponseMessage
+	forward_CryptoWebApp_GetOrderByMarketID_0         = runtime.ForwardResponseMessage
 	forward_CryptoWebApp_UpdateOrder_0                = runtime.ForwardResponseMessage
 	forward_CryptoWebApp_ListOrder_0                  = runtime.ForwardResponseMessage
 	forward_CryptoWebApp_CreateWallet_0               = runtime.ForwardResponseMessage

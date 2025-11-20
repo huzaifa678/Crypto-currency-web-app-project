@@ -2,21 +2,21 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
-import { GoogleLogin } from '@react-oauth/google'; // <-- make sure you installed this
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     try {
       await login(email, password);
       navigate('/dashboard');
@@ -28,16 +28,16 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
+    <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-blue-50 to-indigo-100">
+      <div className="max-w-md w-full mx-auto space-y-8 py-12 px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
           <div className="mx-auto h-12 w-12 bg-blue-600 rounded-full flex items-center justify-center">
             <span className="text-white text-xl font-bold">C</span>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-3xl font-extrabold text-gray-900">
             Sign in to your account
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-sm text-gray-600">
             Or{' '}
             <Link
               to="/register"
@@ -47,7 +47,7 @@ const Login: React.FC = () => {
             </Link>
           </p>
         </div>
-        
+
         {/* Email/Password form */}
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
@@ -73,7 +73,7 @@ const Login: React.FC = () => {
                 />
               </div>
             </div>
-            
+
             {/* Password */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700">
@@ -114,6 +114,7 @@ const Login: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
+              data-testid="submit-button"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? (
@@ -130,25 +131,21 @@ const Login: React.FC = () => {
 
         {/* Divider */}
         <div className="flex items-center my-4">
-          <div className="flex-grow border-t border-gray-300"></div>
+          <div className="grow border-t border-gray-300"></div>
           <span className="px-2 text-sm text-gray-500">Or continue with</span>
-          <div className="flex-grow border-t border-gray-300"></div>
+          <div className="grow border-t border-gray-300"></div>
         </div>
 
         {/* Google login button */}
         <div className="flex justify-center">
           <GoogleLogin
-            onSuccess={async credentialResponse => {
+            onSuccess={async (credentialResponse) => {
               if (credentialResponse.credential) {
                 const client = await loginWithGoogle(credentialResponse.credential);
-                if (client) {
-                  navigate('/dashboard');
-                }
+                if (client) navigate('/dashboard');
               }
             }}
-            onError={() => {
-              console.log('Google Login Failed');
-            }}
+            onError={() => console.log('Google Login Failed')}
             theme="outline"
             size="large"
             text="signin_with"

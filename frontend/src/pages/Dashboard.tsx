@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="fixed top-20 left-30 right-30 bottom-0 px-5 py-5 bg-animated-gradient min-h-2 overflow-y-auto h-[calc(100vh-5rem)]">
+    <div className="fixed top-30 left-80 right-30 bottom-0 px-5 py-5 bg-animated-gradient min-h-2 overflow-y-auto h-[calc(100vh-5rem)] bg-blue-900">
       {/* Welcome Section */}
       <div className="sticky bg-white rounded-lg shadow p-6">
         <TypeAnimation sequence={[

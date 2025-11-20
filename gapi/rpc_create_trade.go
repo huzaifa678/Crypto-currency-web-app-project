@@ -38,6 +38,10 @@ func (server *server) CreateTrade(ctx context.Context, req *pb.CreateTradeReques
 		return nil, status.Errorf(codes.InvalidArgument, "invalid sell order ID: %v", err)
 	}
 
+	buyerUserEmail := req.GetBuyerUserEmail()
+
+	sellerUserEmail := req.GetSellerUserEmail()
+
 	marketID, err := uuid.Parse(req.GetMarketId())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid market ID: %v", err)
@@ -61,6 +65,8 @@ func (server *server) CreateTrade(ctx context.Context, req *pb.CreateTradeReques
 	args := db.CreateTradeTxParams{
 		TradeParams: db.CreateTradeParams{	
 			Username: authPayload.Username,
+			BuyerUserEmail: buyerUserEmail,
+			SellerUserEmail: sellerUserEmail,
 			BuyOrderID: buyOrderId,
 			SellOrderID: sellOrderId,
 			MarketID: marketID,
@@ -103,6 +109,8 @@ func validateCreateTradeRequest(req *pb.CreateTradeRequest) (violations []*errde
 
 	if len(violations) == 0 {
 		if err := val.ValidateCreateTradeRequest(
+			req.GetBuyerUserEmail(),
+			req.GetSellerUserEmail(),
 			req.GetBuyOrderId(),
 			req.GetSellOrderId(),
 			req.GetMarketId(),
