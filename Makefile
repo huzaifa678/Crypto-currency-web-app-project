@@ -50,4 +50,7 @@ go-tools:
 redis:
 	docker run --name redis -p 6379:6379 -d redis:7.2-alpine
 
-.PHONY: createdb dropdb postgres migrateup migratedown sqlc server mock test go-backend-compose proto evans go-tools redis
+selenium-test:
+	go run cmd/selenium/main.go
+
+.PHONY: createdb dropdb postgres migrateup migratedown sqlc server mock test go-backend-compose proto evans go-tools redis selenium-test

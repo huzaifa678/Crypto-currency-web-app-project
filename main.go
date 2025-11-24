@@ -209,7 +209,7 @@ func runGatewayServer(
 	mux.HandleFunc("/oauth/google/callback", oauth2.GoogleCallbackHandler)
 
     c := cors.New(cors.Options{
-        AllowedOrigins:   []string{"http://localhost:5173"},
+        AllowedOrigins:   []string{"http://localhost:8081", "http://127.0.0.1:8081", "null"},
         AllowedMethods:   []string{"GET", "POST", "PATCH", "DELETE", "OPTIONS"},
         AllowedHeaders:   []string{"Authorization", "Content-Type"},
         ExposedHeaders:   []string{"Content-Length"},
