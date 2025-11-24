@@ -13,3 +13,4 @@ Godeps/
 .terraform
 .DS_Store
 .env
+cmd

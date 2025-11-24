@@ -149,7 +149,7 @@ const Orders: React.FC = () => {
   }
 
   return (
-    <div className="fixed top-10 bottom-0 right-0 left-[16rem] z-30 bg-white shadow p-6 overflow-y-auto">
+    <div className="fixed top-10 bottom-0 right-0 left-64 z-30 bg-white shadow p-6 overflow-y-auto">
       {/* Header + Create Order */}
       <div className="bg-white rounded-lg shadow p-6 sticky z-20 mb-10">
         <h1 className="text-2xl font-bold text-gray-900">Orders</h1>

@@ -131,7 +131,7 @@ const WalletPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-64" role="status">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -180,7 +180,7 @@ const WalletPage: React.FC = () => {
         {Array.isArray(wallets) && wallets.filter(Boolean).map((wallet) => (
           <div
             key={wallet.id}
-            className="bg-white rounded-lg shadow p-5 min-h-[320px] flex flex-col justify-between"
+            className="bg-white rounded-lg shadow p-5 min-h-80 flex flex-col justify-between"
           >
             {/* Top content */}
             <div className="flex-1">
