@@ -43,6 +43,8 @@ func main() {
 
 	fmt.Println("Starting Selenium backend test suite")
 
+	driver.Get(baseURL)
+
 	userPayload := `{"username":"testuser","email":"testuser@example.com","password":"pass123"}`
 	createUserResp := fetchPost(driver, "/v1/create_user", userPayload)
 	fmt.Println("CreateUser response:", createUserResp)
