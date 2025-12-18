@@ -62,7 +62,7 @@ describe("Transactions Component", () => {
 
     await waitFor(() =>
       expect(mockApiGet).toHaveBeenCalledWith(
-        "/v1/transactions/list/test@example.com"
+        "/v1/transactions/list/huzaifa210@example.com"
       )
     );
 
@@ -108,8 +108,8 @@ describe("Transactions Component", () => {
 
     await waitFor(() =>
       expect(mockApiPost).toHaveBeenCalledWith("/v1/transactions", {
-        username: "testuser",
-        user_email: "test@example.com",
+        username: "huzaifa210",
+        user_email: "huzaifa210@example.com",
         type: "deposit",
         currency: "USD",
         amount: "50",

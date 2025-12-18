@@ -30,11 +30,6 @@ jobs:
         working-directory: frontend
         run: npx playwright install --with-deps
 
-      - name: Start React server
-        working-directory: frontend
-        run: |
-          npm run dev
-
       - name: Run Playwright tests
         working-directory: frontend
         run: npx playwright test
