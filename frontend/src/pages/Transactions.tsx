@@ -208,7 +208,7 @@ const Transactions: React.FC = () => {
         {error && <p className="text-red-500 p-4">{error}</p>}
         {loading && (
           <div className="flex items-center justify-center h-32">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" role="status"></div>
           </div>
         )}
         <div className="overflow-x-auto">

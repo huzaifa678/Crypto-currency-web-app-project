@@ -13,7 +13,7 @@ import Orders from './pages/Orders';
 import Wallet from './pages/Wallet';
 import Transactions from './pages/Transactions';
 import Profile from './pages/Profile';
-import MarketsTable from './pages/websocket';
+import MarketsTable from './pages/WebSocket';
 import { OrderProvider } from './contexts/OrderContext';
 import "./index.css";
 import { GoogleOAuthProvider } from '@react-oauth/google';

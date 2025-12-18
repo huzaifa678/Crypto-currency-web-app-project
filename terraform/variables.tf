@@ -105,7 +105,7 @@ variable "google_client_secret" {
 variable "redirect_url" {
   description = "OAuth2 Redirect URL"
   type        = string
-  default     = "http://localhost:8081/oauth/google/callback"
+  default     = "https://api.freeeasycrypto.com/oauth/google/callback"
 }
 
 variable "token_symmetric_key" {
@@ -113,3 +113,9 @@ variable "token_symmetric_key" {
   type        = string
   sensitive   = true
 }
+
+variable "environment" {
+  description = "Environment For Backend"
+  type        = string
+  default     = "development"
+} 

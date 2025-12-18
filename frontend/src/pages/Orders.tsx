@@ -142,7 +142,7 @@ const Orders: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex items-center justify-center h-64" role="status">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -247,7 +247,7 @@ const Orders: React.FC = () => {
 
       {/* Orders Table */}
       <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
+        <table aria-label="orders-table" className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               {['Order ID','Market','Type','Status','Price','Amount','Date','Actions'].map(h => (

@@ -14,3 +14,4 @@ Godeps/
 .DS_Store
 .env
 cmd
+node_modules

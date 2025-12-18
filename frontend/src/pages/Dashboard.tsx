@@ -1,15 +1,12 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { api } from '../contexts/AuthContext';
 import { useTradeStream } from '../components/TradeStream';
 
 import { 
   TrendingUp, 
-  TrendingDown, 
   DollarSign, 
   Wallet, 
-  BarChart3,
   ArrowUpRight,
   ArrowDownRight,
   Activity
@@ -109,10 +106,6 @@ const Dashboard: React.FC = () => {
       <div className="sticky bg-white rounded-lg shadow p-6">
         <TypeAnimation sequence={[
           `Welcome back, ${user?.username}! 👋`,
-          1500,
-          `Your portfolio is up +12.5% today 📈`,
-          1500,
-          `24h profit: $1,250 💰`,
           1500,
           () => console.log('Typing loop completed!')
         ]}

@@ -64,7 +64,7 @@ func (processor *RedisTaskProcessor) ProcessTaskSendVerifyEmail(ctx context.Cont
 	}
 
 	subject := "Welcome to the Crypto Currency Web App System - Please kindly verify your email"
-	verifyEmaillink := fmt.Sprintf("http://localhost:8081/v1/verify_email?email_id=%d&secret_code=%s", verifyEmail.ID, verifyEmail.SecretCode)
+	verifyEmaillink := fmt.Sprintf("https://api.freeeasycrypto.com/v1/verify_email?email_id=%d&secret_code=%s", verifyEmail.ID, verifyEmail.SecretCode)
 	content := fmt.Sprintf(`
 		<h1>Welcome %s</h1>
 		<p>Thank you for registering with us. Please click the link below to verify your email address:</p>

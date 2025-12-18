@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Market } from "../pages/websocket";
+import { Market } from "../pages/WebSocket";
 
 interface Trade {
   symbol: string;
@@ -16,7 +16,7 @@ export function useTradeStream() {
     async function streamTrades() {
       const symbols = ["BTCUSDT", "ETHUSDT"];
       const queryParams = symbols.map(s => `symbols=${encodeURIComponent(s)}`).join("&");
-      const url = `http://localhost:8081/v1/stream_trades?${queryParams}`;
+      const url = `https://localhost:8081/v1/stream_trades?${queryParams}`;
 
       try {
         const res = await fetch(url, {
