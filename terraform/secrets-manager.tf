@@ -25,7 +25,8 @@ resource "aws_secretsmanager_secret_version" "production_credentials_version" {
     GOOGLE_CLIENT_ID      = var.google_client_id
     GOOGLE_CLIENT_SECRET  = var.google_client_secret
     REDIRECT_URL          = var.redirect_url
-    ENVIRONMENT           = data.external.app_env.result.ENVIRONMENT
+    ENVIRONMENT           = var.environment
+    ORIGIN                = var.origin
   })
 
   depends_on = [

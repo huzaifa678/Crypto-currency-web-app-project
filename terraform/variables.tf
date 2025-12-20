@@ -117,5 +117,11 @@ variable "token_symmetric_key" {
 variable "environment" {
   description = "Environment For Backend"
   type        = string
-  default     = "development"
+  default     = "testing"
 } 
+
+variable "origin" {
+  description = "Origin for CORS"
+  type        = string
+  default     = "https://www.freeeasycrypto.com"
+}
