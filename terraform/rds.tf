@@ -19,7 +19,7 @@ resource "aws_db_subnet_group" "rds_subnet_group" {
 resource "aws_db_instance" "postgres" {
   identifier          = "crypto-db"
   engine              = "postgres"
-  engine_version      = "16.3"
+  engine_version      = "16.1"
   instance_class      = "db.t3.micro"
   allocated_storage   = 20
   db_name             = var.rds_db_name
