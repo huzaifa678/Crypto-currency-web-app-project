@@ -94,8 +94,8 @@ jobs:
           chmod +x ./helm.sh
           ./helm.sh
         working-directory: ./eks
-        
-      - name: Deploy to EKS using helm
-        run: |
-            helm upgrade --install crypto-app-cluster .
-        working-directory: ./eks-chart
+
+      # - name: Deploy to EKS using helm
+      #   run: |
+      #       helm upgrade --install crypto-app-cluster .
+      #   working-directory: ./eks-chart

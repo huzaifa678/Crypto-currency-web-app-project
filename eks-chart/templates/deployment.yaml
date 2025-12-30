@@ -23,3 +23,16 @@ spec:
           name: http-server
         - containerPort: 9090
           name: grpc-server
+        livenessProbe:
+            httpGet:
+              path: /healthz
+              port: {{ .Values.httpPort }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: {{ .Values.httpPort }}
+            initialDelaySeconds: 5
+            periodSeconds: 5
+        
