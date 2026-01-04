@@ -95,7 +95,32 @@ jobs:
           ./helm.sh
         working-directory: ./eks
 
-      # - name: Deploy to EKS using helm
-      #   run: |
-      #       helm upgrade --install crypto-app-cluster .
-      #   working-directory: ./eks-chart
+  delivery:
+    name: Update Argo CD Application Image
+    runs-on: ubuntu-latest
+    needs: docker
+    steps:
+      - name: Checkout GitOps Repository
+        uses: actions/checkout@v4
+        with:
+          repository: huzaifa678/Continious-Delivery
+          token: ${{ secrets.DELIVERY_REPO_TOKEN}}
+          path: Continious-Delivery
+
+      - name: Update image tag in Helm values
+        run: |
+          cd eks-chart
+
+          IMAGE_TAG=${{ github.sha }}
+
+          yq e -i '.image.tag = "'$IMAGE_TAG'"' eks-chart/values.yaml
+
+      - name: Commit and push changes
+        run: |
+          cd Continious-Delivery
+          git config user.name "${{ secrets.USER_NAME }}"
+          git config user.email "${{ secrets.EMAIL }}"
+
+          git add eks-chart/values.yaml
+          git commit -m "deploy(crypto): image -> ${{ github.sha }}"
+          git push -u origin main
