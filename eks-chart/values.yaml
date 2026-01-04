@@ -2,43 +2,29 @@ domainName:
   http: api.freeeasycrypto.com
   grpc: gapi.freeeasycrypto.com
 
-namespace: 
-  kube-system
+namespace: kube-system
 
-apiService:
-  crypto-api-service
+apiService: crypto-api-service
 
-appName:
-  crypto-app-api
+appName: crypto-app-api
 
-httpPort:
-  80
-
+httpPort: 80
 service:
   port: 80
 
 ingress:
   enabled: true
   ingressClassName: nginx
+replicas: 2
+image: '533267178572.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:latest'
 
-replicas:
-  2
+server: https://acme-v02.api.letsencrypt.org/directory
 
-image:
-  533267178572.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:latest
-
-server:
-  https://acme-v02.api.letsencrypt.org/directory
-
-email:
-  huzaifagill411@gmail.com
-
+email: huzaifagill411@gmail.com
 tlsSecretName:
   http: crypto-app-api-tls-secret
   grpc: crypto-app-gapi-tls-secret
 
-ingressClass: 
-  nginx
+ingressClass: nginx
 
-hostedZoneId:
-  Z01601922DP7HAM1NYV8Z
+hostedZoneId: Z01601922DP7HAM1NYV8Z

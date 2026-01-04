@@ -103,7 +103,7 @@ jobs:
       - name: Checkout GitOps Repository
         uses: actions/checkout@v4
         with:
-          repository: huzaifa678/Continious-Delivery
+          repository: ${{ secrets.USER_NAME }}/Continious-Delivery
           token: ${{ secrets.DELIVERY_REPO_TOKEN}}
           path: Continious-Delivery
 
@@ -111,14 +111,12 @@ jobs:
         run: |
           cd eks-chart
 
-          IMAGE_TAG=${{ github.sha }}
+          IMAGE="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:${{ github.sha }}"
 
-          yq e -i '.image |= sub(":(.*)$", ":'"$IMAGE_TAG"'")' \
-          eks-chart/values.yaml
+          yq e -i '.image = "'$IMAGE'"' eks-chart/values.yaml
 
       - name: Commit and push changes
         run: |
-          cd Continious-Delivery
           git config user.name "${{ secrets.USER_NAME }}"
           git config user.email "${{ secrets.EMAIL }}"
 
