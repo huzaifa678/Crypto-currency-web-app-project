@@ -113,7 +113,8 @@ jobs:
 
           IMAGE_TAG=${{ github.sha }}
 
-          yq e -i '.image.tag = "'$IMAGE_TAG'"' eks-chart/values.yaml
+          yq e -i '.image |= sub(":(.*)$", ":'"$IMAGE_TAG"'")' \
+          eks-chart/values.yaml
 
       - name: Commit and push changes
         run: |
