@@ -2,7 +2,8 @@
 set -e
 
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo add external-dns https://kubernetes-sigs.github.io/external-dns/
+helm repo add jetstack https://charts.jetstack.io
 helm repo update
 
 helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
@@ -21,11 +22,11 @@ helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
 
 # echo "Installing ExternalDNS..."
 
-helm upgrade --install external-dns bitnami/external-dns \
+helm upgrade --install external-dns external-dns/external-dns \
   --namespace external-dns --create-namespace \
   --wait --timeout 5m \
-  --set provider=aws \
-  --set aws.zoneType=public \
+  --set provider.name=aws \
+  --set provider.aws.zoneType=public \
   --set policy=sync \
   --set registry=txt \
   --set txtOwnerId=terraform \
