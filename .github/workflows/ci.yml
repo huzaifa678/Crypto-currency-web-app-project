@@ -50,10 +50,3 @@ jobs:
 
     - name: Run tests
       run: make test
-
-    - name: Checkout GitOps Repository
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ secrets.USER_NAME }}/Continious-Delivery
-        token: ${{ secrets.DELIVERY_REPO_TOKEN}}
-        path: Continious-Delivery
