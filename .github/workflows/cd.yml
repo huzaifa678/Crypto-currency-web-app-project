@@ -123,7 +123,9 @@ jobs:
           git config user.email "${{ secrets.EMAIL }}"
 
           git remote set-url origin \
-          https://${{ secrets.DELIVERY_REPO_TOKEN }}@github.com/${{ secrets.USER_NAME }}/Continious-Delivery.git
+          git remote set-url origin \
+          https://${{ secrets.USER_NAME }}:${{ secrets.DELIVERY_REPO_TOKEN }}@github.com/${{ secrets.USER_NAME }}/Continious-Delivery.git
+
 
           git add eks-chart/values.yaml
           git commit -m "deploy(crypto): image -> ${{ github.sha }}"
