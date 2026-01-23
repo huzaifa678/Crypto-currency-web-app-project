@@ -109,14 +109,16 @@ jobs:
 
       - name: Update image tag in Helm values
         run: |
-          cd eks-chart
+          cd Continious-Delivery/eks-chart
 
           IMAGE="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:${{ github.sha }}"
 
-          yq e -i '.image = "'$IMAGE'"' eks-chart/values.yaml
+          yq e -i '.image = "'$IMAGE'"' values.yaml
 
       - name: Commit and push changes
         run: |
+          cd Continious-Delivery
+
           git config user.name "${{ secrets.USER_NAME }}"
           git config user.email "${{ secrets.EMAIL }}"
 
