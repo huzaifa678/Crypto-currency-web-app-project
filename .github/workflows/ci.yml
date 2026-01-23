@@ -57,9 +57,3 @@ jobs:
         repository: ${{ secrets.USER_NAME }}/Continious-Delivery
         token: ${{ secrets.DELIVERY_REPO_TOKEN}}
         path: Continious-Delivery
-
-    - name: Check The Directories And Files
-      run: |
-        pwd
-        cd Continious-Delivery
-        ls -l
