@@ -14,7 +14,8 @@ resource "aws_elasticache_replication_group" "redis_cluster" {
   engine                        = "redis"
   engine_version                = "7.0"
   node_type                     = "cache.t3.micro"
-  num_cache_clusters            = 1 
+  num_node_groups         = 1
+  replicas_per_node_group = 0
   automatic_failover_enabled    = false
   multi_az_enabled              = false
   subnet_group_name             = aws_elasticache_subnet_group.redis_subnet_group.name

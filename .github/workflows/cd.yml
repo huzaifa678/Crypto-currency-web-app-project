@@ -75,6 +75,7 @@ jobs:
       - name: Get cert-manager IRSA role ARN
         run: |
           echo "CERT_MANAGER_IRSA_ROLE_ARN=$(terraform output -raw cert_manager_irsa_role_arn)" >> $GITHUB_ENV
+          echo "EXTERNAL_DNS_IRSA_ROLE_ARN=$(terraform output -raw external_dns_irsa_role_arn)" >> $GITHUB_ENV
         working-directory: ./terraform
 
       - name: Login to Amazon ECR

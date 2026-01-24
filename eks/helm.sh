@@ -30,8 +30,9 @@ helm upgrade --install external-dns external-dns/external-dns \
   --set policy=sync \
   --set registry=txt \
   --set txtOwnerId=terraform \
-  --set serviceAccount.name=terraform \
-  --set "sources[0]=ingress"
+  --set serviceAccount.create=true \
+  --set serviceAccount.name=external-dns \
+  --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=$EXTERNAL_DNS_IRSA_ROLE_ARN
 
 # helm upgrade external-dns bitnami/external-dns \
 #   --namespace external-dns \

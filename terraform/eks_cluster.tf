@@ -65,6 +65,28 @@ resource "aws_security_group" "redis_sg" {
   }
 }
 
+resource "aws_security_group_rule" "allow_node_to_core_dns_tcp" {
+  type                     = "ingress"
+  from_port                = 53
+  to_port                  = 53
+  protocol                 = "tcp"
+  security_group_id        = aws_eks_cluster.eks_cluster.vpc_config[0].cluster_security_group_id
+  source_security_group_id = aws_security_group.eks_nodes.id
+
+  depends_on = [aws_eks_cluster.eks_cluster]
+}
+
+resource "aws_security_group_rule" "allow_node_to_core_dns_udp" {
+  type                     = "ingress"
+  from_port                = 53
+  to_port                  = 53
+  protocol                 = "udp"
+  security_group_id        = aws_eks_cluster.eks_cluster.vpc_config[0].cluster_security_group_id
+  source_security_group_id = aws_security_group.eks_nodes.id
+
+  depends_on = [aws_eks_cluster.eks_cluster]
+}
+
 resource "aws_security_group_rule" "allow_node_to_control_plane" {
   type                     = "ingress"
   from_port                = 443
@@ -289,6 +311,28 @@ resource "aws_iam_role" "cert_manager_irsa_role" {
   })
 }
 
+resource "aws_iam_role" "external_dns_irsa_role" {
+  name = "external-dns-irsa-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${replace(data.aws_eks_cluster.this.identity[0].oidc[0].issuer, "https://", "")}:sub" = "system:serviceaccount:external-dns:external-dns"
+          }
+        }
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role_policy_attachment" "eks_node_custom_route53_policy_attachment" {
   policy_arn = aws_iam_policy.custom_route53_policy.arn
   role       = aws_iam_role.eks_node_role.name
@@ -296,5 +340,10 @@ resource "aws_iam_role_policy_attachment" "eks_node_custom_route53_policy_attach
 
 resource "aws_iam_role_policy_attachment" "cert_manager_irsa_route53_attach" {
   role       = aws_iam_role.cert_manager_irsa_role.name
+  policy_arn = aws_iam_policy.custom_route53_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "external_dns_route53_attach" {
+  role       = aws_iam_role.external_dns_irsa_role.name
   policy_arn = aws_iam_policy.custom_route53_policy.arn
 }

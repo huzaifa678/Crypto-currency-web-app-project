@@ -38,3 +38,7 @@ output "launch_template_user_data" {
 output "cert_manager_irsa_role_arn" {
   value = aws_iam_role.cert_manager_irsa_role.arn
 }
+
+output "external_dns_irsa_role_arn" {
+  value = aws_iam_role.external_dns_irsa_role.arn
+}
