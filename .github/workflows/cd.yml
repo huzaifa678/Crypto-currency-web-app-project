@@ -63,6 +63,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.6.0
+
+      - name: Terraform Init (read outputs)
+        run: terraform init -input=false
+        working-directory: ./terraform
+
+      - name: Get cert-manager IRSA role ARN
+        run: |
+          echo "CERT_MANAGER_IRSA_ROLE_ARN=$(terraform output -raw cert_manager_irsa_role_arn)" >> $GITHUB_ENV
+        working-directory: ./terraform
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -79,7 +93,6 @@ jobs:
           docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG -t $REGISTRY/$REPOSITORY:latest .
           docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
           docker push $REGISTRY/$REPOSITORY:latest
-
 
       - name: Update kubeconfig for EKS
         run: |

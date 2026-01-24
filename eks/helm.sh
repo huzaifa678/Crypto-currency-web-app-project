@@ -59,7 +59,7 @@ helm upgrade --install \
   --set crds.enabled=true \
   --set serviceAccount.create=true \
   --set serviceAccount.name=cert-manager \
-  --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=$(terraform -chdir=../terraform output -raw cert_manager_irsa_role_arn)
+  --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=$CERT_MANAGER_IRSA_ROLE_ARN
 
 # helm upgrade --install cert-manager jetstack/cert-manager \
 #   --namespace cert-manager \
