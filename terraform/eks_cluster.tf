@@ -87,6 +87,25 @@ resource "aws_security_group_rule" "allow_node_to_core_dns_udp" {
   depends_on = [aws_eks_cluster.eks_cluster]
 }
 
+resource "aws_security_group_rule" "allow_node_to_node_dns_tcp" {
+  type                     = "ingress"
+  from_port                = 53
+  to_port                  = 53
+  protocol                 = "tcp"
+  security_group_id        = aws_security_group.eks_nodes.id
+  source_security_group_id = aws_security_group.eks_nodes.id
+}
+
+resource "aws_security_group_rule" "allow_node_to_node_dns_udp" {
+  type                     = "ingress"
+  from_port                = 53
+  to_port                  = 53
+  protocol                 = "udp"
+  security_group_id        = aws_security_group.eks_nodes.id
+  source_security_group_id = aws_security_group.eks_nodes.id
+}
+
+
 resource "aws_security_group_rule" "allow_node_to_control_plane" {
   type                     = "ingress"
   from_port                = 443

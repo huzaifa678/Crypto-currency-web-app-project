@@ -63,21 +63,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.6.0
-
-      - name: Terraform Init (read outputs)
-        run: terraform init -input=false
-        working-directory: ./terraform
-
-      - name: Get cert-manager IRSA role ARN
-        run: |
-          echo "CERT_MANAGER_IRSA_ROLE_ARN=$(terraform output -raw cert_manager_irsa_role_arn)" >> $GITHUB_ENV
-          echo "EXTERNAL_DNS_IRSA_ROLE_ARN=$(terraform output -raw external_dns_irsa_role_arn)" >> $GITHUB_ENV
-        working-directory: ./terraform
-
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
@@ -98,16 +83,6 @@ jobs:
       - name: Update kubeconfig for EKS
         run: |
           aws eks update-kubeconfig --region us-east-1 --name crypto-system-eks-cluster
-
-      - name: Install Helm
-        run: |
-          curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
-
-      - name: Add ExternalDNS, Ingress and Cert-Manager
-        run: |
-          chmod +x ./helm.sh
-          ./helm.sh
-        working-directory: ./eks
 
   delivery:
     name: Update Argo CD Application Image
