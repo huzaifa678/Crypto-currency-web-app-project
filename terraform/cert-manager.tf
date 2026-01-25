@@ -30,13 +30,29 @@ resource "helm_release" "cert_manager" {
   depends_on = [helm_release.ingress_nginx]
 }
 
-resource "null_resource" "label_cert_manager_ns" {
-  depends_on = [helm_release.external_dns]
+resource "kubectl_manifest" "label_cert_manager_ns" {
+  depends_on = [helm_release.cert_manager]
 
-  provisioner "local-exec" {
-    command = <<EOT
-kubectl label namespace cert-manager cert-manager.io/disable-validation=true --overwrite
-kubectl label namespace default cert-manager.io/disable-validation=true --overwrite
-EOT
-  }
+  yaml_body = <<YAML
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+  labels:
+    cert-manager.io/disable-validation: "true"
+YAML
 }
+
+resource "kubectl_manifest" "label_default_ns" {
+  depends_on = [helm_release.cert_manager]
+
+  yaml_body = <<YAML
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: default
+  labels:
+    cert-manager.io/disable-validation: "true"
+YAML
+}
+
