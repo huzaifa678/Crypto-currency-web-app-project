@@ -346,4 +346,4 @@ resource "aws_iam_role_policy_attachment" "cert_manager_irsa_route53_attach" {
 resource "aws_iam_role_policy_attachment" "external_dns_route53_attach" {
   role       = aws_iam_role.external_dns_irsa_role.name
   policy_arn = aws_iam_policy.custom_route53_policy.arn
-}
+} 

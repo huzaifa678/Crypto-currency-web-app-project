@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: irsa-test
+  namespace: external-dns
+spec:
+  serviceAccountName: external-dns
+  restartPolicy: Never
+  containers:
+  - name: awscli
+    image: amazon/aws-cli:2.14.0
+    command: ["sleep", "3600"]
