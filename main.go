@@ -207,6 +207,11 @@ func runGatewayServer(
     mux := http.NewServeMux()
     mux.Handle("/", grpcMux)
 
+	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
+
     fs := http.FileServer(http.FS(docsFS))
     mux.Handle("/docs/", http.StripPrefix("/", fs))
 
