@@ -34,20 +34,20 @@ helm upgrade --install external-dns external-dns/external-dns \
   --set serviceAccount.name=external-dns \
   --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=$EXTERNAL_DNS_IRSA_ROLE_ARN
 
-# helm upgrade external-dns bitnami/external-dns \
-#   --namespace external-dns \
-#   --set provider=aws \
-#   --set aws.zoneType=public \
-#   --set policy=sync \
-#   --set registry=txt \
-#   --set txtOwnerId=terraform \
-#   --set serviceAccount.name=terraform \
-  #--set domainFilter='["api.freeeasycrypto.com"]'
+# # helm upgrade external-dns bitnami/external-dns \
+# #   --namespace external-dns \
+# #   --set provider=aws \
+# #   --set aws.zoneType=public \
+# #   --set policy=sync \
+# #   --set registry=txt \
+# #   --set txtOwnerId=terraform \
+# #   --set serviceAccount.name=terraform \
+#   #--set domainFilter='["api.freeeasycrypto.com"]'
 
 
-#helm upgrade ingress-nginx ingress-nginx/ingress-nginx --set controller.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"="nlb"
+# #helm upgrade ingress-nginx ingress-nginx/ingress-nginx --set controller.service.annotations."service\.beta\.kubernetes\.io/aws-load-balancer-type"="nlb"
 
-curl -LO https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
+# curl -LO https://cert-manager.io/public-keys/cert-manager-keyring-2021-09-20-1020CF3C033D4F35BAE1C19E1226061C665DF13E.gpg
 
 helm upgrade --install \
   cert-manager oci://quay.io/jetstack/charts/cert-manager \
@@ -62,13 +62,13 @@ helm upgrade --install \
   --set serviceAccount.name=cert-manager \
   --set serviceAccount.annotations."eks\.amazonaws\.com/role-arn"=$CERT_MANAGER_IRSA_ROLE_ARN
 
-# helm upgrade --install cert-manager jetstack/cert-manager \
-#   --namespace cert-manager \
-#   --version v1.18.2 \
-#   --create-namespace  \
-#   --set crds.enabled=true
+# # helm upgrade --install cert-manager jetstack/cert-manager \
+# #   --namespace cert-manager \
+# #   --version v1.18.2 \
+# #   --create-namespace  \
+# #   --set crds.enabled=true
 
 kubectl label namespace cert-manager cert-manager.io/disable-validation=true
-kubectl label namespace default cert-manager.io/disable-validation=true
+kubectl label namespace my-app cert-manager.io/disable-validation=true
 
 

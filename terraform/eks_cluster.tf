@@ -187,7 +187,9 @@ resource "aws_launch_template" "eks_nodes" {
     cluster_name     = aws_eks_cluster.eks_cluster.name
     cluster_endpoint = data.aws_eks_cluster.this.endpoint
     cluster_ca       = data.aws_eks_cluster.this.certificate_authority[0].data
-    cidr             = "10.100.0.0/16"
+    cidr             = aws_eks_cluster.eks_cluster.kubernetes_network_config[0].service_ipv4_cidr
+    # dns_cluster_ip   = cidrhost(aws_eks_cluster.eks_cluster.kubernetes_network_config[0].service_ipv4_cidr, 10)
+
   }))
 
   tag_specifications {
@@ -351,6 +353,33 @@ resource "aws_iam_role" "external_dns_irsa_role" {
     ]
   })
 }
+
+resource "aws_iam_role_policy" "eks_lb_policy" {
+  name = "eks-loadbalancer-policy"
+  role = aws_iam_role.eks_cluster_role.name
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ec2:DescribeSecurityGroups",
+          "ec2:DescribeSubnets",
+          "ec2:DescribeVpcs",
+          "ec2:CreateSecurityGroup",
+          "ec2:DeleteSecurityGroup",
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupIngress",
+          "elasticloadbalancing:*",
+          "iam:PassRole"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 
 resource "aws_iam_role_policy_attachment" "eks_node_custom_route53_policy_attachment" {
   policy_arn = aws_iam_policy.custom_route53_policy.arn

@@ -42,17 +42,3 @@ metadata:
     cert-manager.io/disable-validation: "true"
 YAML
 }
-
-resource "kubectl_manifest" "label_default_ns" {
-  depends_on = [helm_release.cert_manager]
-
-  yaml_body = <<YAML
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: default
-  labels:
-    cert-manager.io/disable-validation: "true"
-YAML
-}
-

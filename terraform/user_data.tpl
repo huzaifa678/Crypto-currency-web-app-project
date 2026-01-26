@@ -9,7 +9,7 @@ write_files:
           name: "${cluster_name}"
           apiServerEndpoint: "${cluster_endpoint}"
           certificateAuthority: "${cluster_ca}"
-          cidr: "${cidr}"
+          cidr: "${cidr}" 
 
 runcmd:
   - /usr/bin/nodeadm init --config-source file:///etc/eks/eks.yaml --daemon kubelet --daemon containerd

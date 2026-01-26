@@ -42,3 +42,8 @@ output "cert_manager_irsa_role_arn" {
 output "external_dns_irsa_role_arn" {
   value = aws_iam_role.external_dns_irsa_role.arn
 }
+
+output "eks_service_ipv4_cidr" {
+  description = "EKS default Service CIDR"
+  value       = aws_eks_cluster.eks_cluster.kubernetes_network_config[0].service_ipv4_cidr
+}
