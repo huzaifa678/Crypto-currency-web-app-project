@@ -44,7 +44,7 @@ This is a comprehensive cryptocurrency web application that provides:
 ### Infrastructure
 
 - **Containerization**: Docker & Docker Compose
-- **Kubernetes**: EKS (AWS Elastic Kubernetes Service) with Helm
+- **Kubernetes**: EKS (AWS Elastic Kubernetes Service) with ArgoCD and Helm
 - **IaC**: Terraform
 - **Frontend Deployment**: AWS CloudFront
 - **Service Mesh**: Cert-Manager for SSL/TLS
@@ -383,14 +383,15 @@ GOOGLE_CLIENT_SECRET=...           # OAuth2 Google secret
 ### API Layers
 
 1. **REST API** (Gin): Traditional HTTP endpoints for web clients
-2. **gRPC API**: High-performance RPC for backend services
-3. **WebSocket**: Real-time market data streaming
-4. **Middleware**: Authentication, CORS, logging, error handling
+2. **gRPC Gateway:** Converting REST API request to gRPC request
+3. **gRPC API**: High-performance RPC for backend services
+4. **WebSocket**: Real-time market data streaming
+5. **Middleware**: Authentication, CORS, logging, error handling
 
 ### Data Flow
 
 ```
-Frontend (React) → REST API (Gin)
+Frontend (React) → REST (gRPC Gateway)
                 ↓
          Token Validation
                 ↓
