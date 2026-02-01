@@ -258,7 +258,7 @@ Main endpoints include:
 Connect via:
 
 ```bash
-evans --host localhost --port 9090 -r repl
+make evans
 ```
 
 ## Database Schema
