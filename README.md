@@ -444,7 +444,7 @@ This project is licensed under the LICENSE file included in the repository.
 
 ## Support
 
-For issues and questions, please open an issue on GitHub or contact the development team.
+For issues and questions, please open an issue on GitHub.
 
 ## CI/CD Status
 
