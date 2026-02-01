@@ -46,6 +46,7 @@ This is a comprehensive cryptocurrency web application that provides:
 - **Containerization**: Docker & Docker Compose
 - **Kubernetes**: EKS (AWS Elastic Kubernetes Service) with Helm
 - **IaC**: Terraform
+- **Frontend Deployment**: AWS CloudFront
 - **Service Mesh**: Cert-Manager for SSL/TLS
 - **Migrations**: golang-migrate
 
