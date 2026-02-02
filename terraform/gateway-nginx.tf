@@ -1,8 +1,7 @@
 resource "kubectl_manifest" "gateway_api_crds" {
-  yaml_body = <<YAML
-$(kubectl kustomize "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.4.0")
-YAML
+  yaml_body = file("${path.module}/gateway-api-crds.yaml")
 }
+
 
 resource "helm_release" "nginx_gateway_fabric" {
   count            = var.environment == "post-test" ? 1 : 0
