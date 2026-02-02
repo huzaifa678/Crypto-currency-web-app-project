@@ -257,10 +257,13 @@ Main endpoints include:
 
 Connect via:
 
+<<<<<<< HEAD
 ```bash
 make evans
 ```
 
+=======
+>>>>>>> 2def249 (added gateway nginx in terraform)
 ## Database Schema
 
 The project uses PostgreSQL with the following key tables:
@@ -318,7 +321,7 @@ docker run -p 8080:8081 -p 9090:9090 \
 
 ```bash
 cd eks-chart
-helm install crypto-app . -n crypto-app --create-namespace
+helm upgrade --install crypto-app . -n crypto-app --create-namespace
 ```
 
 ### Manual Deployment
