@@ -1,23 +1,40 @@
-resource "helm_release" "nginx_gateway_controller" {
-  name             = "nginx-gateway"
-  repository       = "https://kubernetes.github.io/ingress-nginx"
-  chart            = "ingress-nginx"
-  namespace        = "ingress-nginx"
+resource "kubectl_manifest" "gateway_api_crds" {
+  yaml_body = <<YAML
+$(kubectl kustomize "https://github.com/nginx/nginx-gateway-fabric/config/crd/gateway-api/standard?ref=v2.4.0")
+YAML
+}
+
+resource "helm_release" "nginx_gateway_fabric" {
+  count            = var.environment == "post-test" ? 1 : 0
+  provider         = helm
+  name             = "nginx-gateway-fabric"
+  repository       = "oci://ghcr.io/nginx/charts"
+  chart            = "nginx-gateway-fabric"
+  namespace        = "nginx-gateway"
   create_namespace = true
-  timeout          = 300
-  wait             = true
+  timeout          = 600
+
+  depends_on = [
+    kubectl_manifest.gateway_api_crds,
+    helm_release.argocd
+  ]
 
   set = [
     {
-      name  = "controller.gateway.enabled"
-      value = "true"
+      name  = "service.type"
+      value = "LoadBalancer"
     },
     {
-      name  = "controller.service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
+      name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
       value = "nlb"
     },
     {
-      name  = "controller.publishService.enabled"
+      name  = "service.annotations.external-dns.alpha.kubernetes.io/hostname"
+      value = "api.freeeasycrypto.com"
+    },
+
+    {
+      name  = "nginxGateway.gwAPIExperimentalFeatures.enable"
       value = "true"
     }
   ]

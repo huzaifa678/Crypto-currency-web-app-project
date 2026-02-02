@@ -117,7 +117,7 @@ variable "token_symmetric_key" {
 variable "environment" {
   description = "Environment For Backend"
   type        = string
-  default     = "testing"
+  default     = "post-test"
 } 
 
 variable "origin" {
