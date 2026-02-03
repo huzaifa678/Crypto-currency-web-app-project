@@ -35,7 +35,7 @@ resource "helm_release" "nginx_gateway_fabric" {
 
     {
       name  = "nginxGateway.gwAPIExperimentalFeatures.enable"
-      value = "true"
+      value = "false"
     }
   ]
 }
