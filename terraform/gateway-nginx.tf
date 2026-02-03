@@ -1,5 +1,6 @@
 resource "kubectl_manifest" "gateway_api_crds" {
   yaml_body = file("${path.module}/gateway-api-crds.yaml")
+  wait      = true
 }
 
 

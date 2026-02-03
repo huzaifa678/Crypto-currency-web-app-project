@@ -1,4 +1,5 @@
 resource "kubernetes_namespace" "cert_manager" {
+  provider = kubernetes.eks
   metadata {
     name = "cert-manager"
     labels = {
