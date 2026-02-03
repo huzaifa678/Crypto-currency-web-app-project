@@ -28,7 +28,6 @@ resource "helm_release" "cert_manager_post_test" {
       name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
       value = aws_iam_role.cert_manager_irsa_role.arn
     },
-    { name = "config.apiVersion", value = "controller.config.cert-manager.io/v1alpha1" },
     { name = "config.kind", value = "ControllerConfiguration" },
     { name = "config.enableGatewayAPI", value = "true" }
   ]
