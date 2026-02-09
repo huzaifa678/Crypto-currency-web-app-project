@@ -3,6 +3,11 @@ resource "kubectl_manifest" "gateway_api_crds" {
   wait      = true
 }
 
+resource "time_sleep" "wait_60_seconds" {
+  depends_on = [kubectl_manifest.gateway_api_crds]
+  create_duration = "60s"
+}
+
 
 resource "helm_release" "nginx_gateway_fabric" {
   count            = var.environment == "post-test" ? 1 : 0
@@ -12,22 +17,23 @@ resource "helm_release" "nginx_gateway_fabric" {
   chart            = "nginx-gateway-fabric"
   namespace        = "nginx-gateway"
   create_namespace = true
-  timeout          = 600
 
   depends_on = [
-    kubectl_manifest.gateway_api_crds,
+    time_sleep.wait_60_seconds,
     helm_release.argocd
   ]
 
-  set = [
+  set =  [
     {
       name  = "service.type"
       value = "LoadBalancer"
     },
+
     {
       name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
       value = "nlb"
     },
+    
     {
       name  = "service.annotations.external-dns.alpha.kubernetes.io/hostname"
       value = "api.freeeasycrypto.com"
