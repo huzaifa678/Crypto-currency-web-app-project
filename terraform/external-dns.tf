@@ -43,7 +43,7 @@ resource "helm_release" "external_dns" {
   ]
 
   depends_on = [
-    helm_release.cert_manager_post_test,
-    helm_release.cert_manager_test
+    helm_release.ingress_nginx,
+    helm_release.nginx_gateway_fabric
   ]
 }

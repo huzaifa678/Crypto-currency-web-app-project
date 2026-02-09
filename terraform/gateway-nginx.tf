@@ -1,12 +1,17 @@
-resource "kubectl_manifest" "gateway_api_crds" {
-  yaml_body = file("${path.module}/gateway-api-crds.yaml")
-  wait      = true
+data "kubectl_file_documents" "docs" {
+    content = file("${path.module}/gateway-api-crds.yaml")
 }
 
-resource "time_sleep" "wait_60_seconds" {
-  depends_on = [kubectl_manifest.gateway_api_crds]
-  create_duration = "60s"
+resource "kubectl_manifest" "gateway_api_crds" {
+  for_each  = data.kubectl_file_documents.docs.manifests
+  yaml_body = each.value
+  wait = true
 }
+
+# resource "time_sleep" "wait_60_seconds" {
+#   depends_on = [kubectl_manifest.gateway_api_crds]
+#   create_duration = "60s"
+# }
 
 
 resource "helm_release" "nginx_gateway_fabric" {
@@ -19,7 +24,7 @@ resource "helm_release" "nginx_gateway_fabric" {
   create_namespace = true
 
   depends_on = [
-    time_sleep.wait_60_seconds,
+    # time_sleep.wait_60_seconds,
     helm_release.argocd
   ]
 
@@ -33,7 +38,7 @@ resource "helm_release" "nginx_gateway_fabric" {
       name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
       value = "nlb"
     },
-    
+
     {
       name  = "service.annotations.external-dns.alpha.kubernetes.io/hostname"
       value = "api.freeeasycrypto.com"

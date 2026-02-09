@@ -35,7 +35,7 @@ resource "helm_release" "cert_manager_post_test" {
 
   depends_on = [
     kubernetes_namespace.cert_manager,
-    helm_release.nginx_gateway_fabric
+    helm_release.external_dns
   ]
 }
 
@@ -66,7 +66,7 @@ resource "helm_release" "cert_manager_test" {
 
   depends_on = [
     kubernetes_namespace.cert_manager,
-    helm_release.ingress_nginx
+    helm_release.external_dns
   ]
 }
 

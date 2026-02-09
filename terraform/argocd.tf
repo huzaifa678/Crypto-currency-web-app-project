@@ -17,12 +17,15 @@ resource "helm_release" "argocd" {
   ]
 }
 
+data "kubectl_file_documents" "crypto_manifest" {
+    content = templatefile("${path.module}/argo-crypto.yaml.tpl", {
+      environment = var.environment
+    })
+}
 
 resource "kubectl_manifest" "crypto_app" {
-  yaml_body = templatefile("${path.module}/argo-crypto.yaml.tpl", {
-    environment = var.environment
-  })
-
+  yaml_body = data.kubectl_file_documents.crypto_manifest.content
+  wait      = true
   depends_on = [
     helm_release.argocd
   ]
