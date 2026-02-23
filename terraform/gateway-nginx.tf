@@ -8,10 +8,10 @@ resource "kubectl_manifest" "gateway_api_crds" {
   wait = true
 }
 
-# resource "time_sleep" "wait_60_seconds" {
-#   depends_on = [kubectl_manifest.gateway_api_crds]
-#   create_duration = "60s"
-# }
+resource "time_sleep" "wait_60_seconds" {
+  depends_on = [kubectl_manifest.gateway_api_crds]
+  create_duration = "60s"
+}
 
 
 resource "helm_release" "nginx_gateway_fabric" {
