@@ -5,54 +5,33 @@ resource "kubernetes_namespace" "cert_manager" {
   }
 }
 
-resource "helm_release" "cert_manager_crds" {
-  name       = "cert-manager-crds"
+resource "helm_release" "cert_manager_post_test" {
+  count      = var.environment == "post-test" ? 1 : 0
+  name       = "cert-manager"
   chart      = "cert-manager"
   repository = "oci://quay.io/jetstack/charts"
   version    = "v1.18.2"
-  namespace = "cert-manager"
-  set = [
-    { name = "crds.enabled", value = "true" }
-  ]
-}
-
-resource "helm_release" "cert_manager_post_test" {
-  count = var.environment == "post-test" ? 1 : 0
-
-  name             = "cert-manager"
-  chart            = "cert-manager"
-  namespace        = kubernetes_namespace.cert_manager.metadata[0].name
-  create_namespace = false
-  repository       = "oci://quay.io/jetstack/charts"
-  version          = "v1.18.2"
-  timeout          = 300
-  wait             = true
+  namespace  = kubernetes_namespace.cert_manager.metadata[0].name
+  
+  wait          = true
+  wait_for_jobs = true 
+  timeout       = 600
 
   set = [
-    { name = "crds.enabled", value = "false" },
-    { name = "serviceAccount.create", value = "true" },
-    { name = "serviceAccount.name", value = "cert-manager" },
+    { name = "installCRDs", value = "true" }, 
     {
-      name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
-      value = aws_iam_role.cert_manager_irsa_role.arn
+      name  = "crds.enabled"
+      value = "true"
     },
-    {
-      name  = "startupapicheck.timeout"
-      value = "10m"
-    },
-    {
-      name  = "webhook.timeoutSeconds"
-      value = "60"
-    },
+    { name = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn", value = aws_iam_role.cert_manager_irsa_role.arn },
+    { name = "config.enableGatewayAPI", value = "true" },
+    { name = "config.apiVersion", value = "controller.config.cert-manager.io/v1alpha1"},
     { name = "config.kind", value = "ControllerConfiguration" },
-    { name = "config.enableGatewayAPI", value = "true" }
+    { name = "startupapicheck.enabled", value = "false" } 
   ]
-
-  depends_on = [
-    kubectl_manifest.gateway_api_crds,
-    helm_release.cert_manager_crds
-  ]
+  depends_on = [kubectl_manifest.gateway_api_crds]
 }
+
 
 resource "helm_release" "cert_manager_test" {
   count = var.environment != "post-test" ? 1 : 0
