@@ -28,7 +28,6 @@ resource "helm_release" "cert_manager_post_test" {
     { name = "config.kind", value = "ControllerConfiguration" },
     { name = "startupapicheck.enabled", value = "false" } 
   ]
-  depends_on = [kubectl_manifest.gateway_api_crds]
 }
 
 

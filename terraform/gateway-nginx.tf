@@ -24,8 +24,9 @@ resource "helm_release" "nginx_gateway_fabric" {
   create_namespace = true
 
   depends_on = [
-    # time_sleep.wait_60_seconds,
-    helm_release.argocd
+    time_sleep.wait_60_seconds,
+    helm_release.argocd,
+    kubectl_manifest.gateway_api_crds
   ]
 
   set =  [
