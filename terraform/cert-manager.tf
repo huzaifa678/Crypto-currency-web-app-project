@@ -2,12 +2,19 @@ resource "kubernetes_namespace" "cert_manager" {
   provider = kubernetes.eks
   metadata {
     name = "cert-manager"
-    labels = {
-      "cert-manager.io/disable-validation" = "true"
-    }
   }
 }
 
+resource "helm_release" "cert_manager_crds" {
+  name       = "cert-manager-crds"
+  chart      = "cert-manager"
+  repository = "oci://quay.io/jetstack/charts"
+  version    = "v1.18.2"
+
+  set = [
+    { name = "crds.enabled", value = "true" }
+  ]
+}
 
 resource "helm_release" "cert_manager_post_test" {
   count = var.environment == "post-test" ? 1 : 0
@@ -22,20 +29,30 @@ resource "helm_release" "cert_manager_post_test" {
   wait             = true
 
   set = [
-    { name = "crds.enabled", value = "true" },
+    { name = "crds.enabled", value = "false" },
     { name = "serviceAccount.create", value = "true" },
     { name = "serviceAccount.name", value = "cert-manager" },
     {
       name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
       value = aws_iam_role.cert_manager_irsa_role.arn
     },
+    {
+      name  = "startupapicheck.timeout"
+      value = "5m"
+    },
+    {
+      name  = "webhook.timeoutSeconds"
+      value = "30"
+    },
     { name = "config.kind", value = "ControllerConfiguration" },
     { name = "config.enableGatewayAPI", value = "true" }
   ]
 
   depends_on = [
-    kubernetes_namespace.cert_manager,
-    helm_release.external_dns
+    aws_eks_node_group.eks_node_group,
+    aws_iam_role.cert_manager_irsa_role,
+    kubectl_manifest.gateway_api_crds,
+    helm_release.cert_manager_crds
   ]
 }
 
@@ -58,15 +75,11 @@ resource "helm_release" "cert_manager_test" {
     {
       name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
       value = aws_iam_role.cert_manager_irsa_role.arn
-    },
-    { name = "config.apiVersion", value = "controller.config.cert-manager.io/v1alpha1" },
-    { name = "config.kind", value = "ControllerConfiguration" },
-    { name = "config.enableGatewayAPI", value = "true" }
+    }
   ]
 
   depends_on = [
-    kubernetes_namespace.cert_manager,
-    helm_release.external_dns
+    helm_release.ingress_nginx
   ]
 }
 
