@@ -10,7 +10,7 @@ resource "helm_release" "cert_manager_crds" {
   chart      = "cert-manager"
   repository = "oci://quay.io/jetstack/charts"
   version    = "v1.18.2"
-
+  namespace = "cert-manager"
   set = [
     { name = "crds.enabled", value = "true" }
   ]
@@ -38,19 +38,17 @@ resource "helm_release" "cert_manager_post_test" {
     },
     {
       name  = "startupapicheck.timeout"
-      value = "5m"
+      value = "10m"
     },
     {
       name  = "webhook.timeoutSeconds"
-      value = "30"
+      value = "60"
     },
     { name = "config.kind", value = "ControllerConfiguration" },
     { name = "config.enableGatewayAPI", value = "true" }
   ]
 
   depends_on = [
-    aws_eks_node_group.eks_node_group,
-    aws_iam_role.cert_manager_irsa_role,
     kubectl_manifest.gateway_api_crds,
     helm_release.cert_manager_crds
   ]
