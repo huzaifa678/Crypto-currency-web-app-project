@@ -18,7 +18,6 @@ resource "helm_release" "cert_manager_post_test" {
   timeout       = 600
 
   set = [
-    { name = "installCRDs", value = "true" }, 
     {
       name  = "crds.enabled"
       value = "true"
