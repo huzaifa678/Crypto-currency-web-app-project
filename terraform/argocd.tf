@@ -13,7 +13,8 @@ resource "helm_release" "argocd" {
 
   depends_on = [
     aws_eks_cluster.eks_cluster,
-    aws_eks_node_group.eks_node_group
+    aws_eks_node_group.eks_node_group,
+    kubectl_manifest.gateway_api_crds
   ]
 }
 
