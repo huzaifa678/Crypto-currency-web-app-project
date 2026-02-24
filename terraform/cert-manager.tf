@@ -17,6 +17,8 @@ resource "helm_release" "cert_manager_post_test" {
   wait_for_jobs = true 
   timeout       = 600
 
+  depends_on = [aws_eks_node_group.eks_node_group]
+
   set = [
     {
       name  = "crds.enabled"
