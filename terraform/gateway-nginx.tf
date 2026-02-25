@@ -22,6 +22,7 @@ resource "helm_release" "nginx_gateway_fabric" {
   chart            = "nginx-gateway-fabric"
   namespace        = "nginx-gateway"
   create_namespace = true
+  disable_openapi_validation = true
 
   depends_on = [
     time_sleep.wait_60_seconds,
@@ -30,21 +31,6 @@ resource "helm_release" "nginx_gateway_fabric" {
   ]
 
   set =  [
-    {
-      name  = "service.type"
-      value = "LoadBalancer"
-    },
-
-    {
-      name  = "service.annotations.service\\.beta\\.kubernetes\\.io/aws-load-balancer-type"
-      value = "nlb"
-    },
-
-    {
-      name  = "service.annotations.external-dns.alpha.kubernetes.io/hostname"
-      value = "api.freeeasycrypto.com"
-    },
-
     {
       name  = "nginxGateway.gwAPIExperimentalFeatures.enable"
       value = "false"

@@ -43,7 +43,8 @@ terraform {
     bucket         = "my-terraform-state-bucket-1742982420"
     key            = "crypto-system/terraform.tfstate"
     region         = "us-west-2"
-    encrypt        = false
+    use_lockfile = true
+    encrypt        = true
   }
 }
 
@@ -75,8 +76,7 @@ provider "kubectl" {
 
 
 provider "kubernetes" {
-  alias = "eks"
-
+  alias                  = "eks"
   host                   = data.aws_eks_cluster.eks.endpoint
   cluster_ca_certificate = base64decode(
     data.aws_eks_cluster.eks.certificate_authority[0].data
