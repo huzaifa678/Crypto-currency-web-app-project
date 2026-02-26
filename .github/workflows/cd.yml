@@ -55,7 +55,7 @@ jobs:
       - name: Terraform Apply
         run: |
           terraform apply -auto-approve tfplan
-          working-directory: ./terraform
+        working-directory: ./terraform
 
   docker:
     name: Build & Push Docker Image to ECR
