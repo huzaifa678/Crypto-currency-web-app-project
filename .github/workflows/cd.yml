@@ -55,7 +55,7 @@ jobs:
       - name: Terraform Apply
         run: |
           terraform apply -auto-approve tfplan
-        working-directory: ./terraform
+          working-directory: ./terraform
 
   docker:
     name: Build & Push Docker Image to ECR
@@ -112,10 +112,15 @@ jobs:
           IMAGE="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:${{ github.sha }}"
 
           yq e -i '.image = "'$IMAGE'"' values.yaml
-          yq e -i '.environment = strenv(ENVIRONMENT)' values.yaml
+          if [ "$ENVIRONMENT" = "test" ] || [ "$ENVIRONMENT" = "post-test" ]; then
+            echo "Setting environment in values.yaml for $ENVIRONMENT"
+            yq e -i '.environment = strenv(ENVIRONMENT)' values.yaml
+          else
+            echo "Skipping environment set for $ENVIRONMENT"
+          fi
          
       - name: Add Gateway NLB target
-        if: env.ENVIRONMENT == 'post-test'
+        if: env.ENVIRONMENT == 'post-test' || env.ENVIRONMENT == 'main'
         run: |
           cd Continious-Delivery/eks-chart
 
