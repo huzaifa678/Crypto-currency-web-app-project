@@ -150,7 +150,6 @@ jobs:
             --output text)
 
           yq e -i '.gateway.nlbTarget = "'$NLB_DNS'"' values.yaml
-
           
       - name: Commit and push changes
         run: |
