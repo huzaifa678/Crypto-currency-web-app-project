@@ -137,4 +137,4 @@ jobs:
 
           git add eks-chart/values.yaml
           git commit -m "deploy(crypto): image -> ${{ github.sha }}"
-          git push -u origin main
+          git push -u origin post-test
