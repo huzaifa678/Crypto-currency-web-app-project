@@ -45,10 +45,6 @@ resource "aws_security_group" "eks_nodes" {
   tags = {
     Name = "eks-nodes-sg"
   }
-
-  depends_on = [
-    aws_eks_node_group.eks_node_group
-  ]
 }
 
 resource "aws_security_group" "rds_sg" {
