@@ -9,6 +9,7 @@ on:
         default: 'main'
         type: choice
         options:
+          - main
           - test
           - post-test
   push:
