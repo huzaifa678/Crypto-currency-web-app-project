@@ -9,9 +9,6 @@ on:
     branches:
       - main 
 
-env:
-  ENVIRONMENT: ${{ github.ref_name }}
-
 jobs:
   terraform:
     name: Terraform Apply
@@ -39,7 +36,6 @@ jobs:
       - name: Terraform Plan
         run: |
           terraform plan \
-            -var="environment=$ENVIRONMENT" \
             -var="google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}" \
             -var="google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
             -var="token_symmetric_key=${{ secrets.TOKEN_SYMMETRIC_KEY }}" \
@@ -108,7 +104,6 @@ jobs:
           yq e -i '.image = "'$IMAGE'"' values.yaml
          
       - name: Add Gateway NLB target
-        if: github.ref_name == 'post-test'
         run: |
           cd Continious-Delivery/eks-chart
 
