@@ -16,3 +16,4 @@ Godeps/
 cmd
 node_modules
 eks/irsa-test.yaml
+.github/workflows/
