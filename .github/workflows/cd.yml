@@ -4,10 +4,15 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - "*"
+      - main
+      - test
+      - post-test
   pull_request:
     branches:
       - main 
+
+env:
+  ENVIRONMENT: ${{ github.event.inputs.environment || github.ref_name }}
 
 jobs:
   terraform:
@@ -102,8 +107,10 @@ jobs:
           IMAGE="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:${{ github.sha }}"
 
           yq e -i '.image = "'$IMAGE'"' values.yaml
+          yq e -i '.environment = strenv(ENVIRONMENT)' values.yaml
          
       - name: Add Gateway NLB target
+        if: env.ENVIRONMENT == 'post-test'
         run: |
           cd Continious-Delivery/eks-chart
 
