@@ -12,6 +12,16 @@ module "vpc" {
   enable_dns_hostnames = true
   enable_dns_support   = true
 
+  public_subnet_tags = {
+    "kubernetes.io/role/elb" = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+  }
+
+  private_subnet_tags = {
+    "kubernetes.io/role/internal-elb" = "1"
+    "kubernetes.io/cluster/${var.cluster_name}" = "shared"
+  }
+
   tags = {
       Name = "crypto-based-web-system-vpc-network"
   }
