@@ -37,6 +37,22 @@ resource "helm_release" "external_dns" {
       value = "external-dns"
     },
     {
+      name  = "namespaced"
+      value = "false"
+    },
+    {
+      name  = "rbac.create"
+      value = "true"
+    },
+    {
+      name  = "sources[0]"
+      value = "gateway-httproute"
+    },
+    {
+      name  = "sources[1]"
+      value = "gateway-grpcroute"
+    },
+    {
       name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
       value = aws_iam_role.external_dns_irsa_role.arn
     }
