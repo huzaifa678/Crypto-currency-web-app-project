@@ -106,6 +106,26 @@ jobs:
           IMAGE="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:${{ github.sha }}"
 
           yq e -i '.image = "'$IMAGE'"' values.yaml
+ post-test
+         
+      - name: Add Gateway NLB target
+        if: github.ref_name == 'post-test'
+        run: |
+          cd Continious-Delivery/eks-chart
+
+          IMAGE="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com/crypto-ecr-repo:${{ github.sha }}"
+
+          yq e -i '.image = "'$IMAGE'"' values.yaml
+         
+          echo "Post-test environment detected"
+
+          NLB_DNS=$(aws elbv2 describe-load-balancers \
+            --query "LoadBalancers[?Type=='network'].DNSName | [0]" \
+            --output text)
+
+          yq e -i '.gateway.nlbTarget = "'$NLB_DNS'"' values.yaml
+
+main
           
       - name: Commit and push changes
         run: |
@@ -120,4 +140,8 @@ jobs:
 
           git add eks-chart/values.yaml
           git commit -m "deploy(crypto): image -> ${{ github.sha }}"
+post-test
+          git push -u origin post-test
+
           git push -u origin test
+main
