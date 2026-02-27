@@ -145,12 +145,6 @@ jobs:
          
           echo "Post-test environment detected"
 
-          NLB_DNS=$(aws elbv2 describe-load-balancers \
-            --query "LoadBalancers[?Type=='network'].DNSName | [0]" \
-            --output text)
-
-          yq e -i '.gateway.nlbTarget = "'$NLB_DNS'"' values.yaml
-
           export PUBLIC_SUBNETS=$(aws ec2 describe-subnets \
           --filters "Name=tag:kubernetes.io/role/elb,Values=1" \
           --query "Subnets[*].SubnetId" \
