@@ -96,6 +96,7 @@ const Login: React.FC = () => {
                 />
                 <button
                   type="button"
+                  data-testid="toggle-password"
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
                 >
