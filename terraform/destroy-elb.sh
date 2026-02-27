@@ -12,25 +12,25 @@ for arn in $ELB_ARNS; do
     aws elbv2 delete-load-balancer --load-balancer-arn "$arn"
 done
 
-echo "Waiting for ENIs to release..."
-sleep 30
+echo "Waiting for ENIs to become available..."
+sleep 60
 
 SGS=$(aws ec2 describe-security-groups --filters Name=vpc-id,Values=$VPC_ID --query "SecurityGroups[*].GroupId" --output text)
-
-
-# This breaks the circular dependencies that stop SGs from being deleted
 for sg in $SGS; do
     GROUP_NAME=$(aws ec2 describe-security-groups --group-ids "$sg" --query "SecurityGroups[0].GroupName" --output text)
     if [[ "$GROUP_NAME" != "default" ]]; then
         echo "Stripping rules from SG: $sg ($GROUP_NAME)"
-        aws ec2 revoke-security-group-ingress --group-id "$sg" --ip-permissions "$(aws ec2 describe-security-groups --group-ids "$sg" --query 'SecurityGroups[0].IpPermissions')" || true
-        aws ec2 revoke-security-group-egress --group-id "$sg" --ip-permissions "$(aws ec2 describe-security-groups --group-ids "$sg" --query 'SecurityGroups[0].IpPermissionsEgress')" || true
+        aws ec2 describe-security-groups --group-ids "$sg" --query 'SecurityGroups[0].IpPermissions' --output json > /tmp/sg-ingress.json
+        aws ec2 describe-security-groups --group-ids "$sg" --query 'SecurityGroups[0].IpPermissionsEgress' --output json > /tmp/sg-egress.json
+        aws ec2 revoke-security-group-ingress --group-id "$sg" --ip-permissions file:///tmp/sg-ingress.json || true
+        aws ec2 revoke-security-group-egress --group-id "$sg" --ip-permissions file:///tmp/sg-egress.json || true
     fi
 done
 
 ENIS=$(aws ec2 describe-network-interfaces --filters Name=vpc-id,Values=$VPC_ID --query "NetworkInterfaces[*].NetworkInterfaceId" --output text)
 for eni in $ENIS; do
-    echo "Force deleting ENI: $eni"
+    echo "Deleting ENI: $eni"
+    aws ec2 wait network-interface-available --network-interface-ids $eni || true
     aws ec2 delete-network-interface --network-interface-id "$eni" || true
 done
 

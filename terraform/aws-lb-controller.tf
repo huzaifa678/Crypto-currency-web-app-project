@@ -30,7 +30,8 @@ resource "helm_release" "aws_lb_controller" {
   ]
 
   depends_on = [
-    kubernetes_service_account.aws_lb_controller
+    kubernetes_service_account.aws_lb_controller,
+    module.vpc
   ]
 }
 
@@ -44,4 +45,8 @@ resource "kubernetes_service_account" "aws_lb_controller" {
       "eks.amazonaws.com/role-arn" = aws_iam_role.aws_lb_controller_irsa_role.arn
     }
   }
+
+  depends_on = [ 
+    module.vpc
+  ]
 }
