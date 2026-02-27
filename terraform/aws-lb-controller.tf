@@ -26,6 +26,14 @@ resource "helm_release" "aws_lb_controller" {
     {
       name  = "serviceAccount.name"
       value = "aws-load-balancer-controller"
+    },
+    {
+      name  = "subnetTags.kubernetes\\.io/role/elb"
+      value = "1"
+    },
+    { 
+      name  = "subnetTags.kubernetes\\.io/cluster/${var.cluster_name}"
+      value = "shared"
     }
   ]
 
