@@ -144,8 +144,8 @@ jobs:
           yq e -i '.image = "'$IMAGE'"' values.yaml
          
           NLB_DNS=$(aws elbv2 describe-load-balancers \
-            --query "LoadBalancers[?Type=='network'].DNSName | [0]" \
-            --output text)
+          --query "LoadBalancers[?Type=='network' && Scheme=='internet-facing'].DNSName | [0]" \
+          --output text)
 
           yq e -i '.gateway.nlbTarget = "'$NLB_DNS'"' values.yaml
 
