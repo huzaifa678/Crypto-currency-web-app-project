@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -12,7 +13,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-
 func addAuthMiddleware(t *testing.T, request *http.Request, tokenMaker token.Maker, authorizationType string, username string, duration time.Duration) {
 	token, payload, err := tokenMaker.CreateToken(username, duration, token.TokenTypeAccessToken)
 
@@ -26,7 +26,7 @@ func addAuthMiddleware(t *testing.T, request *http.Request, tokenMaker token.Mak
 func TestAuthMiddleWare(t *testing.T) {
 
 	testCases := []struct {
-		name 		  string
+		name          string
 		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		checkResponse func(t *testing.T, recoder *httptest.ResponseRecorder)
 	}{
@@ -81,13 +81,12 @@ func TestAuthMiddleWare(t *testing.T) {
 
 		t.Run(tc.name, func(t *testing.T) {
 
-
-            server := NewTestServer(t, nil)
+			server := NewTestServer(t, nil)
 
 			url := "/auth"
 			server.router.GET(url, authMiddleware(server.tokenMaker), func(ctx *gin.Context) {
-					ctx.JSON(http.StatusOK, gin.H{})
-				},
+				ctx.JSON(http.StatusOK, gin.H{})
+			},
 			)
 
 			recorder := httptest.NewRecorder()
@@ -99,5 +98,5 @@ func TestAuthMiddleWare(t *testing.T) {
 			tc.checkResponse(t, recorder)
 		})
 	}
-	
+
 }

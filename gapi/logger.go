@@ -11,7 +11,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-
 func GrpcLogger(
 	ctx context.Context,
 	req interface{},
@@ -64,7 +63,7 @@ func (rec *ResponseRecorder) Flush() {
 	}
 }
 
-func HttpLogger(handler http.Handler) http.Handler {
+func HTTPLogger(handler http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
 		startTime := time.Now()
 		rec := &ResponseRecorder{

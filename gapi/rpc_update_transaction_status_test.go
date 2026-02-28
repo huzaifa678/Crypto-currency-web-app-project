@@ -18,23 +18,22 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-
 func TestUpdateTransactionStatus(t *testing.T) {
 
 	_, _, createTxParams := createRandomTransaction()
 	transactionID := uuid.New()
 	transaction := db.Transaction{
-    	ID:       transactionID,
-    	Status:   db.TransactionStatus(pb.TransactionStatus_PENDING),
-    	Username: createTxParams.Username, 
+		ID:       transactionID,
+		Status:   db.TransactionStatus(pb.TransactionStatus_PENDING),
+		Username: createTxParams.Username,
 	}
 
 	testCases := []struct {
-		name      string
-		req       *pb.UpdateTransactionStatusRequest
-		buildStubs func(store *mockdb.MockStore_interface)
+		name          string
+		req           *pb.UpdateTransactionStatusRequest
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
-		checkResponse  func(t *testing.T, res *pb.UpdateTransactionStatusResponse, err error)
+		checkResponse func(t *testing.T, res *pb.UpdateTransactionStatusResponse, err error)
 	}{
 		{
 			name: "OK",
@@ -45,7 +44,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, createTxParams.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), transactionID).
 					Times(1).
@@ -54,7 +53,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 				store.EXPECT().
 					UpdateTransactionStatus(gomock.Any(), db.UpdateTransactionStatusParams{
 						Status: db.TransactionStatus("pending"),
-						ID: transactionID,
+						ID:     transactionID,
 					}).
 					Times(1).
 					Return(nil)
@@ -75,7 +74,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, createTxParams.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().GetTransactionByID(gomock.Any(), gomock.Any()).Times(0)
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateTransactionStatusResponse, err error) {
@@ -94,7 +93,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, createTxParams.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), transactionID).
 					Times(1).
@@ -116,7 +115,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateTransactionStatusResponse, err error) {
 				require.Error(t, err)
@@ -134,7 +133,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, createTxParams.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), transactionID).
 					Times(1).
@@ -160,7 +159,7 @@ func TestUpdateTransactionStatus(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)

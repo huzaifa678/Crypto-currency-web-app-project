@@ -16,15 +16,13 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-
-
 func TestDeleteTransactionRPC(t *testing.T) {
 	transaction, _, _ := createRandomTransaction()
 
 	testCases := []struct {
 		name          string
 		req           *pb.DeleteTransactionRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.DeleteTransactionResponse, err error)
 	}{
@@ -36,7 +34,7 @@ func TestDeleteTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
 					Times(1).
@@ -61,7 +59,7 @@ func TestDeleteTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -84,7 +82,7 @@ func TestDeleteTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -107,7 +105,7 @@ func TestDeleteTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
 					Times(1).
@@ -128,7 +126,7 @@ func TestDeleteTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
 					Times(1).
@@ -149,7 +147,7 @@ func TestDeleteTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, "differentuser", time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
 					Times(1).
@@ -170,7 +168,7 @@ func TestDeleteTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTransactionByID(gomock.Any(), gomock.Eq(transaction.ID)).
 					Times(1).
@@ -197,7 +195,7 @@ func TestDeleteTransactionRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)

@@ -7,10 +7,11 @@ import (
 	"testing"
 	"time"
 
+	"math/rand/v2"
+
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/rand"
 )
 
 func TestCreateMarket(t *testing.T) {
@@ -25,17 +26,15 @@ func TestCreateMarket(t *testing.T) {
 
 func TestDeleteMarket(t *testing.T) {
 
-
 	marketParams, _, _ := createRandomMarket()
 
 	existingMarkets, err := testStore.ListMarketsByUsername(context.Background(), marketParams.Username)
 	require.NoError(t, err)
-	
+
 	for _, market := range existingMarkets {
 		err := testStore.DeleteMarket(context.Background(), market.ID)
 		require.NoError(t, err)
 	}
-
 
 	createMarketArg := CreateMarketParams{
 		Username:       marketParams.Username,
@@ -86,7 +85,6 @@ func TestGetMarketById(t *testing.T) {
 func TestListMarkets(t *testing.T) {
 	ctx := context.Background()
 
-
 	seenPairs := make(map[string]struct{})
 	var marketParams CreateMarketParams
 	var market CreateMarketRow
@@ -101,7 +99,7 @@ func TestListMarkets(t *testing.T) {
 		}
 
 		_, err := testStore.CreateMarket(ctx, marketParams)
-    	require.NoError(t, err, "Failed to create market")
+		require.NoError(t, err, "Failed to create market")
 
 		log.Println("Inserted Market:", market)
 	}
@@ -133,13 +131,14 @@ func createRandomMarket() (CreateMarketParams, Market, CreateMarketRow) {
 
 	user, _ := testStore.CreateUser(ctx, userArgs)
 
-	rand.Seed(uint64(time.Now().UnixNano()))
+	mySeed := uint64(time.Now().UnixNano())
+	rand.New(rand.NewPCG(mySeed, 0))
 	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
 
 	var baseCurrency, quoteCurrency string
 	for {
-		baseCurrency = currencies[rand.Intn(len(currencies))]
-		quoteCurrency = currencies[rand.Intn(len(currencies))]
+		baseCurrency = currencies[rand.IntN(len(currencies))]
+		quoteCurrency = currencies[rand.IntN(len(currencies))]
 
 		if baseCurrency != quoteCurrency {
 			pairKey := baseCurrency + "_" + quoteCurrency
@@ -152,8 +151,8 @@ func createRandomMarket() (CreateMarketParams, Market, CreateMarketRow) {
 
 	marketArgs := CreateMarketParams{
 		Username:       user.Username,
-		BaseCurrency:   baseCurrency + fmt.Sprintf("_%d", rand.Intn(100000)),
-		QuoteCurrency:  quoteCurrency + fmt.Sprintf("_%d", rand.Intn(100000)),
+		BaseCurrency:   baseCurrency + fmt.Sprintf("_%d", rand.IntN(100000)),
+		QuoteCurrency:  quoteCurrency + fmt.Sprintf("_%d", rand.IntN(100000)),
 		MinOrderAmount: decimal.NewFromFloat(0.1),
 		PricePrecision: 8,
 	}

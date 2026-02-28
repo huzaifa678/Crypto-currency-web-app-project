@@ -1,3 +1,4 @@
+//nolint:revive
 package token
 
 import (
@@ -8,8 +9,6 @@ import (
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/stretchr/testify/require"
 )
-
-
 
 func TestJWTMaker(t *testing.T) {
 

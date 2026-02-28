@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -12,6 +13,8 @@ import (
 	"testing"
 	"time"
 
+	"math/rand/v2"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
@@ -21,148 +24,146 @@ import (
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/rand"
 )
 
-
 func TestCreateOrderAPI(t *testing.T) {
-    createOrderParams, order, _, createOrderRow := createRandomOrder()
+	createOrderParams, order, _, createOrderRow := createRandomOrder()
 
-    testCases := []struct {
-        name          string
-        body          gin.H
-        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
-        buildStubs    func(store *mockdb.MockStore_interface)
-        checkResponse func(recorder *httptest.ResponseRecorder)
-    }{
-        {
-            name: "OK",
-            body: gin.H{
-                "user_name":  createOrderParams.Username,
-                "user_email": createOrderParams.UserEmail,
-                "market_id":  createOrderParams.MarketID,
-                "type":       createOrderParams.Type,
-                "status":     createOrderParams.Status,
-                "price":      createOrderParams.Price,
-                "amount":     createOrderParams.Amount,
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, createOrderParams.Username, time.Minute)
-            },
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    CreateOrder(gomock.Any(), gomock.Any()).
-                    DoAndReturn(func(ctx context.Context, arg db.CreateOrderParams) (db.CreateOrderRow, error) {
-                        require.Equal(t, createOrderParams.Username, arg.Username)
-                        require.Equal(t, createOrderParams.UserEmail, arg.UserEmail)
-                        require.Equal(t, createOrderParams.MarketID, arg.MarketID)
-                        require.Equal(t, createOrderParams.Type, arg.Type)
-                        require.Equal(t, createOrderParams.Status, arg.Status)
-                        require.True(t, createOrderParams.Price.Equal(arg.Price), "price mismatch")
-                        require.True(t, createOrderParams.Amount.Equal(arg.Amount), "amount mismatch")
-                        return createOrderRow, nil
-                    }).
-                    Times(1)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusOK, recorder.Code)
-                requireBodyMatchOrder(t, recorder.Body, order)
-            },
-        },
-        {
-            name: "InternalError",
-            body: gin.H{
-                "user_name":  createOrderParams.Username,
-                "user_email": createOrderParams.UserEmail,
-                "market_id":  createOrderParams.MarketID,
-                "type":       createOrderParams.Type,
-                "status":     createOrderParams.Status,
-                "price":      createOrderParams.Price,
-                "amount":     createOrderParams.Amount,
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, createOrderParams.Username, time.Minute)
-            },
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    CreateOrder(gomock.Any(), gomock.Any()).
-                    DoAndReturn(func(ctx context.Context, arg db.CreateOrderParams) (db.CreateOrderRow, error) {
-                        require.Equal(t, createOrderParams.Username, arg.Username)
-                        require.Equal(t, createOrderParams.UserEmail, arg.UserEmail)
-                        require.Equal(t, createOrderParams.MarketID, arg.MarketID)
-                        require.Equal(t, createOrderParams.Type, arg.Type)
-                        require.Equal(t, createOrderParams.Status, arg.Status)
-                        require.True(t, createOrderParams.Price.Equal(arg.Price), "price mismatch")
-                        require.True(t, createOrderParams.Amount.Equal(arg.Amount), "amount mismatch")
-                        return createOrderRow, sql.ErrConnDone
-                    }).
-                    Times(1)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusInternalServerError, recorder.Code)
-            },
-        },
-        {
-            name: "InvalidMarketID",
-            body: gin.H{
-                "user_name":  createOrderParams.Username,
-                "user_email": createOrderParams.UserEmail,
-                "market_id":  "invalid-uuid",
-                "type":       createOrderParams.Type,
-                "status":     createOrderParams.Status,
-                "price":      createOrderParams.Price,
-                "amount":     createOrderParams.Amount,
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, createOrderParams.Username, time.Minute)
-            },
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    CreateOrder(gomock.Any(), gomock.Any()).
-                    Times(0)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusBadRequest, recorder.Code)
-            },
-        },
-    }
+	testCases := []struct {
+		name          string
+		body          gin.H
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+		buildStubs    func(store *mockdb.MockStoreInterface)
+		checkResponse func(recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name: "OK",
+			body: gin.H{
+				"user_name": createOrderParams.Username,
+				"userEmail": createOrderParams.UserEmail,
+				"market_id": createOrderParams.MarketID,
+				"type":      createOrderParams.Type,
+				"status":    createOrderParams.Status,
+				"price":     createOrderParams.Price,
+				"amount":    createOrderParams.Amount,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, createOrderParams.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+				store.EXPECT().
+					CreateOrder(gomock.Any(), gomock.Any()).
+					DoAndReturn(func(ctx context.Context, arg db.CreateOrderParams) (db.CreateOrderRow, error) {
+						require.Equal(t, createOrderParams.Username, arg.Username)
+						require.Equal(t, createOrderParams.UserEmail, arg.UserEmail)
+						require.Equal(t, createOrderParams.MarketID, arg.MarketID)
+						require.Equal(t, createOrderParams.Type, arg.Type)
+						require.Equal(t, createOrderParams.Status, arg.Status)
+						require.True(t, createOrderParams.Price.Equal(arg.Price), "price mismatch")
+						require.True(t, createOrderParams.Amount.Equal(arg.Amount), "amount mismatch")
+						return createOrderRow, nil
+					}).
+					Times(1)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+				requireBodyMatchOrder(t, recorder.Body, order)
+			},
+		},
+		{
+			name: "InternalError",
+			body: gin.H{
+				"user_name": createOrderParams.Username,
+				"userEmail": createOrderParams.UserEmail,
+				"market_id": createOrderParams.MarketID,
+				"type":      createOrderParams.Type,
+				"status":    createOrderParams.Status,
+				"price":     createOrderParams.Price,
+				"amount":    createOrderParams.Amount,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, createOrderParams.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+				store.EXPECT().
+					CreateOrder(gomock.Any(), gomock.Any()).
+					DoAndReturn(func(ctx context.Context, arg db.CreateOrderParams) (db.CreateOrderRow, error) {
+						require.Equal(t, createOrderParams.Username, arg.Username)
+						require.Equal(t, createOrderParams.UserEmail, arg.UserEmail)
+						require.Equal(t, createOrderParams.MarketID, arg.MarketID)
+						require.Equal(t, createOrderParams.Type, arg.Type)
+						require.Equal(t, createOrderParams.Status, arg.Status)
+						require.True(t, createOrderParams.Price.Equal(arg.Price), "price mismatch")
+						require.True(t, createOrderParams.Amount.Equal(arg.Amount), "amount mismatch")
+						return createOrderRow, sql.ErrConnDone
+					}).
+					Times(1)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+		{
+			name: "InvalidMarketID",
+			body: gin.H{
+				"user_name": createOrderParams.Username,
+				"userEmail": createOrderParams.UserEmail,
+				"market_id": "invalid-uuid",
+				"type":      createOrderParams.Type,
+				"status":    createOrderParams.Status,
+				"price":     createOrderParams.Price,
+				"amount":    createOrderParams.Amount,
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, createOrderParams.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+				store.EXPECT().
+					CreateOrder(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+	}
 
-    for i := range testCases {
-        tc := testCases[i]
+	for i := range testCases {
+		tc := testCases[i]
 
-        t.Run(tc.name, func(t *testing.T) {
-            ctrl := gomock.NewController(t)
-            defer ctrl.Finish()
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-            store := mockdb.NewMockStore_interface(ctrl)
-            tc.buildStubs(store)
+			store := mockdb.NewMockStoreInterface(ctrl)
+			tc.buildStubs(store)
 
-            server := NewTestServer(t, store)
-            recorder := httptest.NewRecorder()
+			server := NewTestServer(t, store)
+			recorder := httptest.NewRecorder()
 
-            data, err := json.Marshal(tc.body)
-            require.NoError(t, err)
+			data, err := json.Marshal(tc.body)
+			require.NoError(t, err)
 
-            url := "/orders"
-            request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
-            require.NoError(t, err)
+			url := "/orders"
+			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
+			require.NoError(t, err)
 
-            tc.setupAuth(t, request, server.tokenMaker)
+			tc.setupAuth(t, request, server.tokenMaker)
 
-            server.router.ServeHTTP(recorder, request)
-            tc.checkResponse(recorder)
-        })
-    }
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(recorder)
+		})
+	}
 }
 
 func TestGetOrderAPI(t *testing.T) {
 
-    _, order, _, _ := createRandomOrder()
+	_, order, _, _ := createRandomOrder()
 
 	testCases := []struct {
 		name          string
 		orderID       string
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
@@ -170,9 +171,9 @@ func TestGetOrderAPI(t *testing.T) {
 			name:    "OK",
 			orderID: order.ID.String(),
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, order.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, order.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Eq(order.ID)).
 					Times(1).
@@ -187,9 +188,9 @@ func TestGetOrderAPI(t *testing.T) {
 			name:    "NotFound",
 			orderID: order.ID.String(),
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, order.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, order.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Eq(order.ID)).
 					Times(1).
@@ -203,9 +204,9 @@ func TestGetOrderAPI(t *testing.T) {
 			name:    "InvalidUUID",
 			orderID: "invalid-uuid",
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, order.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, order.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -215,12 +216,12 @@ func TestGetOrderAPI(t *testing.T) {
 			},
 		},
 		{
-			name:   "InvalidID",
+			name:    "InvalidID",
 			orderID: uuid.Nil.String(),
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, order.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, order.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -238,7 +239,7 @@ func TestGetOrderAPI(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store)
@@ -257,134 +258,133 @@ func TestGetOrderAPI(t *testing.T) {
 }
 
 func TestDeleteOrderAPI(t *testing.T) {
-    trade, _, getTrade := createRandomTrade()
+	trade, _, getTrade := createRandomTrade()
 
-    testCases := []struct {
-        name          string
-        tradeID       uuid.UUID
-        buildStubs    func(store *mockdb.MockStore_interface)
-        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
-        checkResponse func(recorder *httptest.ResponseRecorder)
-    }{
-        {
-            name:    "OK",
-            tradeID: trade.ID,
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(1).
-                    Return(getTrade, nil)
+	testCases := []struct {
+		name          string
+		tradeID       uuid.UUID
+		buildStubs    func(store *mockdb.MockStoreInterface)
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+		checkResponse func(recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name:    "OK",
+			tradeID: trade.ID,
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+				store.EXPECT().
+					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(1).
+					Return(getTrade, nil)
 
 				store.EXPECT().
-                    DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(1).
-                    Return(nil)
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusOK, recorder.Code)
-            },
-        },
-        {
-            name:    "NotFound",
-            tradeID: trade.ID,
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(1).
-                    Return(getTrade, sql.ErrNoRows)
+					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(1).
+					Return(nil)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name:    "NotFound",
+			tradeID: trade.ID,
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+				store.EXPECT().
+					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(1).
+					Return(getTrade, sql.ErrNoRows)
 
 				store.EXPECT().
-                    DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(0)
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusNotFound, recorder.Code)
-            },
-        },
-        {
-            name:    "InvalidUUID",
-            tradeID: uuid.Nil,
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    GetTradeByID(gomock.Any(), gomock.Any()).
-                    Times(0)
+					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(0)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			name:    "InvalidUUID",
+			tradeID: uuid.Nil,
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+				store.EXPECT().
+					GetTradeByID(gomock.Any(), gomock.Any()).
+					Times(0)
 
 				store.EXPECT().
-                    DeleteTrade(gomock.Any(), gomock.Any()).
-                    Times(0)
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusBadRequest, recorder.Code)
-            },
-        },
-        {
-            name:    "InternalError",
-            tradeID: trade.ID,
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(1).
-                    Return(getTrade, nil)
+					DeleteTrade(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:    "InternalError",
+			tradeID: trade.ID,
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+				store.EXPECT().
+					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(1).
+					Return(getTrade, nil)
 
 				store.EXPECT().
-                    DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(1).
-                    Return(sql.ErrConnDone)
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusInternalServerError, recorder.Code)
-            },
-        },
-    }
+					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(1).
+					Return(sql.ErrConnDone)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+	}
 
-    for i := range testCases {
-        tc := testCases[i]
+	for i := range testCases {
+		tc := testCases[i]
 
-        t.Run(tc.name, func(t *testing.T) {
-            ctrl := gomock.NewController(t)
-            defer ctrl.Finish()
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-            store := mockdb.NewMockStore_interface(ctrl)
-            tc.buildStubs(store)
+			store := mockdb.NewMockStoreInterface(ctrl)
+			tc.buildStubs(store)
 
-            server := NewTestServer(t, store)
-            recorder := httptest.NewRecorder()
+			server := NewTestServer(t, store)
+			recorder := httptest.NewRecorder()
 
-            url := fmt.Sprintf("/trades/%s", tc.tradeID)
-            request, err := http.NewRequest(http.MethodDelete, url, nil)
-            require.NoError(t, err)
+			url := fmt.Sprintf("/trades/%s", tc.tradeID)
+			request, err := http.NewRequest(http.MethodDelete, url, nil)
+			require.NoError(t, err)
 
-            tc.setupAuth(t, request, server.tokenMaker)
-            server.router.ServeHTTP(recorder, request)
-            tc.checkResponse(recorder)
-        })
-    }
+			tc.setupAuth(t, request, server.tokenMaker)
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(recorder)
+		})
+	}
 }
-
 
 func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order, updatedOrderParams db.UpdateOrderStatusAndFilledAmountParams, createOrderRow db.CreateOrderRow) {
 	username := utils.RandomUser()
-	email := "hello" + fmt.Sprint(rand.Intn(10000)) + "@example.com"
+	email := "hello" + fmt.Sprint(rand.IntN(10000)) + "@example.com"
 	marketID := uuid.New()
-	orderType := db.OrderType(fmt.Sprint(rand.Intn(2))) 
-	orderStatus := db.OrderStatus(fmt.Sprint(rand.Intn(3))) 
+	orderType := db.OrderType(fmt.Sprint(rand.IntN(2)))
+	orderStatus := db.OrderStatus(fmt.Sprint(rand.IntN(3)))
 	price := decimal.NewFromFloat(100.50)
 	amount := decimal.NewFromFloat(10.30)
 
 	createOrderParams = db.CreateOrderParams{
-		Username: username,
+		Username:  username,
 		UserEmail: email,
 		MarketID:  marketID,
 		Type:      orderType,
@@ -393,28 +393,27 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Amount:    amount,
 	}
 
-
 	createdOrder := db.Order{
 		ID:           uuid.New(),
-		Username: 	  username,
+		Username:     username,
 		UserEmail:    email,
 		MarketID:     marketID,
 		Type:         orderType,
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: decimal.NewFromFloat(5), 
+		FilledAmount: decimal.NewFromFloat(5),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
 
 	updatedOrderParams = db.UpdateOrderStatusAndFilledAmountParams{
-		Status:       db.OrderStatus(fmt.Sprint(1)), 
-		FilledAmount: decimal.NewFromFloat(10), 
+		Status:       db.OrderStatus(fmt.Sprint(1)),
+		FilledAmount: decimal.NewFromFloat(10),
 		ID:           createdOrder.ID,
 	}
 
-	createOrderRow = db.CreateOrderRow {
+	createOrderRow = db.CreateOrderRow{
 		ID:           createdOrder.ID,
 		UserEmail:    email,
 		MarketID:     marketID,
@@ -422,7 +421,7 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: decimal.NewFromFloat(5), 
+		FilledAmount: decimal.NewFromFloat(5),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
@@ -430,34 +429,32 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 	return createOrderParams, createdOrder, updatedOrderParams, createOrderRow
 }
 
-
 func requireBodyMatchOrderForGet(t *testing.T, body *bytes.Buffer, order db.Order) {
-    data, err := io.ReadAll(body)
-    require.NoError(t, err)
+	data, err := io.ReadAll(body)
+	require.NoError(t, err)
 
-    var gotOrder db.Order
-    err = json.Unmarshal(data, &gotOrder)
-    require.NoError(t, err)
+	var gotOrder db.Order
+	err = json.Unmarshal(data, &gotOrder)
+	require.NoError(t, err)
 
-    require.Equal(t, order.ID, gotOrder.ID)
-    require.Equal(t, order.UserEmail, order.UserEmail)
-    require.Equal(t, order.MarketID, gotOrder.MarketID)
-    require.Equal(t, order.Type, gotOrder.Type)
-    require.Equal(t, order.Status, gotOrder.Status)
-    require.Equal(t, order.Price, gotOrder.Price)
-    require.Equal(t, order.Amount, gotOrder.Amount)
-    require.Equal(t, order.FilledAmount, gotOrder.FilledAmount)
-    require.WithinDuration(t, order.CreatedAt, gotOrder.CreatedAt, time.Second)
+	require.Equal(t, order.ID, gotOrder.ID)
+	require.Equal(t, order.UserEmail, order.UserEmail)
+	require.Equal(t, order.MarketID, gotOrder.MarketID)
+	require.Equal(t, order.Type, gotOrder.Type)
+	require.Equal(t, order.Status, gotOrder.Status)
+	require.Equal(t, order.Price, gotOrder.Price)
+	require.Equal(t, order.Amount, gotOrder.Amount)
+	require.Equal(t, order.FilledAmount, gotOrder.FilledAmount)
+	require.WithinDuration(t, order.CreatedAt, gotOrder.CreatedAt, time.Second)
 }
 
-
 func requireBodyMatchOrder(t *testing.T, body *bytes.Buffer, order db.Order) {
-    data, err := io.ReadAll(body)
-    require.NoError(t, err)
+	data, err := io.ReadAll(body)
+	require.NoError(t, err)
 
-    var gotOrder db.Order
-    err = json.Unmarshal(data, &gotOrder)
-    require.NoError(t, err)
+	var gotOrder db.Order
+	err = json.Unmarshal(data, &gotOrder)
+	require.NoError(t, err)
 
-    require.Equal(t, order.ID, gotOrder.ID)
+	require.Equal(t, order.ID, gotOrder.ID)
 }

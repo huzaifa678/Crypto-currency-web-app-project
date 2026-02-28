@@ -14,7 +14,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-
 func (server *server) UpdateOrderStatusAndFilledAmount(ctx context.Context, req *pb.UpdateOrderStatusAndFilledAmountRequest) (*pb.UpdateOrderStatusAndFilledAmountResponse, error) {
 	violations := validateUpdateOrderStatusAndFilledAmount(req)
 	if violations != nil {
@@ -26,13 +25,13 @@ func (server *server) UpdateOrderStatusAndFilledAmount(ctx context.Context, req 
 		return nil, status.Errorf(codes.Unauthenticated, "unauthorized")
 	}
 
-	orderId, err := uuid.Parse(req.GetOrderId())
+	orderID, err := uuid.Parse(req.GetOrderId())
 
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "ID not parsed")
 	}
 
-	order, err := server.store.GetOrderByID(ctx, orderId)
+	order, err := server.store.GetOrderByID(ctx, orderID)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to find the order for the user")
 	}
@@ -46,7 +45,7 @@ func (server *server) UpdateOrderStatusAndFilledAmount(ctx context.Context, req 
 	args := db.UpdateOrderStatusAndFilledAmountParams{
 		Status:       db.OrderStatus(pbStatus),
 		FilledAmount: decimal.NewFromFloat(float64(req.GetFilledAmount())),
-		ID:           orderId,
+		ID:           orderID,
 	}
 
 	err = server.store.UpdateOrderStatusAndFilledAmount(ctx, args)
@@ -61,7 +60,6 @@ func (server *server) UpdateOrderStatusAndFilledAmount(ctx context.Context, req 
 
 	return res, nil
 }
-
 
 func validateUpdateOrderStatusAndFilledAmount(req *pb.UpdateOrderStatusAndFilledAmountRequest) (violations []*errdetails.BadRequest_FieldViolation) {
 	if err := val.ValidateUpdateOrderStatusAndFilledAmount(req.GetOrderId(), req.GetOrderStatus(), decimal.NewFromFloat(float64(req.GetFilledAmount()))); err != nil {

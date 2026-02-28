@@ -1,3 +1,4 @@
+//nolint:revive
 package token
 
 import (
@@ -13,7 +14,6 @@ const minSecretKeySize = 32
 type JWTMaker struct {
 	secretKey string
 }
-
 
 func NewJWTMaker(secretKey string) (Maker, error) {
 
@@ -54,7 +54,6 @@ func (maker *JWTMaker) VerifyToken(token string, tokenType TokenType) (*Payload,
 		}
 		return nil, ErrInvalidToken
 	}
-
 
 	payload, ok := jwtToken.Claims.(*Payload)
 	if !ok {

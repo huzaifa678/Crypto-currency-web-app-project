@@ -16,26 +16,26 @@ import (
 	"google.golang.org/grpc/status"
 )
 
- func TestGetOrderAPI(t *testing.T) {
+func TestGetOrderAPI(t *testing.T) {
 
-    _, order, _, _ := createRandomOrder()
+	_, order, _, _ := createRandomOrder()
 
 	testCases := []struct {
 		name          string
-		req 		  *pb.GetOrderRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		req           *pb.GetOrderRequest
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.GetOrderResponse, err error)
 	}{
 		{
-			name:    "OK",
+			name: "OK",
 			req: &pb.GetOrderRequest{
 				OrderId: order.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Eq(order.ID)).
 					Times(1).
@@ -48,14 +48,14 @@ import (
 			},
 		},
 		{
-			name:    "NotFound",
+			name: "NotFound",
 			req: &pb.GetOrderRequest{
 				OrderId: order.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Eq(order.ID)).
 					Times(1).
@@ -69,14 +69,14 @@ import (
 			},
 		},
 		{
-			name:   "InvalidID",
-			req:	&pb.GetOrderRequest{
+			name: "InvalidID",
+			req: &pb.GetOrderRequest{
 				OrderId: "invalid-id",
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -93,10 +93,10 @@ import (
 			req: &pb.GetOrderRequest{
 				OrderId: order.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Eq(order.ID)).
 					Times(1).
@@ -118,7 +118,7 @@ import (
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)

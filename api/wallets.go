@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -13,95 +14,92 @@ import (
 )
 
 type WalletRequest struct {
-    UserEmail string         `json:"user_email" binding:"required,email"`
-    Currency  string         `json:"currency"`
+	UserEmail string `json:"user_email" binding:"required,email"`
+	Currency  string `json:"currency"`
 }
 
 type UpdateWalletRequest struct {
 	Balance       decimal.Decimal `json:"balance"`
 	LockedBalance decimal.Decimal `json:"locked_balance"`
-	UserEmail     string         `json:"user_email"`
-	Currency      string         `json:"currency"`
+	UserEmail     string          `json:"user_email"`
+	Currency      string          `json:"currency"`
 }
 
 func (server *server) createWallet(ctx *gin.Context) {
-    var req WalletRequest
+	var req WalletRequest
 
-    if err := ctx.ShouldBindJSON(&req); err != nil {
-        ctx.JSON(http.StatusBadRequest, errorResponse(err))
-        return
-    }
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
-    authPayload, _ := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+	authPayload, _ := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
 
-    arg := db.CreateWalletParams{
-        Username:  authPayload.Username,
-        UserEmail: req.UserEmail,
-        Currency:  req.Currency,
-        Balance:   decimal.NewFromFloat(0),
-    }
+	arg := db.CreateWalletParams{
+		Username:  authPayload.Username,
+		UserEmail: req.UserEmail,
+		Currency:  req.Currency,
+		Balance:   decimal.NewFromFloat(0),
+	}
 
-    wallet, err := server.store.CreateWallet(ctx, arg)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	wallet, err := server.store.CreateWallet(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-    ctx.JSON(http.StatusOK, gin.H{"id": wallet.ID})
+	ctx.JSON(http.StatusOK, gin.H{"id": wallet.ID})
 }
 
 func (server *server) getWallet(ctx *gin.Context) {
 
-    id := ctx.Param("id")
+	id := ctx.Param("id")
 
+	walletID, err := uuid.Parse(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
-    walletID, err := uuid.Parse(id)
-    if err != nil {
-        ctx.JSON(http.StatusBadRequest, errorResponse(err))
-        return
-    }
+	if walletID == uuid.Nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
+		return
+	}
 
-    if walletID == uuid.Nil {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
-        return
-    }
+	wallet, err := server.store.GetWalletByID(ctx, walletID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
+	authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
 
-    wallet, err := server.store.GetWalletByID(ctx, walletID)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            ctx.JSON(http.StatusNotFound, errorResponse(err))
-            return
-        }
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	if authPayload.Username != wallet.Username {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
 
-
-    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
-
-    if authPayload.Username != wallet.Username {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-        return
-    }
-
-    ctx.JSON(http.StatusOK, wallet)
+	ctx.JSON(http.StatusOK, wallet)
 }
 
 func (server *server) updateWallet(ctx *gin.Context) {
 	var req UpdateWalletRequest
 
-    if err := ctx.ShouldBindJSON(&req); err != nil {
-        ctx.JSON(http.StatusBadRequest, errorResponse(err))
-        return
-    }
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
-    id := ctx.Param("id")
+	id := ctx.Param("id")
 
 	if id == "" {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
-        return
-    }
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
 
 	walletID, err := uuid.Parse(id)
 
@@ -110,75 +108,75 @@ func (server *server) updateWallet(ctx *gin.Context) {
 		return
 	}
 
-    wallet, err := server.store.GetWalletByID(ctx, walletID)
+	wallet, err := server.store.GetWalletByID(ctx, walletID)
 
-    if err != nil {
-        if err == sql.ErrNoRows {
-            ctx.JSON(http.StatusNotFound, errorResponse(err))
-            return
-        }
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
-    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
 
-    if authPayload.Username != wallet.Username {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-        return
-    }
+	if authPayload.Username != wallet.Username {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
 
 	arg := db.UpdateWalletBalanceParams{
 		Balance:       req.Balance,
 		LockedBalance: req.LockedBalance,
-        ID: walletID,
+		ID:            walletID,
 	}
 
-    err = server.store.UpdateWalletBalance(ctx, arg)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	err = server.store.UpdateWalletBalance(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-    ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }
 
 func (server *server) deleteWallet(ctx *gin.Context) {
-    id := ctx.Param("id")
-    walletID, err := uuid.Parse(id)
-    if err != nil {
-        ctx.JSON(http.StatusBadRequest, errorResponse(err))
-        return
-    }
+	id := ctx.Param("id")
+	walletID, err := uuid.Parse(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
-    if walletID == uuid.Nil {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
-        return
-    }
+	if walletID == uuid.Nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
+		return
+	}
 
-    wallet, err := server.store.GetWalletByID(ctx, walletID)
+	wallet, err := server.store.GetWalletByID(ctx, walletID)
 
-    if err != nil {
-        if err == sql.ErrNoRows {
-            ctx.JSON(http.StatusNotFound, errorResponse(err))
-            return
-        }
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+	authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
 
-    if authPayload.Username != wallet.Username {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
-        return
-    }
+	if authPayload.Username != wallet.Username {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized"})
+		return
+	}
 
-    err = server.store.DeleteWallet(ctx, walletID)
+	err = server.store.DeleteWallet(ctx, walletID)
 
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-    ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }

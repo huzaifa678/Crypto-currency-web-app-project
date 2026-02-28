@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -27,7 +28,7 @@ func TestCreateTradeAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          gin.H
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
@@ -42,9 +43,9 @@ func TestCreateTradeAPI(t *testing.T) {
 				"fee":           createTradeParams.Fee,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateTrade(gomock.Any(), gomock.Eq(createTradeParams)).
 					Times(1).
@@ -66,9 +67,9 @@ func TestCreateTradeAPI(t *testing.T) {
 				"fee":           trade.Fee,
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateTrade(gomock.Any(), gomock.Eq(createTradeParams)).
 					Times(1).
@@ -89,9 +90,9 @@ func TestCreateTradeAPI(t *testing.T) {
 				"fee":           "invalid-fee",
 			},
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateTrade(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -109,7 +110,7 @@ func TestCreateTradeAPI(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store)
@@ -117,7 +118,6 @@ func TestCreateTradeAPI(t *testing.T) {
 
 			data, err := json.Marshal(tc.body)
 			require.NoError(t, err)
-			
 
 			url := "/trades"
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
@@ -136,17 +136,17 @@ func TestGetTradeAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		tradeID       uuid.UUID
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
-			name: "OK",
+			name:    "OK",
 			tradeID: trade.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
@@ -158,12 +158,12 @@ func TestGetTradeAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "NotFound",
+			name:    "NotFound",
 			tradeID: trade.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
@@ -174,12 +174,12 @@ func TestGetTradeAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InvalidID",
+			name:    "InvalidID",
 			tradeID: uuid.Nil,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -189,12 +189,12 @@ func TestGetTradeAPI(t *testing.T) {
 			},
 		},
 		{
-			name: "InternalError",
+			name:    "InternalError",
 			tradeID: trade.ID,
 			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
 					Times(1).
@@ -213,7 +213,7 @@ func TestGetTradeAPI(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store)
@@ -232,120 +232,120 @@ func TestGetTradeAPI(t *testing.T) {
 }
 
 func TestDeleteTradeAPI(t *testing.T) {
-    trade, _, getTrade := createRandomTrade()
+	trade, _, getTrade := createRandomTrade()
 
-    testCases := []struct {
-        name          string
-        tradeID       uuid.UUID
-        buildStubs    func(store *mockdb.MockStore_interface)
-        setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
-        checkResponse func(recorder *httptest.ResponseRecorder)
-    }{
-        {
-            name:    "OK",
-            tradeID: trade.ID,
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(1).
-                    Return(getTrade, nil)
-				
+	testCases := []struct {
+		name          string
+		tradeID       uuid.UUID
+		buildStubs    func(store *mockdb.MockStoreInterface)
+		setupAuth     func(t *testing.T, request *http.Request, tokenMaker token.Maker)
+		checkResponse func(recorder *httptest.ResponseRecorder)
+	}{
+		{
+			name:    "OK",
+			tradeID: trade.ID,
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
-                    DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(1).
-                    Return(nil)
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusOK, recorder.Code)
-            },
-        },
-        {
-            name:    "NotFound",
-            tradeID: trade.ID,
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(1).
-                    Return(getTrade, sql.ErrNoRows)
-				
-				store.EXPECT().
-                    DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(0)
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusNotFound, recorder.Code)
-            },
-        },
-        {
-            name:    "InvalidUUID",
-            tradeID: uuid.Nil,
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    GetTradeByID(gomock.Any(), gomock.Any()).
-                    Times(0)
+					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(1).
+					Return(getTrade, nil)
 
 				store.EXPECT().
-                    DeleteTrade(gomock.Any(), gomock.Any()).
-                    Times(0)
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusBadRequest, recorder.Code)
-            },
-        },
-        {
-            name:    "InternalError",
-            tradeID: trade.ID,
-            buildStubs: func(store *mockdb.MockStore_interface) {
-                store.EXPECT().
-                    GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(1).
-                    Return(getTrade, nil)
+					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(1).
+					Return(nil)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusOK, recorder.Code)
+			},
+		},
+		{
+			name:    "NotFound",
+			tradeID: trade.ID,
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+				store.EXPECT().
+					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(1).
+					Return(getTrade, sql.ErrNoRows)
 
-					store.EXPECT().
-                    DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
-                    Times(1).
-                    Return(sql.ErrConnDone)
-            },
-            setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
-                addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
-            },
-            checkResponse: func(recorder *httptest.ResponseRecorder) {
-                require.Equal(t, http.StatusInternalServerError, recorder.Code)
-            },
-        },
-    }
+				store.EXPECT().
+					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(0)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusNotFound, recorder.Code)
+			},
+		},
+		{
+			name:    "InvalidUUID",
+			tradeID: uuid.Nil,
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+				store.EXPECT().
+					GetTradeByID(gomock.Any(), gomock.Any()).
+					Times(0)
 
-    for i := range testCases {
-        tc := testCases[i]
+				store.EXPECT().
+					DeleteTrade(gomock.Any(), gomock.Any()).
+					Times(0)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusBadRequest, recorder.Code)
+			},
+		},
+		{
+			name:    "InternalError",
+			tradeID: trade.ID,
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+				store.EXPECT().
+					GetTradeByID(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(1).
+					Return(getTrade, nil)
 
-        t.Run(tc.name, func(t *testing.T) {
-            ctrl := gomock.NewController(t)
-            defer ctrl.Finish()
+				store.EXPECT().
+					DeleteTrade(gomock.Any(), gomock.Eq(trade.ID)).
+					Times(1).
+					Return(sql.ErrConnDone)
+			},
+			setupAuth: func(t *testing.T, request *http.Request, tokenMaker token.Maker) {
+				addAuthMiddleware(t, request, tokenMaker, AuthorizationTypeBearer, trade.Username, time.Minute)
+			},
+			checkResponse: func(recorder *httptest.ResponseRecorder) {
+				require.Equal(t, http.StatusInternalServerError, recorder.Code)
+			},
+		},
+	}
 
-            store := mockdb.NewMockStore_interface(ctrl)
-            tc.buildStubs(store)
+	for i := range testCases {
+		tc := testCases[i]
 
-            server := NewTestServer(t, store)
-            recorder := httptest.NewRecorder()
+		t.Run(tc.name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
 
-            url := fmt.Sprintf("/trades/%s", tc.tradeID)
-            request, err := http.NewRequest(http.MethodDelete, url, nil)
-            require.NoError(t, err)
+			store := mockdb.NewMockStoreInterface(ctrl)
+			tc.buildStubs(store)
 
-            tc.setupAuth(t, request, server.tokenMaker)
-            server.router.ServeHTTP(recorder, request)
-            tc.checkResponse(recorder)
-        })
-    }
+			server := NewTestServer(t, store)
+			recorder := httptest.NewRecorder()
+
+			url := fmt.Sprintf("/trades/%s", tc.tradeID)
+			request, err := http.NewRequest(http.MethodDelete, url, nil)
+			require.NoError(t, err)
+
+			tc.setupAuth(t, request, server.tokenMaker)
+			server.router.ServeHTTP(recorder, request)
+			tc.checkResponse(recorder)
+		})
+	}
 }
 
 func TestListTradesByMarketIDAPI(t *testing.T) {
@@ -357,13 +357,13 @@ func TestListTradesByMarketIDAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		marketID      uuid.UUID
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name:     "OK",
 			marketID: marketID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTradesByMarketID(gomock.Any(), gomock.Eq(marketID)).
 					Times(1).
@@ -377,7 +377,7 @@ func TestListTradesByMarketIDAPI(t *testing.T) {
 		{
 			name:     "InternalError",
 			marketID: marketID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTradesByMarketID(gomock.Any(), gomock.Eq(marketID)).
 					Times(1).
@@ -390,7 +390,7 @@ func TestListTradesByMarketIDAPI(t *testing.T) {
 		{
 			name:     "EmptyList",
 			marketID: marketID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetTradesByMarketID(gomock.Any(), gomock.Eq(marketID)).
 					Times(1).
@@ -410,7 +410,7 @@ func TestListTradesByMarketIDAPI(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store)
@@ -483,53 +483,50 @@ func createRandomTrade() (trade db.Trade, createTradeParams db.CreateTradeParams
 	_, BuyOrder, _, _ := createRandomOrder()
 	_, market, _ := createRandomMarket()
 
-	createTradeParams = db.CreateTradeParams {
-		BuyOrderID: BuyOrder.ID,
-    	SellOrderID: sellOrder.ID,   
-    	MarketID:    market.ID,      
-    	Price:       decimal.NewFromFloat(0.0),   
-    	Amount:      decimal.NewFromFloat(0.0),         
-    	Fee:         decimal.NewFromFloat(5),
+	createTradeParams = db.CreateTradeParams{
+		BuyOrderID:  BuyOrder.ID,
+		SellOrderID: sellOrder.ID,
+		MarketID:    market.ID,
+		Price:       decimal.NewFromFloat(0.0),
+		Amount:      decimal.NewFromFloat(0.0),
+		Fee:         decimal.NewFromFloat(5),
 	}
 
-	Trade := db.Trade {
-		ID: uuid.New(),
-		BuyOrderID: BuyOrder.ID,
-    	SellOrderID: sellOrder.ID,   
-    	MarketID:    market.ID,      
-    	Price:       createTradeParams.Price,   
-    	Amount:      createTradeParams.Amount,         
-    	Fee:         createTradeParams.Fee,
+	Trade := db.Trade{
+		ID:          uuid.New(),
+		BuyOrderID:  BuyOrder.ID,
+		SellOrderID: sellOrder.ID,
+		MarketID:    market.ID,
+		Price:       createTradeParams.Price,
+		Amount:      createTradeParams.Amount,
+		Fee:         createTradeParams.Fee,
 		CreatedAt:   time.Now(),
 	}
 
-	getTrade := db.GetTradeByIDRow {
-		ID: Trade.ID,
-		BuyOrderID: Trade.BuyOrderID,
-		SellOrderID: Trade.SellOrderID,   
+	getTrade := db.GetTradeByIDRow{
+		ID:          Trade.ID,
+		BuyOrderID:  Trade.BuyOrderID,
+		SellOrderID: Trade.SellOrderID,
 		MarketID:    Trade.MarketID,
 		Price:       Trade.Price,
 		Amount:      Trade.Amount,
 		Fee:         Trade.Fee,
 		CreatedAt:   Trade.CreatedAt,
-
 	}
 
 	return Trade, createTradeParams, getTrade
 }
 
 func createRandomTradeWithMarketID(marketID uuid.UUID) db.GetTradesByMarketIDRow {
-    return db.GetTradesByMarketIDRow{
-        ID:          uuid.New(),
-        Username:    fmt.Sprintf("user-%s", uuid.New().String()),
-        BuyOrderID:  uuid.New(),
-        SellOrderID: uuid.New(),
-        MarketID:    marketID,
-        Price:       decimal.NewFromFloat(0.5),
-        Amount:      decimal.NewFromFloat(0.0),
-        Fee:         decimal.NewFromFloat(0.1),
-        CreatedAt:   time.Now(),
-    }
+	return db.GetTradesByMarketIDRow{
+		ID:          uuid.New(),
+		Username:    fmt.Sprintf("user-%s", uuid.New().String()),
+		BuyOrderID:  uuid.New(),
+		SellOrderID: uuid.New(),
+		MarketID:    marketID,
+		Price:       decimal.NewFromFloat(0.5),
+		Amount:      decimal.NewFromFloat(0.0),
+		Fee:         decimal.NewFromFloat(0.1),
+		CreatedAt:   time.Now(),
+	}
 }
-
-

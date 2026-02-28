@@ -11,7 +11,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var testStore Store_interface
+var testStore StoreInterface
 
 func TestMain(m *testing.M) {
 
@@ -19,15 +19,13 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatal("cannot load config:", err)
 	}
-	
+
 	connPool, err := pgxpool.New(context.Background(), config.Dbsource)
 	if err != nil {
 		log.Fatal("Failed to connect to the database:", err)
 	}
-	
+
 	testStore = NewStore(connPool)
 
 	os.Exit(m.Run())
 }
-
-

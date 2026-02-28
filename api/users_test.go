@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -13,6 +14,8 @@ import (
 	"testing"
 	"time"
 
+	"math/rand/v2"
+
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
@@ -21,7 +24,6 @@ import (
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/lib/pq"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/rand"
 )
 
 type eqCreateUserParamsMatcher struct {
@@ -92,22 +94,22 @@ func TestCreateUserAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          gin.H
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
 			body: gin.H{
-				"username":		 userArgs.Username,
+				"username":      userArgs.Username,
 				"email":         userArgs.Email,
 				"password_hash": userArgs.PasswordHash,
 				"role":          userArgs.Role,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
-                    GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
-                    Times(1).
-                    Return(userEmailGetArgs, sql.ErrNoRows)
+					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+					Times(1).
+					Return(userEmailGetArgs, sql.ErrNoRows)
 
 				store.EXPECT().
 					CreateUser(gomock.Any(), EqCreateUserParams(userArgs, userArgs.PasswordHash)).
@@ -122,16 +124,16 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "InternalError",
 			body: gin.H{
-				"username":		 userArgs.Username,
+				"username":      userArgs.Username,
 				"email":         userArgs.Email,
 				"password_hash": userArgs.PasswordHash,
 				"role":          userArgs.Role,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
-                    GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
-                    Times(1).
-                    Return(userEmailGetArgs, sql.ErrNoRows)
+					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+					Times(1).
+					Return(userEmailGetArgs, sql.ErrNoRows)
 
 				store.EXPECT().
 					CreateUser(gomock.Any(), EqCreateUserParams(userArgs, userArgs.PasswordHash)).
@@ -145,16 +147,16 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "DuplicateEmail",
 			body: gin.H{
-				"username":		 userArgs.Username,
+				"username":      userArgs.Username,
 				"email":         userArgs.Email,
 				"password_hash": userArgs.PasswordHash,
 				"role":          user.Role,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
-                    GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
-                    Times(1).
-                    Return(userEmailGetArgs, sql.ErrNoRows)
+					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
+					Times(1).
+					Return(userEmailGetArgs, sql.ErrNoRows)
 
 				store.EXPECT().
 					CreateUser(gomock.Any(), EqCreateUserParams(userArgs, userArgs.PasswordHash)).
@@ -168,13 +170,13 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "InvalidEmail",
 			body: gin.H{
-				"username":	   userArgs.Username,
+				"username":    userArgs.Username,
 				"email":       "invalid-email",
 				"password":    userArgs.PasswordHash,
 				"role":        user.Role,
 				"is_verified": user.IsVerified,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -186,13 +188,13 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "TooShortPassword",
 			body: gin.H{
-				"username":	   userArgs.Username,
+				"username":    userArgs.Username,
 				"email":       user.Email,
 				"password":    "123",
 				"role":        user.Role,
 				"is_verified": user.IsVerified,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -210,10 +212,10 @@ func TestCreateUserAPI(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
-            server := NewTestServer(t, store)
+			server := NewTestServer(t, store)
 			recorder := httptest.NewRecorder()
 
 			data, err := json.Marshal(tc.body)
@@ -235,16 +237,16 @@ func TestLoginUserAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          gin.H
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name: "OK",
 			body: gin.H{
-				"email":    	 userArgs.Email,
+				"email":         userArgs.Email,
 				"password_hash": userArgs.PasswordHash,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				user.PasswordHash = getUserArgs.PasswordHash
 
 				store.EXPECT().
@@ -273,10 +275,10 @@ func TestLoginUserAPI(t *testing.T) {
 		{
 			name: "EmailNotFound",
 			body: gin.H{
-				"email":    userArgs.Email,
+				"email":         userArgs.Email,
 				"password_hash": userArgs.PasswordHash,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Any()).
 					Times(1).
@@ -289,10 +291,10 @@ func TestLoginUserAPI(t *testing.T) {
 		{
 			name: "WrongPassword",
 			body: gin.H{
-				"email":    	  userArgs.Email,
+				"email":         userArgs.Email,
 				"password_hash": "wrongpass12345678",
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				user.PasswordHash = getUserArgs.PasswordHash
 
 				store.EXPECT().
@@ -307,10 +309,10 @@ func TestLoginUserAPI(t *testing.T) {
 		{
 			name: "DBError",
 			body: gin.H{
-				"email":    user.Email,
+				"email":         user.Email,
 				"password_hash": getUserArgs.PasswordHash,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
 					Times(1).
@@ -325,7 +327,7 @@ func TestLoginUserAPI(t *testing.T) {
 			body: gin.H{
 				"email": 12345,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusBadRequest, recorder.Code)
@@ -340,7 +342,7 @@ func TestLoginUserAPI(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store)
@@ -358,20 +360,19 @@ func TestLoginUserAPI(t *testing.T) {
 	}
 }
 
-
 func TestGetUserAPI(t *testing.T) {
 	_, user, _, getUserParams, _ := createRandomUser()
 
 	testCases := []struct {
 		name          string
 		userID        uuid.UUID
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name:   "OK",
 			userID: user.ID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByID(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
@@ -385,7 +386,7 @@ func TestGetUserAPI(t *testing.T) {
 		{
 			name:   "NotFound",
 			userID: user.ID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByID(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
@@ -398,7 +399,7 @@ func TestGetUserAPI(t *testing.T) {
 		{
 			name:   "InternalError",
 			userID: user.ID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByID(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
@@ -417,7 +418,7 @@ func TestGetUserAPI(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store)
@@ -441,21 +442,20 @@ func TestUpdateUserAPI(t *testing.T) {
 		name          string
 		userID        uuid.UUID
 		body          gin.H
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name:   "OK",
 			userID: user.ID,
 			body: gin.H{
-				"username": user.Username,
-				"email": 	user.Email,
+				"username":      user.Username,
+				"email":         user.Email,
 				"password_hash": "password123",
 				"role":          user.Role,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
-				
-				
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
 					Times(1).
@@ -472,7 +472,7 @@ func TestUpdateUserAPI(t *testing.T) {
 				"password_hash": user.PasswordHash,
 				"role":          user.Role,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -488,7 +488,7 @@ func TestUpdateUserAPI(t *testing.T) {
 				"password_hash": user.PasswordHash,
 				"role":          user.Role,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -505,7 +505,7 @@ func TestUpdateUserAPI(t *testing.T) {
 				"role":          user.Role,
 			},
 
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -523,7 +523,7 @@ func TestUpdateUserAPI(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			data, err := json.Marshal(tc.body)
@@ -547,13 +547,13 @@ func TestDeleteUserAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		userID        uuid.UUID
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		checkResponse func(recorder *httptest.ResponseRecorder)
 	}{
 		{
 			name:   "OK",
 			userID: user.ID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
@@ -566,7 +566,7 @@ func TestDeleteUserAPI(t *testing.T) {
 		{
 			name:   "NotFound",
 			userID: user.ID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
@@ -579,7 +579,7 @@ func TestDeleteUserAPI(t *testing.T) {
 		{
 			name:   "InternalError",
 			userID: user.ID,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
@@ -592,7 +592,7 @@ func TestDeleteUserAPI(t *testing.T) {
 		{
 			name:   "InvalidID",
 			userID: uuid.Nil,
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -610,7 +610,7 @@ func TestDeleteUserAPI(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store)
@@ -627,12 +627,12 @@ func TestDeleteUserAPI(t *testing.T) {
 }
 
 func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetUserByIDRow, db.GetUserByEmailRow) {
-	randomEmail := fmt.Sprintf("testing%d@example.com", rand.Intn(1000))
-	randomPassword := fmt.Sprintf("password%d", rand.Intn(1000))
+	randomEmail := fmt.Sprintf("testing%d@example.com", rand.IntN(1000))
+	randomPassword := fmt.Sprintf("password%d", rand.IntN(1000))
 	hashedPassword, _ := utils.HashPassword(randomPassword)
 
 	userArgs := db.CreateUserParams{
-		Username: 	  utils.RandomString(32),
+		Username:     utils.RandomString(32),
 		Email:        randomEmail,
 		PasswordHash: randomPassword,
 		Role:         db.UserRole("user"),
@@ -640,8 +640,8 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 	}
 
 	user := db.User{
-		ID: 		  uuid.New(),
-		Username: 	  userArgs.Username,
+		ID:           uuid.New(),
+		Username:     userArgs.Username,
 		Email:        userArgs.Email,
 		PasswordHash: hashedPassword,
 		Role:         userArgs.Role,
@@ -650,7 +650,7 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 
 	userRow := db.CreateUserRow{
 		ID:         user.ID,
-		Username: 	user.Username,
+		Username:   user.Username,
 		Email:      user.Email,
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
@@ -660,7 +660,7 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 
 	getUserRow := db.GetUserByIDRow{
 		ID:           user.ID,
-		Username: 	  user.Username,	
+		Username:     user.Username,
 		Email:        user.Email,
 		PasswordHash: hashedPassword,
 		CreatedAt:    time.Now(),
@@ -669,9 +669,9 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 		IsVerified:   userArgs.IsVerified,
 	}
 
-	userEmailGetArgs := db.GetUserByEmailRow {
+	userEmailGetArgs := db.GetUserByEmailRow{
 		ID:           user.ID,
-		Username: 	  user.Username,	
+		Username:     user.Username,
 		Email:        user.Email,
 		PasswordHash: hashedPassword,
 		CreatedAt:    time.Now(),
@@ -682,7 +682,6 @@ func createRandomUser() (db.CreateUserParams, db.User, db.CreateUserRow, db.GetU
 
 	return userArgs, user, userRow, getUserRow, userEmailGetArgs
 }
-
 
 func requireBodyMatchUser(t *testing.T, body *bytes.Buffer, user db.User) {
 	data, err := io.ReadAll(body)

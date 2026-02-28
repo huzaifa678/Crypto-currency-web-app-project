@@ -23,7 +23,7 @@ func TestUpdateWalletRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.UpdateWalletRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.UpdateWalletResponse, err error)
 	}{
@@ -34,10 +34,10 @@ func TestUpdateWalletRPC(t *testing.T) {
 				Balance:       100,
 				LockedBalance: 50,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				arg := db.UpdateWalletBalanceParams{
 					ID:            wallet.ID,
 					Balance:       decimal.NewFromFloat(100),
@@ -66,10 +66,10 @@ func TestUpdateWalletRPC(t *testing.T) {
 				Balance:       100,
 				LockedBalance: 50,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return context.Background()
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return context.Background()
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					UpdateWalletBalance(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -88,10 +88,10 @@ func TestUpdateWalletRPC(t *testing.T) {
 				Balance:       100,
 				LockedBalance: 50,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					UpdateWalletBalance(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -110,10 +110,10 @@ func TestUpdateWalletRPC(t *testing.T) {
 				Balance:       100,
 				LockedBalance: 50,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				arg := db.UpdateWalletBalanceParams{
 					ID:            wallet.ID,
 					Balance:       decimal.NewFromFloat(100),
@@ -140,7 +140,7 @@ func TestUpdateWalletRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)
@@ -150,4 +150,4 @@ func TestUpdateWalletRPC(t *testing.T) {
 			tc.checkResponse(t, res, err)
 		})
 	}
-} 
+}

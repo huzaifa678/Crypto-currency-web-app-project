@@ -22,33 +22,33 @@ func TestCreateTradeRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.CreateTradeRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.CreateTradeResponse, err error)
 	}{
 		{
 			name: "OK",
 			req: &pb.CreateTradeRequest{
-				BuyerUserEmail: createTradeParams.BuyerUserEmail,
+				BuyerUserEmail:  createTradeParams.BuyerUserEmail,
 				SellerUserEmail: createTradeParams.SellerUserEmail,
-				BuyOrderId:  createTradeParams.BuyOrderID.String(),
-				SellOrderId: createTradeParams.SellOrderID.String(),
-				MarketId:    createTradeParams.MarketID.String(),
-				Price:       createTradeParams.Price.String(),
-				Amount:      createTradeParams.Amount.String(),
-				Fee:         createTradeParams.Fee.String(),
+				BuyOrderId:      createTradeParams.BuyOrderID.String(),
+				SellOrderId:     createTradeParams.SellOrderID.String(),
+				MarketId:        createTradeParams.MarketID.String(),
+				Price:           createTradeParams.Price.String(),
+				Amount:          createTradeParams.Amount.String(),
+				Fee:             createTradeParams.Fee.String(),
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, trade.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 
 				store.EXPECT().
-    				CreateTradeTx(gomock.Any(), gomock.Any()).
-    				Times(1).
-    				DoAndReturn(func(ctx context.Context, arg db.CreateTradeTxParams) (db.CreateTradeTxResult, error) {
-        				return db.CreateTradeTxResult{Trade: trade}, nil
-    				})
+					CreateTradeTx(gomock.Any(), gomock.Any()).
+					Times(1).
+					DoAndReturn(func(ctx context.Context, arg db.CreateTradeTxParams) (db.CreateTradeTxResult, error) {
+						return db.CreateTradeTxResult{Trade: trade}, nil
+					})
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateTradeResponse, err error) {
 				log.Println("ERROR: ", err)
@@ -61,19 +61,19 @@ func TestCreateTradeRPC(t *testing.T) {
 		{
 			name: "Unauthorized",
 			req: &pb.CreateTradeRequest{
-				BuyerUserEmail: createTradeParams.BuyerUserEmail,
+				BuyerUserEmail:  createTradeParams.BuyerUserEmail,
 				SellerUserEmail: createTradeParams.SellerUserEmail,
-				BuyOrderId:  createTradeParams.BuyOrderID.String(),
-				SellOrderId: createTradeParams.SellOrderID.String(),
-				MarketId:    createTradeParams.MarketID.String(),
-				Price:       createTradeParams.Price.String(),
-				Amount:      createTradeParams.Amount.String(),
-				Fee:         createTradeParams.Fee.String(),
+				BuyOrderId:      createTradeParams.BuyOrderID.String(),
+				SellOrderId:     createTradeParams.SellOrderID.String(),
+				MarketId:        createTradeParams.MarketID.String(),
+				Price:           createTradeParams.Price.String(),
+				Amount:          createTradeParams.Amount.String(),
+				Fee:             createTradeParams.Fee.String(),
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateTradeTx(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -88,19 +88,19 @@ func TestCreateTradeRPC(t *testing.T) {
 		{
 			name: "InvalidBuyOrderID",
 			req: &pb.CreateTradeRequest{
-				BuyerUserEmail: createTradeParams.BuyerUserEmail,
+				BuyerUserEmail:  createTradeParams.BuyerUserEmail,
 				SellerUserEmail: createTradeParams.SellerUserEmail,
-				BuyOrderId:  "invalid-uuid",
-				SellOrderId: createTradeParams.SellOrderID.String(),
-				MarketId:    createTradeParams.MarketID.String(),
-				Price:       createTradeParams.Price.String(),
-				Amount:      createTradeParams.Amount.String(),
-				Fee:         createTradeParams.Fee.String(),
+				BuyOrderId:      "invalid-uuid",
+				SellOrderId:     createTradeParams.SellOrderID.String(),
+				MarketId:        createTradeParams.MarketID.String(),
+				Price:           createTradeParams.Price.String(),
+				Amount:          createTradeParams.Amount.String(),
+				Fee:             createTradeParams.Fee.String(),
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, trade.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateTrade(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -116,19 +116,19 @@ func TestCreateTradeRPC(t *testing.T) {
 		{
 			name: "InternalError",
 			req: &pb.CreateTradeRequest{
-				BuyerUserEmail: createTradeParams.BuyerUserEmail,
+				BuyerUserEmail:  createTradeParams.BuyerUserEmail,
 				SellerUserEmail: createTradeParams.SellerUserEmail,
-				BuyOrderId:  createTradeParams.BuyOrderID.String(),
-				SellOrderId: createTradeParams.SellOrderID.String(),
-				MarketId:    createTradeParams.MarketID.String(),
-				Price:       createTradeParams.Price.String(),
-				Amount:      createTradeParams.Amount.String(),
-				Fee:         createTradeParams.Fee.String(),
+				BuyOrderId:      createTradeParams.BuyOrderID.String(),
+				SellOrderId:     createTradeParams.SellOrderID.String(),
+				MarketId:        createTradeParams.MarketID.String(),
+				Price:           createTradeParams.Price.String(),
+				Amount:          createTradeParams.Amount.String(),
+				Fee:             createTradeParams.Fee.String(),
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, trade.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateTradeTx(gomock.Any(), gomock.Any()).
 					Times(1).
@@ -152,7 +152,7 @@ func TestCreateTradeRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)
@@ -163,4 +163,3 @@ func TestCreateTradeRPC(t *testing.T) {
 		})
 	}
 }
-

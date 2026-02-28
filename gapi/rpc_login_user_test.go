@@ -23,7 +23,7 @@ func TestLoginUserRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.LoginUserRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		checkResponse func(t *testing.T, res *pb.LoginUserResponse, err error)
 	}{
 		{
@@ -32,7 +32,7 @@ func TestLoginUserRPC(t *testing.T) {
 				Email:    userArgs.Email,
 				Password: password,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
 					Times(1).
@@ -70,7 +70,7 @@ func TestLoginUserRPC(t *testing.T) {
 				Email:    user.Email,
 				Password: user.PasswordHash,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
 					Times(1).
@@ -90,7 +90,7 @@ func TestLoginUserRPC(t *testing.T) {
 				Email:    user.Email,
 				Password: "wrongpassword",
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
 					Times(1).
@@ -115,7 +115,7 @@ func TestLoginUserRPC(t *testing.T) {
 				Email:    "invalid-email",
 				Password: user.PasswordHash,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -131,9 +131,9 @@ func TestLoginUserRPC(t *testing.T) {
 			name: "InvalidPassword",
 			req: &pb.LoginUserRequest{
 				Email:    user.Email,
-				Password: "123", 
+				Password: "123",
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -151,7 +151,7 @@ func TestLoginUserRPC(t *testing.T) {
 				Email:    user.Email,
 				Password: user.PasswordHash,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetUserByEmail(gomock.Any(), gomock.Eq(user.Email)).
 					Times(1).
@@ -173,7 +173,7 @@ func TestLoginUserRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)
@@ -181,4 +181,4 @@ func TestLoginUserRPC(t *testing.T) {
 			tc.checkResponse(t, res, err)
 		})
 	}
-} 
+}

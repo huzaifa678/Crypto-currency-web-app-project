@@ -1,11 +1,11 @@
+//nolint:revive
 package utils
 
 import (
 	"strings"
 
-	"golang.org/x/exp/rand"
+	"math/rand/v2"
 )
-
 
 func RandomString(length int) string {
 	const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ01234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ01234567890njnkuhbnhbbiibjbhjbihbibi"
@@ -13,7 +13,7 @@ func RandomString(length int) string {
 	var sb strings.Builder
 
 	for i := 0; i < length; i++ {
-		sb.WriteByte(letters[rand.Intn(len(letters))])
+		sb.WriteByte(letters[rand.IntN(len(letters))])
 	}
 	return sb.String()
 }

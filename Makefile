@@ -20,7 +20,7 @@ server:
 	go run main.go
 
 mock:
-	mockgen -destination db/mock/store.go github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc Store_interface
+	mockgen -destination db/mock/store.go github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc StoreInterface
 	mockgen -package mockwk -destination worker/mock/distributor.go github.com/huzaifa678/Crypto-currency-web-app-project/worker TaskDistributor
 
 test:

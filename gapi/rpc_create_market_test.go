@@ -24,7 +24,7 @@ func TestCreateMarketRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.CreateMarketRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.CreateMarketResponse, err error)
 	}{
@@ -36,10 +36,10 @@ func TestCreateMarketRPC(t *testing.T) {
 				MinOrderAmount: market.MinOrderAmount.Mul(decimal.New(1, scale)).IntPart(),
 				PricePrecision: market.PricePrecision,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateMarket(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(ctx context.Context, arg db.CreateMarketParams) (db.CreateMarketRow, error) {
@@ -65,10 +65,10 @@ func TestCreateMarketRPC(t *testing.T) {
 				MinOrderAmount: market.MinOrderAmount.IntPart(),
 				PricePrecision: market.PricePrecision,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateMarket(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -83,15 +83,15 @@ func TestCreateMarketRPC(t *testing.T) {
 		{
 			name: "InvalidBaseCurrency",
 			req: &pb.CreateMarketRequest{
-				BaseCurrency:   "", 
+				BaseCurrency:   "",
 				QuoteCurrency:  market.QuoteCurrency,
 				MinOrderAmount: market.MinOrderAmount.IntPart(),
 				PricePrecision: market.PricePrecision,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateMarket(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -107,14 +107,14 @@ func TestCreateMarketRPC(t *testing.T) {
 			name: "InvalidQuoteCurrency",
 			req: &pb.CreateMarketRequest{
 				BaseCurrency:   market.BaseCurrency,
-				QuoteCurrency:  "", 
+				QuoteCurrency:  "",
 				MinOrderAmount: market.MinOrderAmount.IntPart(),
 				PricePrecision: market.PricePrecision,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateMarket(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -134,10 +134,10 @@ func TestCreateMarketRPC(t *testing.T) {
 				MinOrderAmount: market.MinOrderAmount.IntPart(),
 				PricePrecision: market.PricePrecision,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 
 				store.EXPECT().
 					CreateMarket(gomock.Any(), gomock.Any()).
@@ -160,7 +160,7 @@ func TestCreateMarketRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)
@@ -173,38 +173,37 @@ func TestCreateMarketRPC(t *testing.T) {
 }
 
 func createRandomMarket() (db.CreateMarketParams, db.Market, db.CreateMarketRow) {
-    rand.New(rand.NewSource(int64(time.Now().UnixNano())))
-    currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
-    baseCurrency := currencies[rand.Intn(len(currencies))]
-    quoteCurrency := currencies[rand.Intn(len(currencies))]
+	rand.New(rand.NewSource(int64(time.Now().UnixNano())))
+	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
+	baseCurrency := currencies[rand.Intn(len(currencies))]
+	quoteCurrency := currencies[rand.Intn(len(currencies))]
 
-    for baseCurrency == quoteCurrency {
-        quoteCurrency = currencies[rand.Intn(len(currencies))]
-    }
+	for baseCurrency == quoteCurrency {
+		quoteCurrency = currencies[rand.Intn(len(currencies))]
+	}
 
 	marketArgs := db.CreateMarketParams{
-		BaseCurrency:  baseCurrency,
-		QuoteCurrency: quoteCurrency,
+		BaseCurrency:   baseCurrency,
+		QuoteCurrency:  quoteCurrency,
 		MinOrderAmount: decimal.NewFromFloat(0.1),
 		PricePrecision: 8,
 	}
 
-    market := db.Market{
-        ID:            uuid.New(),
-        BaseCurrency:  marketArgs.BaseCurrency,
-        QuoteCurrency: marketArgs.QuoteCurrency,
-        MinOrderAmount: marketArgs.MinOrderAmount,
-        PricePrecision: marketArgs.PricePrecision,
-		CreatedAt:     time.Now(),
-    }
-
-	marketRow := db.CreateMarketRow {
-		ID: market.ID,
-		BaseCurrency: market.BaseCurrency,
-		QuoteCurrency: market.QuoteCurrency,
-		CreatedAt: market.CreatedAt,
+	market := db.Market{
+		ID:             uuid.New(),
+		BaseCurrency:   marketArgs.BaseCurrency,
+		QuoteCurrency:  marketArgs.QuoteCurrency,
+		MinOrderAmount: marketArgs.MinOrderAmount,
+		PricePrecision: marketArgs.PricePrecision,
+		CreatedAt:      time.Now(),
 	}
 
-    return marketArgs, market, marketRow
-}
+	marketRow := db.CreateMarketRow{
+		ID:            market.ID,
+		BaseCurrency:  market.BaseCurrency,
+		QuoteCurrency: market.QuoteCurrency,
+		CreatedAt:     market.CreatedAt,
+	}
 
+	return marketArgs, market, marketRow
+}

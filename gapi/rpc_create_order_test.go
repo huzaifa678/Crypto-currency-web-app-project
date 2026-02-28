@@ -27,7 +27,7 @@ func TestCreateOrderRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.CreateOrderRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.CreateOrderResponse, err error)
 	}{
@@ -41,10 +41,10 @@ func TestCreateOrderRPC(t *testing.T) {
 				Price:     order.Price.Mul(decimal.New(1, scale)).IntPart(),
 				Amount:    order.Amount.Mul(decimal.New(1, scale)).IntPart(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 
 				store.EXPECT().
 					OrderForCurrencyTx(gomock.Any(), gomock.Any()).
@@ -78,10 +78,10 @@ func TestCreateOrderRPC(t *testing.T) {
 				Price:     100,
 				Amount:    1,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 
 				store.EXPECT().
 					OrderForCurrencyTx(gomock.Any(), gomock.Any()).
@@ -108,10 +108,10 @@ func TestCreateOrderRPC(t *testing.T) {
 				Price:     100,
 				Amount:    1,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 
 				store.EXPECT().
 					OrderForCurrencyTx(gomock.Any(), gomock.Any()).
@@ -138,10 +138,10 @@ func TestCreateOrderRPC(t *testing.T) {
 				Price:     100,
 				Amount:    1,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateOrder(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -164,10 +164,10 @@ func TestCreateOrderRPC(t *testing.T) {
 				Price:     100,
 				Amount:    1,
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 
 				store.EXPECT().
 					OrderForCurrencyTx(gomock.Any(), gomock.Any()).
@@ -196,7 +196,7 @@ func TestCreateOrderRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)
@@ -206,20 +206,19 @@ func TestCreateOrderRPC(t *testing.T) {
 			tc.checkResponse(t, res, err)
 		})
 	}
-} 
-
+}
 
 func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order, updatedOrderParams db.UpdateOrderStatusAndFilledAmountParams, createOrderRow db.CreateOrderRow) {
 	username := utils.RandomUser()
 	email := "hello" + fmt.Sprint(rand.Intn(10000)) + "@example.com"
 	marketID := uuid.New()
-	orderType := db.OrderType("buy") 
-	orderStatus := db.OrderStatus("open") 
+	orderType := db.OrderType("buy")
+	orderStatus := db.OrderStatus("open")
 	price := decimal.NewFromFloat(100.50)
 	amount := decimal.NewFromFloat(10)
 
 	createOrderParams = db.CreateOrderParams{
-		Username: username,
+		Username:  username,
 		UserEmail: email,
 		MarketID:  marketID,
 		Type:      orderType,
@@ -228,24 +227,23 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Amount:    amount,
 	}
 
-
 	createdOrder := db.Order{
 		ID:           uuid.New(),
-		Username: 	  username,
+		Username:     username,
 		UserEmail:    email,
 		MarketID:     marketID,
 		Type:         orderType,
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: decimal.NewFromFloat(5), 
+		FilledAmount: decimal.NewFromFloat(5),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}
 
 	updatedOrderParams = db.UpdateOrderStatusAndFilledAmountParams{
-		Status:       db.OrderStatus(fmt.Sprint(1)), 
-		FilledAmount: decimal.NewFromFloat(10), 
+		Status:       db.OrderStatus(fmt.Sprint(1)),
+		FilledAmount: decimal.NewFromFloat(10),
 		ID:           createdOrder.ID,
 	}
 
@@ -257,7 +255,7 @@ func createRandomOrder() (createOrderParams db.CreateOrderParams, order db.Order
 		Status:       orderStatus,
 		Price:        price,
 		Amount:       amount,
-		FilledAmount: decimal.NewFromFloat(5), 
+		FilledAmount: decimal.NewFromFloat(5),
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
 	}

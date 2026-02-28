@@ -14,8 +14,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-
-
 func (server *server) CreateTrade(ctx context.Context, req *pb.CreateTradeRequest) (*pb.CreateTradeResponse, error) {
 	violations := validateCreateTradeRequest(req)
 
@@ -28,12 +26,12 @@ func (server *server) CreateTrade(ctx context.Context, req *pb.CreateTradeReques
 		return nil, unauthenticatedError(err)
 	}
 
-	buyOrderId, err := uuid.Parse(req.GetBuyOrderId())
+	buyOrderID, err := uuid.Parse(req.GetBuyOrderId())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid buy order ID: %v", err)
 	}
 
-	sellOrderId, err := uuid.Parse(req.GetSellOrderId())
+	sellOrderID, err := uuid.Parse(req.GetSellOrderId())
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid sell order ID: %v", err)
 	}
@@ -49,30 +47,30 @@ func (server *server) CreateTrade(ctx context.Context, req *pb.CreateTradeReques
 
 	price, err := decimal.NewFromString(req.GetPrice())
 	if err != nil {
-    	return nil, status.Errorf(codes.InvalidArgument, "invalid price: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid price: %v", err)
 	}
 
 	amount, err := decimal.NewFromString(req.GetAmount())
 	if err != nil {
-    	return nil, status.Errorf(codes.InvalidArgument, "invalid amount: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid amount: %v", err)
 	}
 
 	fee, err := decimal.NewFromString(req.GetFee())
 	if err != nil {
-    	return nil, status.Errorf(codes.InvalidArgument, "invalid fee: %v", err)
+		return nil, status.Errorf(codes.InvalidArgument, "invalid fee: %v", err)
 	}
 
 	args := db.CreateTradeTxParams{
-		TradeParams: db.CreateTradeParams{	
-			Username: authPayload.Username,
-			BuyerUserEmail: buyerUserEmail,
+		TradeParams: db.CreateTradeParams{
+			Username:        authPayload.Username,
+			BuyerUserEmail:  buyerUserEmail,
 			SellerUserEmail: sellerUserEmail,
-			BuyOrderID: buyOrderId,
-			SellOrderID: sellOrderId,
-			MarketID: marketID,
-			Price: price,
-			Amount: amount,
-			Fee: fee,
+			BuyOrderID:      buyOrderID,
+			SellOrderID:     sellOrderID,
+			MarketID:        marketID,
+			Price:           price,
+			Amount:          amount,
+			Fee:             fee,
 		},
 	}
 

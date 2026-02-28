@@ -31,7 +31,7 @@ func TestGoogleLogin(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.GoogleLoginRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		stubVerify    func()
 		checkResponse func(t *testing.T, res *pb.GoogleLoginResponse, err error)
 	}{
@@ -50,7 +50,7 @@ func TestGoogleLogin(t *testing.T) {
 					}, nil
 				}
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetGoogleUserByProviderID(gomock.Any(), sub).
 					Times(1).
@@ -76,19 +76,19 @@ func TestGoogleLogin(t *testing.T) {
 					CreateUser(gomock.Any(), gomock.Any()).
 					Times(1).
 					Return(db.CreateUserRow{
-						ID:           userID,
-						Username:     username,
-						Email:        email,
-						CreatedAt: 	  time.Now(),
-						UpdatedAt: 	  time.Now(),
-						Role:         db.UserRole("user"),
-						IsVerified:   true,
+						ID:         userID,
+						Username:   username,
+						Email:      email,
+						CreatedAt:  time.Now(),
+						UpdatedAt:  time.Now(),
+						Role:       db.UserRole("user"),
+						IsVerified: true,
 					}, nil)
-				
+
 				store.EXPECT().
-        			CreateSession(gomock.Any(), gomock.Any()).
-        			Times(1).
-        			Return(db.Session{}, nil)
+					CreateSession(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.Session{}, nil)
 			},
 			checkResponse: func(t *testing.T, res *pb.GoogleLoginResponse, err error) {
 				require.NoError(t, err)
@@ -107,7 +107,7 @@ func TestGoogleLogin(t *testing.T) {
 					return nil, errors.New("invalid token")
 				}
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 			},
 			checkResponse: func(t *testing.T, res *pb.GoogleLoginResponse, err error) {
 				require.Error(t, err)
@@ -130,16 +130,16 @@ func TestGoogleLogin(t *testing.T) {
 					}, nil
 				}
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetGoogleUserByProviderID(gomock.Any(), sub).
 					Times(1).
 					Return(db.GoogleAuth{}, db.ErrRecordNotFound)
 
 				store.EXPECT().
-    			CreateGoogleUser(gomock.Any(), gomock.Any()).
-    			Times(1).
-    			Return(db.GoogleAuth{}, errors.New("db failure"))
+					CreateGoogleUser(gomock.Any(), gomock.Any()).
+					Times(1).
+					Return(db.GoogleAuth{}, errors.New("db failure"))
 			},
 			checkResponse: func(t *testing.T, res *pb.GoogleLoginResponse, err error) {
 				require.Error(t, err)
@@ -157,7 +157,7 @@ func TestGoogleLogin(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 			tc.stubVerify()
 

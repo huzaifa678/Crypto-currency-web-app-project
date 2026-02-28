@@ -6,11 +6,12 @@ import (
 	"testing"
 	"time"
 
+	"math/rand/v2"
+
 	"github.com/google/uuid"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/rand"
 )
 
 func TestCreateOrder(t *testing.T) {
@@ -190,11 +191,11 @@ func createRandomMarketForOrder(t *testing.T) CreateMarketRow {
 	require.NoError(t, err, "Failed to create user for market")
 
 	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
-	baseCurrency := currencies[rand.Intn(len(currencies))]
-	quoteCurrency := currencies[rand.Intn(len(currencies))]
+	baseCurrency := currencies[rand.IntN(len(currencies))]
+	quoteCurrency := currencies[rand.IntN(len(currencies))]
 
 	for baseCurrency == quoteCurrency {
-		quoteCurrency = currencies[rand.Intn(len(currencies))]
+		quoteCurrency = currencies[rand.IntN(len(currencies))]
 	}
 
 	existingMarket, err := testStore.GetMarketByCurrencies(ctx, GetMarketByCurrenciesParams{

@@ -20,7 +20,7 @@ func TestUpdateUserRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.UpdateUserRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		checkResponse func(t *testing.T, res *pb.UpdateUserResponse, err error)
 	}{
 		{
@@ -29,8 +29,8 @@ func TestUpdateUserRPC(t *testing.T) {
 				UserId:   user.ID.String(),
 				Password: newPassword,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
-		
+			buildStubs: func(store *mockdb.MockStoreInterface) {
+
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
 					Times(1).
@@ -48,7 +48,7 @@ func TestUpdateUserRPC(t *testing.T) {
 				UserId:   "invalid-uuid",
 				Password: newPassword,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -64,9 +64,9 @@ func TestUpdateUserRPC(t *testing.T) {
 			name: "InvalidPassword",
 			req: &pb.UpdateUserRequest{
 				UserId:   user.ID.String(),
-				Password: "short", 
+				Password: "short",
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -84,7 +84,7 @@ func TestUpdateUserRPC(t *testing.T) {
 				UserId:   user.ID.String(),
 				Password: newPassword,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					UpdateUser(gomock.Any(), gomock.Any()).
 					Times(1).
@@ -106,13 +106,13 @@ func TestUpdateUserRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
-            server := NewTestServer(t, store, nil)
+			server := NewTestServer(t, store, nil)
 
 			res, err := server.UpdateUser(context.Background(), tc.req)
 			tc.checkResponse(t, res, err)
 		})
 	}
-} 
+}

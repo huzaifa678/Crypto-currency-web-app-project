@@ -17,8 +17,6 @@ linters:
     revive:
       rules:
         - name: var-naming
-        - name: line-length-limit
-          arguments: [120]
 
 issues:
   max-issues-per-linter: 0

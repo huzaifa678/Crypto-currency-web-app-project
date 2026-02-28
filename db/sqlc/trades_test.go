@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"testing"
 
+	"math/rand/v2"
+
 	"github.com/google/uuid"
 	"github.com/huzaifa678/Crypto-currency-web-app-project/utils"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	"golang.org/x/exp/rand"
 )
 
 func TestCreateTrade(t *testing.T) {
@@ -69,15 +70,15 @@ func TestCreateTrade(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the seller")
 
 	tradeArgs := CreateTradeParams{
-		Username:    market.Username,
-		BuyerUserEmail: buyer.Email,
+		Username:        market.Username,
+		BuyerUserEmail:  buyer.Email,
 		SellerUserEmail: seller.Email,
-		BuyOrderID:  buyOrder.ID,
-		SellOrderID: sellOrder.ID,
-		MarketID:    market.ID,
-		Price:       decimal.NewFromFloat(105.50000000),
-		Amount:      decimal.NewFromFloat(10.00000000),
-		Fee:         decimal.NewFromFloat(0.01),
+		BuyOrderID:      buyOrder.ID,
+		SellOrderID:     sellOrder.ID,
+		MarketID:        market.ID,
+		Price:           decimal.NewFromFloat(105.50000000),
+		Amount:          decimal.NewFromFloat(10.00000000),
+		Fee:             decimal.NewFromFloat(0.01),
 	}
 
 	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
@@ -147,15 +148,15 @@ func TestDeleteTrade(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the seller")
 
 	tradeArgs := CreateTradeParams{
-		Username:    market.Username,
-		BuyerUserEmail: buyer.Email,
+		Username:        market.Username,
+		BuyerUserEmail:  buyer.Email,
 		SellerUserEmail: seller.Email,
-		BuyOrderID:  buyOrder.ID,
-		SellOrderID: sellOrder.ID,
-		MarketID:    market.ID,
-		Price:       decimal.NewFromFloat(105.50000000),
-		Amount:      decimal.NewFromFloat(10.00000000),
-		Fee:         decimal.NewFromFloat(0.01),
+		BuyOrderID:      buyOrder.ID,
+		SellOrderID:     sellOrder.ID,
+		MarketID:        market.ID,
+		Price:           decimal.NewFromFloat(105.50000000),
+		Amount:          decimal.NewFromFloat(10.00000000),
+		Fee:             decimal.NewFromFloat(0.01),
 	}
 
 	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
@@ -223,15 +224,15 @@ func TestGetTradeById(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the seller")
 
 	tradeArgs := CreateTradeParams{
-		Username:    market.Username,
-		BuyerUserEmail: buyer.Email,
+		Username:        market.Username,
+		BuyerUserEmail:  buyer.Email,
 		SellerUserEmail: seller.Email,
-		BuyOrderID:  buyOrder.ID,
-		SellOrderID: sellOrder.ID,
-		MarketID:    market.ID,
-		Price:       decimal.NewFromFloat(105.50000000),
-		Amount:      decimal.NewFromFloat(10.00000000),
-		Fee:         decimal.NewFromFloat(0.01),
+		BuyOrderID:      buyOrder.ID,
+		SellOrderID:     sellOrder.ID,
+		MarketID:        market.ID,
+		Price:           decimal.NewFromFloat(105.50000000),
+		Amount:          decimal.NewFromFloat(10.00000000),
+		Fee:             decimal.NewFromFloat(0.01),
 	}
 
 	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
@@ -302,15 +303,15 @@ func TestGetTradeByMarketID(t *testing.T) {
 	require.NoError(t, err, "Failed to create order for the seller")
 
 	tradeArgs := CreateTradeParams{
-		Username:    market.Username,
-		BuyerUserEmail: buyer.Email,
+		Username:        market.Username,
+		BuyerUserEmail:  buyer.Email,
 		SellerUserEmail: seller.Email,
-		BuyOrderID:  buyOrder.ID,
-		SellOrderID: sellOrder.ID,
-		MarketID:    market.ID,
-		Price:       decimal.NewFromFloat(105.50000000),
-		Amount:      decimal.NewFromFloat(10.00000000),
-		Fee:         decimal.NewFromFloat(0.01),
+		BuyOrderID:      buyOrder.ID,
+		SellOrderID:     sellOrder.ID,
+		MarketID:        market.ID,
+		Price:           decimal.NewFromFloat(105.50000000),
+		Amount:          decimal.NewFromFloat(10.00000000),
+		Fee:             decimal.NewFromFloat(0.01),
 	}
 
 	trade, err := testStore.CreateTrade(context.Background(), tradeArgs)
@@ -336,11 +337,11 @@ func createRandomMarketForTrade(t *testing.T) CreateMarketRow {
 	require.NoError(t, err, "Failed to create user for market")
 
 	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
-	baseCurrency := currencies[rand.Intn(len(currencies))]
-	quoteCurrency := currencies[rand.Intn(len(currencies))]
+	baseCurrency := currencies[rand.IntN(len(currencies))]
+	quoteCurrency := currencies[rand.IntN(len(currencies))]
 
 	for baseCurrency == quoteCurrency {
-		quoteCurrency = currencies[rand.Intn(len(currencies))]
+		quoteCurrency = currencies[rand.IntN(len(currencies))]
 	}
 
 	existingMarket, err := testStore.GetMarketByCurrencies(ctx, GetMarketByCurrenciesParams{

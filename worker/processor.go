@@ -10,7 +10,6 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-
 const (
 	QueueCritical = "critical"
 	QueueDefault  = "default"
@@ -24,11 +23,11 @@ type TaskProcessor interface {
 
 type RedisTaskProcessor struct {
 	server *asynq.Server
-	store  db.Store_interface
+	store  db.StoreInterface
 	mailer mail.Sender
 }
 
-func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.Store_interface, mailer mail.Sender) TaskProcessor {
+func NewRedisTaskProcessor(redisOpt asynq.RedisClientOpt, store db.StoreInterface, mailer mail.Sender) TaskProcessor {
 	logger := NewLogger()
 	redis.SetLogger(logger)
 

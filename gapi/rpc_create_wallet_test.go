@@ -26,7 +26,7 @@ func TestCreateWalletRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.CreateWalletRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.CreateWalletResponse, err error)
 	}{
@@ -36,7 +36,7 @@ func TestCreateWalletRPC(t *testing.T) {
 				UserEmail: user.Email,
 				Currency:  "BTC",
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				arg := db.CreateWalletParams{
 					Username:  user.Username,
 					UserEmail: user.Email,
@@ -54,9 +54,9 @@ func TestCreateWalletRPC(t *testing.T) {
 						Balance:   decimal.NewFromFloat(0),
 					}, nil)
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute, token.TokenTypeAccessToken)
-            },
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute, token.TokenTypeAccessToken)
+			},
 			checkResponse: func(t *testing.T, res *pb.CreateWalletResponse, err error) {
 				log.Println("ERROR: ", err)
 				require.NoError(t, err)
@@ -70,10 +70,10 @@ func TestCreateWalletRPC(t *testing.T) {
 				UserEmail: user.Email,
 				Currency:  "BTC",
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return context.Background()
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return context.Background()
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateWallet(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -91,10 +91,10 @@ func TestCreateWalletRPC(t *testing.T) {
 				UserEmail: "invalid-email",
 				Currency:  "BTC",
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateWallet(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -112,10 +112,10 @@ func TestCreateWalletRPC(t *testing.T) {
 				UserEmail: user.Email,
 				Currency:  "INVALID",
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateWallet(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -133,10 +133,10 @@ func TestCreateWalletRPC(t *testing.T) {
 				UserEmail: user.Email,
 				Currency:  "BTC",
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, user.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				arg := db.CreateWalletParams{
 					Username:  user.Username,
 					UserEmail: user.Email,
@@ -165,7 +165,7 @@ func TestCreateWalletRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)
@@ -175,4 +175,4 @@ func TestCreateWalletRPC(t *testing.T) {
 			tc.checkResponse(t, res, err)
 		})
 	}
-} 
+}

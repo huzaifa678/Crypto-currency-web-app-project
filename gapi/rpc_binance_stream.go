@@ -67,7 +67,12 @@ func (server *server) StreamTrades(req *pb.TradeStreamRequest, stream pb.CryptoW
     if err != nil {
         return status.Errorf(codes.Internal, "failed to connect to binance websocket: %v", err)
     }
-    defer c.Close()
+    
+    defer func() {
+        if err := c.Close(); err != nil {
+            log.Println("close websocket:", err)
+        }
+    }()
 
     for {
         select {

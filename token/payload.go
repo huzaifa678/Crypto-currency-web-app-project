@@ -1,13 +1,13 @@
+//nolint:revive
 package token
 
 import (
 	"errors"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 )
-
 
 var (
 	ErrExpiredToken = errors.New("token has expired")
@@ -86,4 +86,3 @@ func (payload *Payload) GetSubject() (string, error) {
 func (payload *Payload) GetAudience() (jwt.ClaimStrings, error) {
 	return jwt.ClaimStrings{}, nil
 }
-

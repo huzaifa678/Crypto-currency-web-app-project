@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -11,10 +12,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-
-func NewTestServer(t *testing.T, store db.Store_interface) *server {
+func NewTestServer(t *testing.T, store db.StoreInterface) *server {
 	config := utils.Config{
-		PasetoSymmetricKey: utils.RandomString(32),
+		PasetoSymmetricKey:  utils.RandomString(32),
 		AccessTokenDuration: time.Minute,
 	}
 
@@ -24,8 +24,6 @@ func NewTestServer(t *testing.T, store db.Store_interface) *server {
 
 	return server
 }
-
-
 
 func TestMain(m *testing.M) {
 

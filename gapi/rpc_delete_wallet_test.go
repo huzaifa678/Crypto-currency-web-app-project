@@ -22,7 +22,7 @@ func TestDeleteWalletRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.DeleteWalletRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.DeleteWalletResponse, err error)
 	}{
@@ -31,10 +31,10 @@ func TestDeleteWalletRPC(t *testing.T) {
 			req: &pb.DeleteWalletRequest{
 				WalletId: wallet.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetWalletByID(gomock.Any(), gomock.Eq(wallet.ID)).
 					Times(1).
@@ -56,10 +56,10 @@ func TestDeleteWalletRPC(t *testing.T) {
 			req: &pb.DeleteWalletRequest{
 				WalletId: wallet.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return context.Background()
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return context.Background()
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetWalletByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -80,10 +80,10 @@ func TestDeleteWalletRPC(t *testing.T) {
 			req: &pb.DeleteWalletRequest{
 				WalletId: "invalid-uuid",
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetWalletByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -104,10 +104,10 @@ func TestDeleteWalletRPC(t *testing.T) {
 			req: &pb.DeleteWalletRequest{
 				WalletId: wallet.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetWalletByID(gomock.Any(), gomock.Eq(wallet.ID)).
 					Times(1).
@@ -130,10 +130,10 @@ func TestDeleteWalletRPC(t *testing.T) {
 			req: &pb.DeleteWalletRequest{
 				WalletId: wallet.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, wallet.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetWalletByID(gomock.Any(), gomock.Eq(wallet.ID)).
 					Times(1).
@@ -160,7 +160,7 @@ func TestDeleteWalletRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)
@@ -170,4 +170,4 @@ func TestDeleteWalletRPC(t *testing.T) {
 			tc.checkResponse(t, res, err)
 		})
 	}
-} 
+}

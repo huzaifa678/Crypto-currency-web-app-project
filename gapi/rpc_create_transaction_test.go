@@ -25,7 +25,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.CreateTransactionRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.CreateTransactionResponse, err error)
 	}{
@@ -42,10 +42,10 @@ func TestCreateTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				result := db.UpdateBalanceForTransactionTypeTxResult{
-        			CreateTransactionRow: transactionRow,
-    			}
+					CreateTransactionRow: transactionRow,
+				}
 				store.EXPECT().
 					CreateTransactionForTransactionTypeTx(gomock.Any(), gomock.Any()).
 					DoAndReturn(func(ctx context.Context, arg db.UpdateBalanceForTransactionTypeTxParams) (db.UpdateBalanceForTransactionTypeTxResult, error) {
@@ -80,7 +80,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateTransaction(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -105,7 +105,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateTransaction(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -131,15 +131,15 @@ func TestCreateTransactionRPC(t *testing.T) {
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, transaction.Username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					CreateTransactionForTransactionTypeTx(gomock.Any(), gomock.Any()).
 					Times(1).
 					Return(
 						db.UpdateBalanceForTransactionTypeTxResult{
-                    		CreateTransactionRow: transactionRow,
-                		},
-                		db.ErrRecordNotFound,
+							CreateTransactionRow: transactionRow,
+						},
+						db.ErrRecordNotFound,
 					)
 			},
 			checkResponse: func(t *testing.T, res *pb.CreateTransactionResponse, err error) {
@@ -158,7 +158,7 @@ func TestCreateTransactionRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)

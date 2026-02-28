@@ -27,7 +27,7 @@ import (
 type eqCreateUserTxParamsMatcher struct {
 	arg      db.CreateUserTxParams
 	password string
-	user db.CreateUserRow
+	user     db.CreateUserRow
 }
 
 func (expected eqCreateUserTxParamsMatcher) Matches(x interface{}) bool {
@@ -72,25 +72,25 @@ func TestCreateUserAPI(t *testing.T) {
 	testCases := []struct {
 		name          string
 		body          *pb.CreateUserRequest
-		buildStubs    func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor)
+		buildStubs    func(store *mockdb.MockStoreInterface, taskDistributor *mockwk.MockTaskDistributor)
 		checkResponse func(t *testing.T, res *pb.CreateUserResponse, err error)
 	}{
 		{
 			name: "OK",
 			body: &pb.CreateUserRequest{
-				Username:	   userArgs.Username,
-				Email:         userArgs.Email,
-				Password: 	   password,
-				Role:          pb.UserRole_USER_ROLE_USER,
+				Username: userArgs.Username,
+				Email:    userArgs.Email,
+				Password: password,
+				Role:     pb.UserRole_USER_ROLE_USER,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor) {
+			buildStubs: func(store *mockdb.MockStoreInterface, taskDistributor *mockwk.MockTaskDistributor) {
 				arg := db.CreateUserTxParams{
 					CreateUserParams: db.CreateUserParams{
-						Username: user.Username,
-						Email:    user.Email,
+						Username:     user.Username,
+						Email:        user.Email,
 						PasswordHash: password,
-						Role:     db.UserRole(pb.UserRole_USER_ROLE_USER.String()),
-						IsVerified: userArgs.IsVerified,
+						Role:         db.UserRole(pb.UserRole_USER_ROLE_USER.String()),
+						IsVerified:   userArgs.IsVerified,
 					},
 				}
 				store.EXPECT().
@@ -116,13 +116,12 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "InternalError",
 			body: &pb.CreateUserRequest{
-				Username:	   userArgs.Username,
-				Email:         user.Email,
-				Password:      password,
-				Role:          pb.UserRole_USER_ROLE_USER,
+				Username: userArgs.Username,
+				Email:    user.Email,
+				Password: password,
+				Role:     pb.UserRole_USER_ROLE_USER,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor) {
-				
+			buildStubs: func(store *mockdb.MockStoreInterface, taskDistributor *mockwk.MockTaskDistributor) {
 
 				store.EXPECT().
 					CreateUserTx(gomock.Any(), gomock.Any()).
@@ -144,12 +143,12 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "DuplicateEmail",
 			body: &pb.CreateUserRequest{
-				Username:	   userArgs.Username,
-				Email:         user.Email,
-				Password:      password,
-				Role:          pb.UserRole_USER_ROLE_USER,
+				Username: userArgs.Username,
+				Email:    user.Email,
+				Password: password,
+				Role:     pb.UserRole_USER_ROLE_USER,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor) {		
+			buildStubs: func(store *mockdb.MockStoreInterface, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(1).
@@ -170,12 +169,12 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "InvalidEmail",
 			body: &pb.CreateUserRequest{
-				Username:	   userArgs.Username,
-				Email:       "invalid-email",
-				Password:    userArgs.PasswordHash,
-				Role:        pb.UserRole_USER_ROLE_USER,
+				Username: userArgs.Username,
+				Email:    "invalid-email",
+				Password: userArgs.PasswordHash,
+				Role:     pb.UserRole_USER_ROLE_USER,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor) {
+			buildStubs: func(store *mockdb.MockStoreInterface, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -195,12 +194,12 @@ func TestCreateUserAPI(t *testing.T) {
 		{
 			name: "TooShortPassword",
 			body: &pb.CreateUserRequest{
-				Username:	   userArgs.Username,
-				Email:       user.Email,
-				Password:    "123",
-				Role:        pb.UserRole_USER_ROLE_USER,
+				Username: userArgs.Username,
+				Email:    user.Email,
+				Password: "123",
+				Role:     pb.UserRole_USER_ROLE_USER,
 			},
-			buildStubs: func(store *mockdb.MockStore_interface, taskDistributor *mockwk.MockTaskDistributor) {
+			buildStubs: func(store *mockdb.MockStoreInterface, taskDistributor *mockwk.MockTaskDistributor) {
 				store.EXPECT().
 					CreateUserTx(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -225,7 +224,7 @@ func TestCreateUserAPI(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			storeCtrl := gomock.NewController(t)
 			defer storeCtrl.Finish()
-			store := mockdb.NewMockStore_interface(storeCtrl)
+			store := mockdb.NewMockStoreInterface(storeCtrl)
 
 			taskCtrl := gomock.NewController(t)
 			defer taskCtrl.Finish()
@@ -242,7 +241,7 @@ func TestCreateUserAPI(t *testing.T) {
 
 func createRandomUser() (
 	db.CreateUserParams, db.User, db.CreateUserRow,
-	db.GetUserByIDRow, db.GetUserByEmailRow, string, 
+	db.GetUserByIDRow, db.GetUserByEmailRow, string,
 ) {
 	randomEmail := fmt.Sprintf("testing%d@example.com", rand.Intn(1000))
 	password := fmt.Sprintf("password%d", rand.Intn(20))
@@ -251,11 +250,11 @@ func createRandomUser() (
 	username := fmt.Sprintf("usertesting%d", rand.Intn(100))
 
 	userArgs := db.CreateUserParams{
-		Username:    username,
-		Email:       randomEmail,
-		PasswordHash: hashedPassword, 
-		Role:        db.UserRole(pb.UserRole_USER_ROLE_USER.String()),
-		IsVerified:  true,
+		Username:     username,
+		Email:        randomEmail,
+		PasswordHash: hashedPassword,
+		Role:         db.UserRole(pb.UserRole_USER_ROLE_USER.String()),
+		IsVerified:   true,
 	}
 
 	user := db.User{
@@ -263,7 +262,7 @@ func createRandomUser() (
 		Username:     username,
 		Email:        randomEmail,
 		PasswordHash: hashedPassword,
-		Role:         db.UserRole(pb.UserRole_USER_ROLE_USER.String()), 
+		Role:         db.UserRole(pb.UserRole_USER_ROLE_USER.String()),
 		IsVerified:   userArgs.IsVerified,
 	}
 

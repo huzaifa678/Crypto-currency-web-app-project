@@ -31,21 +31,21 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.UpdateOrderStatusAndFilledAmountRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.UpdateOrderStatusAndFilledAmountResponse, err error)
 	}{
 		{
 			name: "OK",
 			req: &pb.UpdateOrderStatusAndFilledAmountRequest{
-				OrderId:     orderID.String(),
-				OrderStatus: pb.Status_FILLED,
+				OrderId:      orderID.String(),
+				OrderStatus:  pb.Status_FILLED,
 				FilledAmount: 10,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), orderID).
 					Times(1).
@@ -69,14 +69,14 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 		{
 			name: "InvalidID",
 			req: &pb.UpdateOrderStatusAndFilledAmountRequest{
-				OrderId:     "invalid-uuid",
-				OrderStatus: pb.Status_OPEN,
+				OrderId:      "invalid-uuid",
+				OrderStatus:  pb.Status_OPEN,
 				FilledAmount: 5,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateOrderStatusAndFilledAmountResponse, err error) {
 				require.Error(t, err)
@@ -88,14 +88,14 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 		{
 			name: "Unauthorized",
 			req: &pb.UpdateOrderStatusAndFilledAmountRequest{
-				OrderId:     orderID.String(),
-				OrderStatus: pb.Status_CANCELLED,
+				OrderId:      orderID.String(),
+				OrderStatus:  pb.Status_CANCELLED,
 				FilledAmount: 3,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return context.Background()
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 			},
 			checkResponse: func(t *testing.T, res *pb.UpdateOrderStatusAndFilledAmountResponse, err error) {
 				require.Error(t, err)
@@ -107,14 +107,14 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 		{
 			name: "NotAuthorizedDifferentUser",
 			req: &pb.UpdateOrderStatusAndFilledAmountRequest{
-				OrderId:     orderID.String(),
-				OrderStatus: pb.Status_FILLED,
+				OrderId:      orderID.String(),
+				OrderStatus:  pb.Status_FILLED,
 				FilledAmount: 7,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, "other_user", time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), orderID).
 					Times(1).
@@ -130,14 +130,14 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 		{
 			name: "InternalUpdateError",
 			req: &pb.UpdateOrderStatusAndFilledAmountRequest{
-				OrderId:     orderID.String(),
-				OrderStatus: pb.Status_FILLED,
+				OrderId:      orderID.String(),
+				OrderStatus:  pb.Status_FILLED,
 				FilledAmount: 10,
 			},
 			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
 				return newContextWithBearerToken(t, tokenMaker, username, time.Minute, token.TokenTypeAccessToken)
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), orderID).
 					Times(1).
@@ -164,7 +164,7 @@ func TestUpdateOrderStatusAndFilledAmount(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)

@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -14,16 +15,14 @@ import (
 	"github.com/google/uuid"
 )
 
-
 type RequestTradeParams struct {
-	BuyOrderID  uuid.UUID 	   `json:"buy_order_id" binding:"required"`
-	SellOrderID uuid.UUID	   `json:"sell_order_id" binding:"required"`
-	MarketID    uuid.UUID 	   `json:"market_id" binding:"required"`
-	Price       decimal.Decimal         `json:"price" binding:"required"`
-	Amount      decimal.Decimal         `json:"amount" binding:"required"`
-	Fee         decimal.Decimal 		   `json:"fee" binding:"required"`
+	BuyOrderID  uuid.UUID       `json:"buy_order_id" binding:"required"`
+	SellOrderID uuid.UUID       `json:"sell_order_id" binding:"required"`
+	MarketID    uuid.UUID       `json:"market_id" binding:"required"`
+	Price       decimal.Decimal `json:"price" binding:"required"`
+	Amount      decimal.Decimal `json:"amount" binding:"required"`
+	Fee         decimal.Decimal `json:"fee" binding:"required"`
 }
-
 
 func (server *server) createTrade(ctx *gin.Context) {
 	var req RequestTradeParams
@@ -41,15 +40,14 @@ func (server *server) createTrade(ctx *gin.Context) {
 	authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
 
 	arg := db.CreateTradeParams{
-		Username:  authPayload.Username,
+		Username:    authPayload.Username,
 		BuyOrderID:  req.BuyOrderID,
 		SellOrderID: req.SellOrderID,
 		MarketID:    req.MarketID,
-		Price:     	 req.Price,
-		Amount:    	 req.Amount,
-		Fee:       	 req.Fee,
+		Price:       req.Price,
+		Amount:      req.Amount,
+		Fee:         req.Fee,
 	}
-
 
 	trade, err := server.store.CreateTrade(ctx, arg)
 	if err != nil {
@@ -128,9 +126,8 @@ func (server *server) deleteTrade(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"status": "ok"})
 }
 
-
 func (server *server) listTrades(ctx *gin.Context) {
-    id := ctx.Param("market_id")
+	id := ctx.Param("market_id")
 	marketID, err := uuid.Parse(id)
 
 	if err != nil {
@@ -138,19 +135,17 @@ func (server *server) listTrades(ctx *gin.Context) {
 		return
 	}
 
-    trades, err := server.store.GetTradesByMarketID(ctx, marketID)
+	trades, err := server.store.GetTradesByMarketID(ctx, marketID)
 
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-    ctx.JSON(http.StatusOK, trades)
+	ctx.JSON(http.StatusOK, trades)
 }
-
 
 func isValidFee(fee decimal.Decimal) bool {
 	f, _ := fee.Float64()
-    return !math.IsInf(f, 0) && !math.IsNaN(f)
+	return !math.IsInf(f, 0) && !math.IsNaN(f)
 }
-

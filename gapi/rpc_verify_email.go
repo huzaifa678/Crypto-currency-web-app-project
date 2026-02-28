@@ -18,7 +18,7 @@ func (server *server) VerifyEmail(ctx context.Context, req *pb.VerifyEmailReques
 	}
 
 	txResult, err := server.store.VerifyEmailTx(ctx, db.VerifyEmailTxParams{
-		EmailId:    req.GetEmailId(),
+		EmailID:    req.GetEmailId(),
 		SecretCode: req.GetSecretCode(),
 	})
 
@@ -35,7 +35,7 @@ func (server *server) VerifyEmail(ctx context.Context, req *pb.VerifyEmailReques
 }
 
 func validateVerifyEmailRequest(req *pb.VerifyEmailRequest) (violations []*errdetails.BadRequest_FieldViolation) {
-	if err := val.ValidateEmailId(req.GetEmailId()); err != nil {
+	if err := val.ValidateEmailID(req.GetEmailId()); err != nil {
 		violations = append(violations, fieldViolation("email_id", err))
 	}
 

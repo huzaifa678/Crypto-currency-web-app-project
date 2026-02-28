@@ -60,7 +60,7 @@ func main() {
 	oauth2.InitGoogleOAuth(config)
 
 	ctx, stop := signal.NotifyContext(context.Background(), interruptSignals...)
-	defer stop() 
+	defer stop()
 
 	connPool, err := pgxpool.New(ctx, config.Dbsource)
 	if err != nil {
@@ -75,14 +75,13 @@ func main() {
 		Addr: config.RedisAddr,
 	}
 
-
 	taskDistributor := worker.NewRedisTaskDistributor(redisOpt)
 
 	waitGroup, ctx := errgroup.WithContext(ctx)
-	
+
 	runTaskProcessor(ctx, waitGroup, config, redisOpt, store)
 	runGatewayServer(ctx, waitGroup, config, store, taskDistributor)
-	runGrpcServer(ctx, waitGroup, config, store,taskDistributor)
+	runGrpcServer(ctx, waitGroup, config, store, taskDistributor)
 
 	err = waitGroup.Wait()
 
@@ -105,7 +104,7 @@ func runDBMigration(migrationURL string, dbSource string) {
 	log.Info().Msg("db migrated successfully")
 }
 
-func runTaskProcessor(ctx context.Context, waitGroup *errgroup.Group, config utils.Config, redisOpt asynq.RedisClientOpt, store db.Store_interface) {
+func runTaskProcessor(ctx context.Context, waitGroup *errgroup.Group, config utils.Config, redisOpt asynq.RedisClientOpt, store db.StoreInterface) {
 	mailer := mail.NewGmailSender(config.SenderName, config.SenderEmail, config.SenderPassword)
 	taskProcessor := worker.NewRedisTaskProcessor(redisOpt, store, mailer)
 
@@ -126,7 +125,7 @@ func runTaskProcessor(ctx context.Context, waitGroup *errgroup.Group, config uti
 	})
 }
 
-func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, config utils.Config, store db.Store_interface, taskDistributor worker.TaskDistributor) {
+func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, config utils.Config, store db.StoreInterface, taskDistributor worker.TaskDistributor) {
 	server, err := gapi.NewServer(store, config, taskDistributor)
 
 	if err != nil {
@@ -158,7 +157,6 @@ func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, config utils.
 		return nil
 	})
 
-
 	waitGroup.Go(func() error {
 		<-ctx.Done()
 		log.Info().Msg("graceful shutdown gRPC server")
@@ -171,102 +169,102 @@ func runGrpcServer(ctx context.Context, waitGroup *errgroup.Group, config utils.
 }
 
 func runGatewayServer(
-    ctx context.Context,
-    waitGroup *errgroup.Group,
-    config utils.Config,
-    store db.Store_interface,
-    taskDistributor worker.TaskDistributor,
+	ctx context.Context,
+	waitGroup *errgroup.Group,
+	config utils.Config,
+	store db.StoreInterface,
+	taskDistributor worker.TaskDistributor,
 ) {
-    _, err := gapi.NewServer(store, config, taskDistributor)
-    if err != nil {
-        log.Fatal().Err(err).Msg("Failed to create the Gateway handler server")
-    }
+	_, err := gapi.NewServer(store, config, taskDistributor)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to create the Gateway handler server")
+	}
 
-    jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
-        MarshalOptions: protojson.MarshalOptions{
-            UseProtoNames:   true,
-            UseEnumNumbers:  false,
+	jsonOption := runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+		MarshalOptions: protojson.MarshalOptions{
+			UseProtoNames:   true,
+			UseEnumNumbers:  false,
 			EmitUnpopulated: true,
-        },
-        UnmarshalOptions: protojson.UnmarshalOptions{
-            DiscardUnknown: true,
-        },
-    })
+		},
+		UnmarshalOptions: protojson.UnmarshalOptions{
+			DiscardUnknown: true,
+		},
+	})
 
-    grpcMux := runtime.NewServeMux(jsonOption)
+	grpcMux := runtime.NewServeMux(jsonOption)
 
-    dialOpts := []grpc.DialOption{
-        grpc.WithTransportCredentials(insecure.NewCredentials()),
-    }
+	dialOpts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
 
-    err = pb.RegisterCryptoWebAppHandlerFromEndpoint(ctx, grpcMux, config.GRPCServerAddr, dialOpts)
-    if err != nil {
-        log.Fatal().Err(err).Msg("Failed to start grpc-gateway")
-    }
+	err = pb.RegisterCryptoWebAppHandlerFromEndpoint(ctx, grpcMux, config.GRPCServerAddr, dialOpts)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to start grpc-gateway")
+	}
 
-    mux := http.NewServeMux()
-    mux.Handle("/", grpcMux)
+	mux := http.NewServeMux()
+	mux.Handle("/", grpcMux)
 
 	mux.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		_, _ = w.Write([]byte("OK"))
 	})
 
-    fs := http.FileServer(http.FS(docsFS))
-    mux.Handle("/docs/", http.StripPrefix("/", fs))
+	fs := http.FileServer(http.FS(docsFS))
+	mux.Handle("/docs/", http.StripPrefix("/", fs))
 
 	mux.HandleFunc("/oauth/google/login", oauth2.GoogleLoginHandler)
 	mux.HandleFunc("/oauth/google/callback", oauth2.GoogleCallbackHandler)
 
-    c := cors.New(cors.Options{
-        AllowedOrigins:   []string{config.Origin},
-        AllowedMethods:   []string{http.MethodHead, http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions},
-        AllowedHeaders:   []string{"Authorization", "Content-Type"},
-        ExposedHeaders:   []string{"Content-Length"},
-        AllowCredentials: true,
-    })
-    handler := c.Handler(gapi.HttpLogger(mux))
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{config.Origin},
+		AllowedMethods:   []string{http.MethodHead, http.MethodPost, http.MethodPatch, http.MethodDelete, http.MethodOptions},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		ExposedHeaders:   []string{"Content-Length"},
+		AllowCredentials: true,
+	})
+	handler := c.Handler(gapi.HTTPLogger(mux))
 
-    httpServer := &http.Server{
-        Handler: handler,
-        Addr:    config.HTTPServerAddr,
-    }
+	httpServer := &http.Server{
+		Handler: handler,
+		Addr:    config.HTTPServerAddr,
+	}
 
-    waitGroup.Go(func() error {
-        log.Info().Msgf("start HTTP gateway server at %s", httpServer.Addr)
-        err = httpServer.ListenAndServe()
-        if err != nil {
-            if errors.Is(err, http.ErrServerClosed) {
-                return nil
-            }
-            log.Error().Err(err).Msg("HTTP gateway server failed to serve")
-            return err
-        }
-        return nil
-    })
+	waitGroup.Go(func() error {
+		log.Info().Msgf("start HTTP gateway server at %s", httpServer.Addr)
+		err = httpServer.ListenAndServe()
+		if err != nil {
+			if errors.Is(err, http.ErrServerClosed) {
+				return nil
+			}
+			log.Error().Err(err).Msg("HTTP gateway server failed to serve")
+			return err
+		}
+		return nil
+	})
 
-    waitGroup.Go(func() error {
-        <-ctx.Done()
-        log.Info().Msg("graceful shutdown HTTP gateway server")
+	waitGroup.Go(func() error {
+		<-ctx.Done()
+		log.Info().Msg("graceful shutdown HTTP gateway server")
 
-        err := httpServer.Shutdown(context.Background())
-        if err != nil {
-            log.Error().Err(err).Msg("failed to shutdown HTTP gateway server")
-            return err
-        }
+		err := httpServer.Shutdown(context.Background())
+		if err != nil {
+			log.Error().Err(err).Msg("failed to shutdown HTTP gateway server")
+			return err
+		}
 
-        log.Info().Msg("HTTP gateway server is stopped")
-        return nil
-    })
+		log.Info().Msg("HTTP gateway server is stopped")
+		return nil
+	})
 }
 
-
-func runGinServer(config utils.Config, store db.Store_interface) {
+//nolint:unused
+func runGinServer(config utils.Config, store db.StoreInterface) {
 	server, err := api.NewServer(store, config)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to create the Gin server")
 	}
-	
+
 	err = server.Start(config.HTTPServerAddr)
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to start the Gin server")

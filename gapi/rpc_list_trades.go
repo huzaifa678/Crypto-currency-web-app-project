@@ -10,14 +10,14 @@ import (
 )
 
 func (server *server) ListTrades(ctx context.Context, req *pb.TradeListRequest) (*pb.TradeListResponse, error) {
-	
-	marketId, err := uuid.Parse(req.GetMarketId())
+
+	marketID, err := uuid.Parse(req.GetMarketId())
 
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid UUID: %v", err)
 	}
 
-	trades, err := server.store.GetTradesByMarketID(ctx, marketId)
+	trades, err := server.store.GetTradesByMarketID(ctx, marketID)
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "failed to list trades: %v", err)

@@ -51,11 +51,14 @@ func (store *SQLStore) CreateTransactionForTransactionTypeTx(ctx context.Context
 
 		result.CreateTransactionRow, err = q.CreateTransaction(ctx, args.CreateTransactionParams)
 
-		q.UpdateWalletBalance(ctx, UpdateWalletBalanceParams{
+		if err != nil {
+			return err
+		}
+
+		err = q.UpdateWalletBalance(ctx, UpdateWalletBalanceParams{
 			Balance: result.CreateTransactionRow.Amount,
 			LockedBalance: wallets[0].LockedBalance,
 			ID: wallets[0].ID,
-
 		})
 
 		if err != nil {

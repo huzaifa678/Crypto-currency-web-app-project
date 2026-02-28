@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -16,7 +17,7 @@ type renewAccessTokenRequest struct {
 }
 
 type renewAccessTokenResponse struct {
-	AccessToken string `json:"access_token"`
+	AccessToken          string    `json:"access_token"`
 	AccessTokenExpiresAt time.Time `json:"access_token_expires_at"`
 }
 
@@ -49,7 +50,6 @@ func (server *server) renewAccessToken(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
-
 
 	if session.IsBlocked {
 		err := fmt.Errorf("blocked session")

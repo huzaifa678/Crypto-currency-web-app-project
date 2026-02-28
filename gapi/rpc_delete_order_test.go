@@ -22,7 +22,7 @@ func TestDeleteOrderRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.DeleteOrderRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.DeleteOrderResponse, err error)
 	}{
@@ -31,10 +31,10 @@ func TestDeleteOrderRPC(t *testing.T) {
 			req: &pb.DeleteOrderRequest{
 				OrderId: order.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Eq(order.ID)).
 					Times(1).
@@ -56,10 +56,10 @@ func TestDeleteOrderRPC(t *testing.T) {
 			req: &pb.DeleteOrderRequest{
 				OrderId: order.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return context.Background()
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return context.Background()
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -80,10 +80,10 @@ func TestDeleteOrderRPC(t *testing.T) {
 			req: &pb.DeleteOrderRequest{
 				OrderId: "invalid-uuid",
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -104,10 +104,10 @@ func TestDeleteOrderRPC(t *testing.T) {
 			req: &pb.DeleteOrderRequest{
 				OrderId: order.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Eq(order.ID)).
 					Times(1).
@@ -129,10 +129,10 @@ func TestDeleteOrderRPC(t *testing.T) {
 			req: &pb.DeleteOrderRequest{
 				OrderId: order.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, order.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetOrderByID(gomock.Any(), gomock.Eq(order.ID)).
 					Times(1).
@@ -159,7 +159,7 @@ func TestDeleteOrderRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)
@@ -169,6 +169,4 @@ func TestDeleteOrderRPC(t *testing.T) {
 			tc.checkResponse(t, res, err)
 		})
 	}
-} 
-
-
+}

@@ -11,9 +11,9 @@ import (
 )
 
 var (
-	isValidUsername   = regexp.MustCompile(`^[a-z0-9_]+$`).MatchString
+	isValidUsername = regexp.MustCompile(`^[a-z0-9_]+$`).MatchString
 	//isValidFullName   = regexp.MustCompile(`^[a-zA-Z\s]+$`).MatchString
-	isValidCurrency   = regexp.MustCompile(`^[A-Z]{3}$`).MatchString
+	isValidCurrency = regexp.MustCompile(`^[A-Z]{3}$`).MatchString
 )
 
 func ValidateString(value string, minLength int, maxLength int) error {
@@ -149,7 +149,6 @@ func ValidateCreateOrderRequest(userEmail string, marketID string, price decimal
 	return nil
 }
 
-
 func ValidateUpdateUser(userID, password string) error {
 	if err := ValidateString(userID, 1, 50); err != nil {
 		return err
@@ -169,7 +168,7 @@ func ValidateUpdateWalletRequest(walletID string, balance, lockedBalance decimal
 	return validateDecimal(lockedBalance)
 }
 
-func ValidateCreateTradeRequest(BuyerUserEmail, SellerUserEmail, buyOrderId, sellOrderId, marketID string, price, amount, fee decimal.Decimal) error {
+func ValidateCreateTradeRequest(BuyerUserEmail, SellerUserEmail, buyOrderID, sellOrderID, marketID string, price, amount, fee decimal.Decimal) error {
 
 	if err := ValidateEmail(BuyerUserEmail); err != nil {
 		return err
@@ -179,11 +178,11 @@ func ValidateCreateTradeRequest(BuyerUserEmail, SellerUserEmail, buyOrderId, sel
 		return err
 	}
 
-	if err := ValidateString(buyOrderId, 1, 50); err != nil {
+	if err := ValidateString(buyOrderID, 1, 50); err != nil {
 		return err
 	}
 
-	if err := ValidateString(sellOrderId, 1, 50); err != nil {
+	if err := ValidateString(sellOrderID, 1, 50); err != nil {
 		return err
 	}
 
@@ -250,7 +249,7 @@ func ValidateUpdateOrderStatusAndFilledAmount(orderID string, status pb.Status, 
 	return nil
 }
 
-func ValidateEmailId(value int64) error {
+func ValidateEmailID(value int64) error {
 	if value <= 0 {
 		return fmt.Errorf("must be a positive integer")
 	}
@@ -262,12 +261,12 @@ func ValidateSecretCode(value string) error {
 }
 
 func validateDecimal(value decimal.Decimal) error {
-    coeff := value.Coefficient()          
-    precision := len(coeff.String())      
-    scale := -value.Exponent()             
+	coeff := value.Coefficient()
+	precision := len(coeff.String())
+	scale := -value.Exponent()
 
-    if precision > 20 || scale > 8 {
-        return fmt.Errorf("the value exceeds precision of 20 and scale of 8 constraints")
-    }
-    return nil
+	if precision > 20 || scale > 8 {
+		return fmt.Errorf("the value exceeds precision of 20 and scale of 8 constraints")
+	}
+	return nil
 }

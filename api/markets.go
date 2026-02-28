@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -13,137 +14,137 @@ import (
 )
 
 type MarketRequest struct {
-    BaseCurrency   string `json:"base_currency"`
-    QuoteCurrency  string `json:"quote_currency"`
-    MinOrderAmount decimal.Decimal `json:"min_order_amount"`
-    PricePrecision int32 `json:"price_precision"`
+	BaseCurrency   string          `json:"base_currency"`
+	QuoteCurrency  string          `json:"quote_currency"`
+	MinOrderAmount decimal.Decimal `json:"min_order_amount"`
+	PricePrecision int32           `json:"price_precision"`
 }
 
 func (server *server) createMarket(ctx *gin.Context) {
-    var req MarketRequest
+	var req MarketRequest
 
-    var err error
+	var err error
 
-    if err := ctx.ShouldBindJSON(&req); err != nil {
-        ctx.JSON(http.StatusBadRequest, errorResponse(err))
-        return
-    }
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
-    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+	authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
 
-    arg := db.CreateMarketParams{
-        Username: authPayload.Username,
-        BaseCurrency:  req.BaseCurrency,
-        QuoteCurrency: req.QuoteCurrency,
-        MinOrderAmount: req.MinOrderAmount,
-        PricePrecision: req.PricePrecision,
-    }
+	arg := db.CreateMarketParams{
+		Username:       authPayload.Username,
+		BaseCurrency:   req.BaseCurrency,
+		QuoteCurrency:  req.QuoteCurrency,
+		MinOrderAmount: req.MinOrderAmount,
+		PricePrecision: req.PricePrecision,
+	}
 
-    if req.BaseCurrency == "" || req.QuoteCurrency == "" {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "no currency added"})
-        return 
-    }
+	if req.BaseCurrency == "" || req.QuoteCurrency == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "no currency added"})
+		return
+	}
 
-    currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
+	currencies := []string{"USD", "EUR", "BTC", "ETH", "JPY"}
 
-    if !isValidCurrency(req.BaseCurrency, currencies) || !isValidCurrency(req.QuoteCurrency, currencies) {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid currency"})
-        return
-    }
+	if !isValidCurrency(req.BaseCurrency, currencies) || !isValidCurrency(req.QuoteCurrency, currencies) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid currency"})
+		return
+	}
 
-    market, err := server.store.CreateMarket(ctx, arg)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	market, err := server.store.CreateMarket(ctx, arg)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-    ctx.JSON(http.StatusOK, gin.H{"id": market.ID, "username": market.Username})
+	ctx.JSON(http.StatusOK, gin.H{"id": market.ID, "username": market.Username})
 }
 
 func (server *server) getMarket(ctx *gin.Context) {
-    id := ctx.Param("id")
-    marketID, err := uuid.Parse(id)
-    if err != nil {
-        ctx.JSON(http.StatusBadRequest, errorResponse(err))
-        return
-    }
+	id := ctx.Param("id")
+	marketID, err := uuid.Parse(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
-    market, err := server.store.GetMarketByID(ctx, marketID)
-    if err != nil {
-        if err == sql.ErrNoRows {
-            ctx.JSON(http.StatusNotFound, errorResponse(err))
-            return
-        }
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	market, err := server.store.GetMarketByID(ctx, marketID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+	authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
 
-    if authPayload.Username != market.Username {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
-        return
-    }
+	if authPayload.Username != market.Username {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
+		return
+	}
 
-    ctx.JSON(http.StatusOK, market)
+	ctx.JSON(http.StatusOK, market)
 }
 
 func (server *server) deleteMarket(ctx *gin.Context) {
-    id := ctx.Param("id")
-    marketID, err := uuid.Parse(id)
+	id := ctx.Param("id")
+	marketID, err := uuid.Parse(id)
 
-    if err != nil {
-        ctx.JSON(http.StatusBadRequest, errorResponse(err))
-        return
-    }
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
-    if id == uuid.Nil.String() {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
-        return
-    }
+	if id == uuid.Nil.String() {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
+		return
+	}
 
-    market, err := server.store.GetMarketByID(ctx, marketID)
+	market, err := server.store.GetMarketByID(ctx, marketID)
 
-    if err != nil {
-        if err == sql.ErrNoRows {
-            ctx.JSON(http.StatusNotFound, errorResponse(err))
-            return
-        }
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-    }
+	if err != nil {
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	}
 
-    authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
+	authPayload := ctx.MustGet(AuthorizationPayloadKey).(*token.Payload)
 
-    if authPayload.Username != market.Username {
-        ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
-        return
-    }
+	if authPayload.Username != market.Username {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "not authorized"})
+		return
+	}
 
-    err = server.store.DeleteMarket(ctx, marketID)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	err = server.store.DeleteMarket(ctx, marketID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-    ctx.JSON(http.StatusOK, gin.H{"status": "deleted"})
+	ctx.JSON(http.StatusOK, gin.H{"status": "deleted"})
 }
 
 func (server *server) listMarkets(ctx *gin.Context) {
-    username := ctx.Query("username")
-    markets, err := server.store.ListMarketsByUsername(ctx, username)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	username := ctx.Query("username")
+	markets, err := server.store.ListMarketsByUsername(ctx, username)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-    ctx.JSON(http.StatusOK, markets)
+	ctx.JSON(http.StatusOK, markets)
 }
 
 func isValidCurrency(currency string, currencies []string) bool {
-    for _, c := range currencies {
-        if currency == c {
-            return true
-        }
-    }
-    return false
+	for _, c := range currencies {
+		if currency == c {
+			return true
+		}
+	}
+	return false
 }

@@ -1,7 +1,9 @@
+//nolint:revive
 package api
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	db "github.com/huzaifa678/Crypto-currency-web-app-project/db/sqlc"
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
@@ -9,15 +11,15 @@ import (
 )
 
 type server struct {
-	store       db.Store_interface
-	router 	   *gin.Engine
-	tokenMaker  token.Maker
-	config 	    utils.Config
+	store      db.StoreInterface
+	router     *gin.Engine
+	tokenMaker token.Maker
+	config     utils.Config
 }
 
 const url = "wss://stream.binance.com:9443/ws/btcusdt@trade/ethusdt@trade/eurusdt@trade/jpyusdt@trade"
 
-func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
+func NewServer(store db.StoreInterface, config utils.Config) (*server, error) {
 
 	tokenMaker, err := token.NewPasetoMaker(config.PasetoSymmetricKey)
 	if err != nil {
@@ -37,7 +39,6 @@ func NewServer(store db.Store_interface, config utils.Config) (*server, error) {
 func (server *server) setupRouter() {
 
 	router := gin.Default()
-
 
 	authRoutes := router.Group("/").Use(authMiddleware(server.tokenMaker))
 
@@ -83,14 +84,14 @@ func (server *server) setupRouter() {
 	authRoutes.DELETE("/audit-logs/:id", server.DeleteAuditLog)
 
 	router.GET("/ws", func(ctx *gin.Context) {
-			WebSocket(ctx, url)
-		})
+		WebSocket(ctx, url)
+	})
 
 	server.router = router
 }
 
-func (server *server) Start (address string) error {
-    return server.router.Run(address)
+func (server *server) Start(address string) error {
+	return server.router.Run(address)
 }
 
 func errorResponse(err error) gin.H {

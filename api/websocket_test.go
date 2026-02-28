@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -31,11 +32,11 @@ func TestWebSocket(t *testing.T) {
 		for {
 			messageType, msg, err := ws.ReadMessage()
 			if err != nil {
-				break 
+				break
 			}
 			err = ws.WriteMessage(messageType, msg)
 			if err != nil {
-				break 
+				break
 			}
 		}
 	}))
@@ -84,18 +85,18 @@ func TestWebSocket(t *testing.T) {
 		{
 			name: "InvalidTradeData",
 			setupMockData: func() []byte {
-				
+
 				return []byte(`{"symbol": "BTCUSDT", "price": "50000.00", "quantity": "0.5", "Time": "invalid"}`)
 			},
 			checkResponse: func(t *testing.T, msg []byte) {
-				
+
 			},
 			expectError: true,
 		},
 		{
 			name: "EmptyTradeData",
 			setupMockData: func() []byte {
-				
+
 				return []byte(`{}`)
 			},
 			checkResponse: func(t *testing.T, msg []byte) {
@@ -118,16 +119,13 @@ func TestWebSocket(t *testing.T) {
 			require.NoError(t, err)
 			defer ws.Close()
 
-			
 			mockData := tc.setupMockData()
 			err = ws.WriteMessage(websocket.TextMessage, mockData)
 			require.NoError(t, err)
 
-			
 			var wg sync.WaitGroup
 			wg.Add(1)
 
-			
 			done := make(chan struct{})
 			var response []byte
 			go func() {
@@ -155,7 +153,6 @@ func TestWebSocket(t *testing.T) {
 				}
 			}
 
-			
 			wg.Wait()
 		})
 	}

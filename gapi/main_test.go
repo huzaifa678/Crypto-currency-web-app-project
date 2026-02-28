@@ -18,23 +18,23 @@ const (
 	AuthorizationTypeBearer = "bearer"
 )
 
-type TestServerBuilder struct{
+type TestServerBuilder struct {
 	server *server
 }
 
-func (b *TestServerBuilder) setStore(store db.Store_interface) (*TestServerBuilder) {
+func (b *TestServerBuilder) setStore(store db.StoreInterface) *TestServerBuilder {
 	b.server.store = store
 	return b
 }
 
-func (b *TestServerBuilder) setTaskDistributor(taskDistributor worker.TaskDistributor) (*TestServerBuilder) {
+func (b *TestServerBuilder) setTaskDistributor(taskDistributor worker.TaskDistributor) *TestServerBuilder {
 	b.server.taskDistributor = taskDistributor
 	return b
 }
 
 func NewTestServerBuilder() *TestServerBuilder {
 	config := utils.Config{
-		PasetoSymmetricKey: utils.RandomString(32),
+		PasetoSymmetricKey:  utils.RandomString(32),
 		AccessTokenDuration: time.Minute,
 	}
 
@@ -45,7 +45,7 @@ func NewTestServerBuilder() *TestServerBuilder {
 
 	return &TestServerBuilder{
 		server: &server{
-			config: config,
+			config:     config,
 			tokenMaker: tokenMaker,
 		},
 	}
@@ -55,9 +55,9 @@ func (b *TestServerBuilder) NewTestServer2(t *testing.T) *server {
 	return b.server
 }
 
-func NewTestServer(t *testing.T, store db.Store_interface, taskDistributor worker.TaskDistributor) *server {
+func NewTestServer(t *testing.T, store db.StoreInterface, taskDistributor worker.TaskDistributor) *server {
 	config := utils.Config{
-		PasetoSymmetricKey: utils.RandomString(32),
+		PasetoSymmetricKey:  utils.RandomString(32),
 		AccessTokenDuration: time.Minute,
 	}
 

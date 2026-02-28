@@ -20,7 +20,7 @@ func TestDeleteUserRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.DeleteUserRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		checkResponse func(t *testing.T, res *pb.DeleteUserResponse, err error)
 	}{
 		{
@@ -28,7 +28,7 @@ func TestDeleteUserRPC(t *testing.T) {
 			req: &pb.DeleteUserRequest{
 				UserId: user.ID.String(),
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
@@ -45,7 +45,7 @@ func TestDeleteUserRPC(t *testing.T) {
 			req: &pb.DeleteUserRequest{
 				UserId: "invalid-uuid",
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -62,7 +62,7 @@ func TestDeleteUserRPC(t *testing.T) {
 			req: &pb.DeleteUserRequest{
 				UserId: user.ID.String(),
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
@@ -80,7 +80,7 @@ func TestDeleteUserRPC(t *testing.T) {
 			req: &pb.DeleteUserRequest{
 				UserId: user.ID.String(),
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					DeleteUser(gomock.Any(), gomock.Eq(user.ID)).
 					Times(1).
@@ -102,7 +102,7 @@ func TestDeleteUserRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)
@@ -111,4 +111,4 @@ func TestDeleteUserRPC(t *testing.T) {
 			tc.checkResponse(t, res, err)
 		})
 	}
-} 
+}

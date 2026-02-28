@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -17,33 +18,31 @@ import (
 type UserRole string
 
 const (
-	Admin  UserRole = "admin"
-	User   UserRole = "user"
-	Guest  UserRole = "guest"
+	Admin UserRole = "admin"
+	User  UserRole = "user"
+	Guest UserRole = "guest"
 )
 
-
 type UserRequest struct {
-	Username	 string	   `json:"username" binding:"required"`
-	Email        string    `json:"email" binding:"required,email"` 
-	Password 	 string    `json:"password_hash" binding:"required"`
-	Role         UserRole  `json:"role" binding:"required"`
+	Username string   `json:"username" binding:"required"`
+	Email    string   `json:"email" binding:"required,email"`
+	Password string   `json:"password_hash" binding:"required"`
+	Role     UserRole `json:"role" binding:"required"`
 }
 
 type UserLoginRequest struct {
-	Email 	 string `json:"email" binding:"required,email"`
+	Email    string `json:"email" binding:"required,email"`
 	Password string `json:"password_hash" binding:"required"`
 }
 
 type UserLoginResponse struct {
-	SessionID				string  			`json:"session_id"`
-	AccessToken 			string  			`json:"access_token"`
-	AccessTokenExpiration 	time.Time 			`json:"access_token_expiration"`
-	RefreshToken 			string 				`json:"refresh_token"`
-	RefreshTokenExpiration 	time.Time 			`json:"refresh_token_expiration"`
-	User					db.GetUserByEmailRow`json:"user"`
+	SessionID              string               `json:"session_id"`
+	AccessToken            string               `json:"access_token"`
+	AccessTokenExpiration  time.Time            `json:"access_token_expiration"`
+	RefreshToken           string               `json:"refresh_token"`
+	RefreshTokenExpiration time.Time            `json:"refresh_token_expiration"`
+	User                   db.GetUserByEmailRow `json:"user"`
 }
-
 
 func (server *server) loginUser(ctx *gin.Context) {
 	var req UserLoginRequest
@@ -79,25 +78,25 @@ func (server *server) loginUser(ctx *gin.Context) {
 
 	log.Println("User", user)
 
-	accessToken, accessTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration, token.TokenTypeAccessToken,)
+	accessToken, accessTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.AccessTokenDuration, token.TokenTypeAccessToken)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 		return
 	}
 
-	refreshToken, refreshTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration, token.TokenTypeRefreshToken,)
+	refreshToken, refreshTokenPayload, err := server.tokenMaker.CreateToken(user.Username, server.config.RefreshTokenDuration, token.TokenTypeRefreshToken)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
 	}
 
-	args := db.CreateSessionParams {
-		ID: refreshTokenPayload.ID,
-		Username: user.Username,
+	args := db.CreateSessionParams{
+		ID:           refreshTokenPayload.ID,
+		Username:     user.Username,
 		RefreshToken: refreshToken,
-		UserAgent: ctx.Request.UserAgent(),
-		ClientIp: ctx.ClientIP(),
-		IsBlocked: false,
-		ExpiresAt: refreshTokenPayload.ExpiredAt,
+		UserAgent:    ctx.Request.UserAgent(),
+		ClientIp:     ctx.ClientIP(),
+		IsBlocked:    false,
+		ExpiresAt:    refreshTokenPayload.ExpiredAt,
 	}
 
 	session, err := server.store.CreateSession(ctx, args)
@@ -106,20 +105,18 @@ func (server *server) loginUser(ctx *gin.Context) {
 		return
 	}
 
-
-	res := UserLoginResponse {
-		SessionID: session.ID.String(),
-		AccessToken: accessToken,
-		AccessTokenExpiration: accessTokenPayload.ExpiredAt,
-		RefreshToken: refreshToken,
+	res := UserLoginResponse{
+		SessionID:              session.ID.String(),
+		AccessToken:            accessToken,
+		AccessTokenExpiration:  accessTokenPayload.ExpiredAt,
+		RefreshToken:           refreshToken,
 		RefreshTokenExpiration: refreshTokenPayload.ExpiredAt,
-		User: user,
+		User:                   user,
 	}
 
 	ctx.JSON(http.StatusOK, res)
 
 }
-
 
 func (server *server) createUser(ctx *gin.Context) {
 	var req UserRequest
@@ -138,7 +135,7 @@ func (server *server) createUser(ctx *gin.Context) {
 	}
 
 	_, err = server.store.GetUserByEmail(ctx, req.Email)
-	if err == nil { 
+	if err == nil {
 		ctx.JSON(http.StatusConflict, gin.H{"error": "User with this email already exists"})
 		return
 	}
@@ -148,14 +145,13 @@ func (server *server) createUser(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.CreateUserParams {
-		Username: req.Username,
-		Email: req.Email,
+	arg := db.CreateUserParams{
+		Username:     req.Username,
+		Email:        req.Email,
 		PasswordHash: hashedPassword,
-		Role: db.UserRole(req.Role),
-		IsVerified: true,
+		Role:         db.UserRole(req.Role),
+		IsVerified:   true,
 	}
-
 
 	user, err := server.store.CreateUser(ctx, arg)
 
@@ -205,9 +201,9 @@ func (server *server) updateUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if id == "" {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
-        return
-    }
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
 
 	parsedID, err := uuid.Parse(id)
 
@@ -223,10 +219,10 @@ func (server *server) updateUser(ctx *gin.Context) {
 		return
 	}
 
-	arg := db.UpdateUserParams {
+	arg := db.UpdateUserParams{
 		PasswordHash: hashedPassword,
-		IsVerified: true,
-		ID: parsedID,
+		IsVerified:   true,
+		ID:           parsedID,
 	}
 
 	err = server.store.UpdateUser(ctx, arg)
@@ -243,26 +239,26 @@ func (server *server) deleteUser(ctx *gin.Context) {
 	id := ctx.Param("id")
 
 	if id == "" {
-        ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
-        return
-    }
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "id is required"})
+		return
+	}
 
-    userID, err := uuid.Parse(id)
-    if err != nil {
-        ctx.JSON(http.StatusBadRequest, errorResponse(err))
-        return
-    }
+	userID, err := uuid.Parse(id)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
 
 	if userID == uuid.Nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "invalid UUID"})
 		return
 	}
 
-    err = server.store.DeleteUser(ctx, userID)
-    if err != nil {
-        ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-        return
-    }
+	err = server.store.DeleteUser(ctx, userID)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-    ctx.JSON(http.StatusOK, gin.H{"status": "success"})
+	ctx.JSON(http.StatusOK, gin.H{"status": "success"})
 }

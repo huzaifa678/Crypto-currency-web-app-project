@@ -1,3 +1,4 @@
+//nolint:revive
 package api
 
 import (
@@ -8,13 +9,11 @@ import (
 	token "github.com/huzaifa678/Crypto-currency-web-app-project/token"
 )
 
-
 const (
-	AuthoriationHeaderKey = "authorization"
+	AuthoriationHeaderKey   = "authorization"
 	AuthorizationTypeBearer = "bearer"
 	AuthorizationPayloadKey = "authorization_payload"
 )
-
 
 func authMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 	return func(ctx *gin.Context) {

@@ -1,3 +1,4 @@
+//nolint:revive
 package token
 
 import (
@@ -8,20 +9,18 @@ import (
 	"github.com/o1egl/paseto"
 )
 
-
 type PasetoMaker struct {
-	paseto *paseto.V2
+	paseto       *paseto.V2
 	symmetricKey []byte
 }
-
 
 func NewPasetoMaker(symmetricKey string) (Maker, error) {
 	if len(symmetricKey) != chacha20poly1305.KeySize {
 		return nil, fmt.Errorf("invalid key size: must be exactly %d characters", chacha20poly1305.KeySize)
 	}
-	
-	maker := &PasetoMaker {
-		paseto: paseto.NewV2(),
+
+	maker := &PasetoMaker{
+		paseto:       paseto.NewV2(),
 		symmetricKey: []byte(symmetricKey),
 	}
 

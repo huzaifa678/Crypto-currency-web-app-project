@@ -22,7 +22,7 @@ func TestDeleteMarketRPC(t *testing.T) {
 	testCases := []struct {
 		name          string
 		req           *pb.DeleteMarketRequest
-		buildStubs    func(store *mockdb.MockStore_interface)
+		buildStubs    func(store *mockdb.MockStoreInterface)
 		setupAuth     func(t *testing.T, tokenMaker token.Maker) context.Context
 		checkResponse func(t *testing.T, res *pb.DeleteMarketResponse, err error)
 	}{
@@ -31,10 +31,10 @@ func TestDeleteMarketRPC(t *testing.T) {
 			req: &pb.DeleteMarketRequest{
 				MarketId: market.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetMarketByID(gomock.Any(), gomock.Eq(market.ID)).
 					Times(1).
@@ -56,7 +56,7 @@ func TestDeleteMarketRPC(t *testing.T) {
 			req: &pb.DeleteMarketRequest{
 				MarketId: market.ID.String(),
 			},
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetMarketByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -65,9 +65,9 @@ func TestDeleteMarketRPC(t *testing.T) {
 					DeleteMarket(gomock.Any(), gomock.Any()).
 					Times(0)
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return context.Background()
-            },
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return context.Background()
+			},
 			checkResponse: func(t *testing.T, res *pb.DeleteMarketResponse, err error) {
 				require.Error(t, err)
 				st, ok := status.FromError(err)
@@ -80,10 +80,10 @@ func TestDeleteMarketRPC(t *testing.T) {
 			req: &pb.DeleteMarketRequest{
 				MarketId: "invalid-uuid",
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetMarketByID(gomock.Any(), gomock.Any()).
 					Times(0)
@@ -104,10 +104,10 @@ func TestDeleteMarketRPC(t *testing.T) {
 			req: &pb.DeleteMarketRequest{
 				MarketId: market.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetMarketByID(gomock.Any(), gomock.Eq(market.ID)).
 					Times(1).
@@ -129,10 +129,10 @@ func TestDeleteMarketRPC(t *testing.T) {
 			req: &pb.DeleteMarketRequest{
 				MarketId: market.ID.String(),
 			},
-			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context{
-                return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
-            },
-			buildStubs: func(store *mockdb.MockStore_interface) {
+			setupAuth: func(t *testing.T, tokenMaker token.Maker) context.Context {
+				return newContextWithBearerToken(t, tokenMaker, market.Username, time.Minute, token.TokenTypeAccessToken)
+			},
+			buildStubs: func(store *mockdb.MockStoreInterface) {
 				store.EXPECT().
 					GetMarketByID(gomock.Any(), gomock.Eq(market.ID)).
 					Times(1).
@@ -159,7 +159,7 @@ func TestDeleteMarketRPC(t *testing.T) {
 			ctrl := gomock.NewController(t)
 			defer ctrl.Finish()
 
-			store := mockdb.NewMockStore_interface(ctrl)
+			store := mockdb.NewMockStoreInterface(ctrl)
 			tc.buildStubs(store)
 
 			server := NewTestServer(t, store, nil)
@@ -169,4 +169,4 @@ func TestDeleteMarketRPC(t *testing.T) {
 			tc.checkResponse(t, res, err)
 		})
 	}
-} 
+}

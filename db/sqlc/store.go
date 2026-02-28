@@ -8,7 +8,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Store_interface interface {
+type StoreInterface interface {
 	Querier
 	CreateTransactionTx(ctx context.Context, arg TransactionsParams, feeArgs FeeParams) error
 	UpdatedOrderTx(ctx context.Context, UpdatedOrderArgs UpdatedOrderParams) (ReturnAmountParams, error)
@@ -16,7 +16,7 @@ type Store_interface interface {
 	VerifyEmailTx(ctx context.Context, arg VerifyEmailTxParams) (VerifyEmailTxResult, error)
 	CreateTransactionForTransactionTypeTx(ctx context.Context, arg UpdateBalanceForTransactionTypeTxParams) (UpdateBalanceForTransactionTypeTxResult, error)
 	CreateTradeTx(ctx context.Context, arg CreateTradeTxParams) (CreateTradeTxResult, error)
-	OrderForCurrencyTx(ctx context.Context, arg OrderForCurrencyTxParams) (error)
+	OrderForCurrencyTx(ctx context.Context, arg OrderForCurrencyTxParams) error
 }
 
 // Defining the SQLStore struct to execute the queries and transactions defined
@@ -29,7 +29,7 @@ type SQLStore struct {
 // 	panic("unimplemented")
 // }
 
-func NewStore(connPool *pgxpool.Pool) Store_interface {
+func NewStore(connPool *pgxpool.Pool) StoreInterface {
 	return &SQLStore{
 		Queries:  New(connPool),
 		connPool: connPool,
@@ -41,22 +41,22 @@ type TransactionsParams struct {
 	UserEmail string          `json:"user_email"`
 	Type      TransactionType `json:"type"`
 	Currency  string          `json:"currency"`
-	Amount    decimal.Decimal          `json:"amount"`
+	Amount    decimal.Decimal `json:"amount"`
 	Status    string          `json:"status"`
 	Address   string          `json:"address"`
 	TxHash    string          `json:"tx_hash"`
 }
 
 type FeeParams struct {
-	MarketID uuid.UUID `json:"market_id"`
-	Amount   decimal.Decimal    `json:"amount"`
-	TakerFee decimal.Decimal    `json:"taker_fee"`
+	MarketID uuid.UUID       `json:"market_id"`
+	Amount   decimal.Decimal `json:"amount"`
+	TakerFee decimal.Decimal `json:"taker_fee"`
 }
 
 type UpdatedOrderParams struct {
-	Status       OrderStatus `json:"status"`
-	FilledAmount decimal.Decimal    `json:"filled_amount"`
-	ID           uuid.UUID   `json:"id"`
+	Status       OrderStatus     `json:"status"`
+	FilledAmount decimal.Decimal `json:"filled_amount"`
+	ID           uuid.UUID       `json:"id"`
 }
 
 type ReturnAmountParams struct {
@@ -97,11 +97,8 @@ func (store *SQLStore) UpdatedOrderTx(ctx context.Context, UpdatedOrderArgs Upda
 	var returnAmount ReturnAmountParams
 	var err error
 	err = store.execTx(ctx, func(q *Queries) error {
-		err = q.UpdateOrderStatusAndFilledAmount(ctx, UpdateOrderStatusAndFilledAmountParams{
-			Status:       UpdatedOrderArgs.Status,
-			FilledAmount: UpdatedOrderArgs.FilledAmount,
-			ID:           UpdatedOrderArgs.ID,
-		})
+		params := UpdateOrderStatusAndFilledAmountParams(UpdatedOrderArgs)
+		err = q.UpdateOrderStatusAndFilledAmount(ctx, params)
 
 		returnAmount = ReturnAmountParams{
 			Amount: UpdatedOrderArgs.FilledAmount,
