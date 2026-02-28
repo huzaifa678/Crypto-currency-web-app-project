@@ -149,12 +149,6 @@ jobs:
 
           yq e -i '.gateway.nlbTarget = "'$NLB_DNS'"' values.yaml
 
-          export PUBLIC_SUBNETS=$(aws ec2 describe-subnets \
-          --filters "Name=tag:kubernetes.io/role/elb,Values=1" \
-          --query "Subnets[*].SubnetId" \
-          --output text)
-
-          yq e -i '.gateway.publicSubnetIds = (env(PUBLIC_SUBNETS) | split("\t"))' values.yaml
           
       - name: Commit and push changes
         run: |
