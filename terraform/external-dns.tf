@@ -55,6 +55,18 @@ resource "helm_release" "external_dns" {
     {
       name  = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn"
       value = aws_iam_role.external_dns_irsa_role.arn
+    },
+    {
+      name  = "managedRecordTypes[0]"
+      value = "CNAME"
+    },
+    {
+      name  = "managedRecordTypes[1]"
+      value = "A"
+    },
+    {
+      name  = "managedRecordTypes[2]"
+      value = "txt"
     }
   ]
 

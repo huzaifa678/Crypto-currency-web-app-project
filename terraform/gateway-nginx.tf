@@ -37,3 +37,39 @@ resource "helm_release" "nginx_gateway_fabric" {
     }
   ]
 }
+
+resource "kubernetes_service" "nginx_gateway_lb" {
+  count       = var.environment == "post-test" ? 1 : 0
+  metadata {
+    name      = "nginx-gateway-lb"
+    namespace = "nginx-gateway"
+    annotations = {
+      "service.beta.kubernetes.io/aws-load-balancer-type"   = "nlb"
+      "service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing"
+    }
+  }
+
+  spec {
+    type = "LoadBalancer"
+
+    selector = {
+      "app.kubernetes.io/name" = "nginx-gateway-fabric"
+    }
+
+    port {
+      name       = "http"
+      port       = 80
+      target_port = 80
+      protocol   = "TCP"
+    }
+
+    port {
+      name       = "https"
+      port       = 443
+      target_port = 443
+      protocol   = "TCP"
+    }
+  }
+
+  depends_on = [helm_release.nginx_gateway_fabric]
+}
