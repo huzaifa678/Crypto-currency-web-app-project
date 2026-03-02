@@ -43,7 +43,7 @@ resource "kubernetes_service" "nginx_gateway_lb" {
   provider = kubernetes.eks
   metadata {
     name      = "nginx-gateway-lb"
-    namespace = "nginx-gateway"
+    namespace = "my-app"
     annotations = {
       "service.beta.kubernetes.io/aws-load-balancer-type"   = "nlb"
       "service.beta.kubernetes.io/aws-load-balancer-scheme" = "internet-facing"
@@ -54,7 +54,8 @@ resource "kubernetes_service" "nginx_gateway_lb" {
     type = "LoadBalancer"
 
     selector = {
-      "app.kubernetes.io/name" = "nginx-gateway-fabric"
+      "app.kubernetes.io/name"      = "crypto-app-api"
+      "app.kubernetes.io/component" = "nginx"
     }
 
     port {
