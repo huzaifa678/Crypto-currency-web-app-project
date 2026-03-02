@@ -40,6 +40,7 @@ resource "helm_release" "nginx_gateway_fabric" {
 
 resource "kubernetes_service" "nginx_gateway_lb" {
   count       = var.environment == "post-test" ? 1 : 0
+  provider = kubernetes.eks
   metadata {
     name      = "nginx-gateway-lb"
     namespace = "nginx-gateway"
