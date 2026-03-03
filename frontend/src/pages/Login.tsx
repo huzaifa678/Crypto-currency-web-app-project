@@ -10,7 +10,7 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { login, loginWithGoogle } = useAuth();
+  const { login, loginWithGoogle, loginWithGoogleServer } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -139,19 +139,30 @@ const Login: React.FC = () => {
 
         {/* Google login button */}
         <div className="flex justify-center">
-          <GoogleLogin
-            onSuccess={async (credentialResponse) => {
-              if (credentialResponse.credential) {
-                const client = await loginWithGoogle(credentialResponse.credential);
-                if (client) navigate('/dashboard');
-              }
-            }}
-            onError={() => console.log('Google Login Failed')}
-            theme="outline"
-            size="large"
-            text="signin_with"
-            shape="rectangular"
-          />
+          {import.meta.env.VITE_AUTH_MODE === 'spa' ? (
+            <GoogleLogin
+              onSuccess={async (credentialResponse) => {
+                if (credentialResponse.credential) {
+                  const client = await loginWithGoogle(credentialResponse.credential);
+                  if (client) navigate('/dashboard');
+                }
+              }}
+              onError={() => console.log('Google Login Failed')}
+              theme="outline"
+              size="large"
+              text="signin_with"
+              shape="rectangular"
+            />
+          ) : (
+            <button
+              onClick={() => {
+               loginWithGoogleServer('http://localhost:5173/oauth/callback');
+              }}
+              className="w-full flex justify-center items-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Continue with Google
+            </button>
+          )}
         </div>
       </div>
     </div>

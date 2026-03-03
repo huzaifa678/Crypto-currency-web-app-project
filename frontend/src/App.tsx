@@ -17,6 +17,7 @@ import MarketsTable from './pages/WebSocket';
 import { OrderProvider } from './contexts/OrderContext';
 import "./index.css";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import OAuthCallback from './callbacks/oauth2.callback';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuth();
@@ -68,6 +69,7 @@ function App() {
                   <Register />
                 </PublicRoute>
               } />
+              <Route path="/oauth/callback" element={<OAuthCallback />} />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Layout />

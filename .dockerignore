@@ -2,3 +2,5 @@
 /terraform
 /eks
 /eks-chart
+app.test.env
+.env

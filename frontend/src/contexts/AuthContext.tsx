@@ -45,6 +45,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   loginWithGoogle: (googleIdToken: string) => Promise<Client>;
+  loginWithGoogleServer: (redirectUrl?: string) => void;
   register: (username: string, email: string, password: string, role: string) => Promise<void>;
   logout: () => void;
   loading: boolean;
@@ -240,6 +241,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const loginWithGoogleServer = async (redirectUrl?: string) => {
+    try {
+      setLoading(true);
+
+      const googleLoginUrl = `${API_BASE_URL}/oauth/google/login?redirect_to=${encodeURIComponent(redirectUrl || 'http://localhost:5173/dashboard')}`;
+      window.location.href = googleLoginUrl;
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const register = async (username: string, email: string, password: string, role: string) => {
     try {
       setLoading(true);
@@ -278,6 +291,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     isAuthenticated: !!user || !!client,
     login,
     loginWithGoogle,
+    loginWithGoogleServer,
     register,
     logout,
     loading,

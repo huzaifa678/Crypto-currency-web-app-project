@@ -2,7 +2,8 @@ package oauth2
 
 import (
 	"context"
-	"encoding/json"
+	"crypto/rand"
+	"encoding/base64"
 	"fmt"
 	"net/http"
 
@@ -15,9 +16,13 @@ import (
 var (
 		googleOAuthConfig *oauth2.Config
 		googleClientID    string
+		usePKCE			  bool
 ) 
 
 func InitGoogleOAuth(config utils.Config) {
+	usePKCE = config.Environment == "enterprise"
+	googleClientID = config.GoogleClientID 
+
     googleOAuthConfig = &oauth2.Config{
         ClientID:     config.GoogleClientID,
         ClientSecret: config.GoogleClientSecret,
@@ -32,49 +37,127 @@ func InitGoogleOAuth(config utils.Config) {
 }
 
 func GoogleLoginHandler(w http.ResponseWriter, r *http.Request) {
-	url := googleOAuthConfig.AuthCodeURL("state-random", oauth2.AccessTypeOffline)
-	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
+    redirectTo := r.URL.Query().Get("redirect_to")
+    if redirectTo == "" {
+        redirectTo = "/dashboard" 
+    }
+
+    http.SetCookie(w, &http.Cookie{
+        Name:     "oauth_redirect",
+        Value:    redirectTo,
+        Path:     "/",
+        HttpOnly: true,
+        Secure:   false, 
+        SameSite: http.SameSiteLaxMode,
+    })
+
+    stateBytes := make([]byte, 16)
+    _, _ = rand.Read(stateBytes)
+    state := base64.RawURLEncoding.EncodeToString(stateBytes)
+
+    http.SetCookie(w, &http.Cookie{
+        Name:     "oauth_state",
+        Value:    state,
+        Path:     "/",
+        HttpOnly: true,
+        Secure:   false,
+        SameSite: http.SameSiteLaxMode,
+    })
+
+    var url string
+    if usePKCE {
+        verifier, err := generateCodeVerifier()
+        if err != nil {
+            http.Error(w, "failed to generate verifier", http.StatusInternalServerError)
+            return
+        }
+
+        challenge := generateCodeChallenge(verifier)
+        http.SetCookie(w, &http.Cookie{
+            Name:     "pkce_verifier",
+            Value:    verifier,
+            Path:     "/",
+            HttpOnly: true,
+            Secure:   false,
+            SameSite: http.SameSiteLaxMode,
+        })
+
+        url = googleOAuthConfig.AuthCodeURL(
+            state,
+            oauth2.AccessTypeOffline,
+            oauth2.SetAuthURLParam("code_challenge", challenge),
+            oauth2.SetAuthURLParam("code_challenge_method", "S256"),
+        )
+    } else {
+        url = googleOAuthConfig.AuthCodeURL(state, oauth2.AccessTypeOffline)
+    }
+
+    http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
 func GoogleCallbackHandler(w http.ResponseWriter, r *http.Request) {
-	code := r.URL.Query().Get("code")
-	if code == "" {
-		http.Error(w, "missing code", http.StatusBadRequest)
-		return
-	}
+    code := r.URL.Query().Get("code")
+    if code == "" {
+        http.Error(w, "missing code", http.StatusBadRequest)
+        return
+    }
 
-	token, err := googleOAuthConfig.Exchange(context.Background(), code)
-	if err != nil {
-		http.Error(w, "token exchange failed: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
+    stateFromGoogle := r.URL.Query().Get("state")
+    stateCookie, err := r.Cookie("oauth_state")
+    if err != nil || stateFromGoogle != stateCookie.Value {
+        http.Error(w, "invalid oauth state", http.StatusBadRequest)
+        return
+    }
 
-	rawIDToken, ok := token.Extra("id_token").(string)
-	if !ok {
-		http.Error(w, "no id_token in response", http.StatusInternalServerError)
-		return
-	}
+    ctx := context.Background()
+    var token *oauth2.Token
 
-	payload, err := idtoken.Validate(context.Background(), rawIDToken, googleClientID)
-	if err != nil {
-		http.Error(w, "invalid ID token: "+err.Error(), http.StatusUnauthorized)
-		return
-	}
+    if usePKCE {
+        pkceCookie, err := r.Cookie("pkce_verifier")
+        if err != nil {
+            http.Error(w, "missing pkce verifier", http.StatusBadRequest)
+            return
+        }
 
-	emailVal, ok := payload.Claims["email"].(string)
-	if !ok {
-    	emailVal = ""
-	}
+        token, err = googleOAuthConfig.Exchange(
+            ctx,
+            code,
+            oauth2.SetAuthURLParam("code_verifier", pkceCookie.Value),
+        )
+    } else {
+        token, err = googleOAuthConfig.Exchange(ctx, code)
+    }
 
-	w.Header().Set("Content-Type", "application/json")
+    if err != nil {
+        http.Error(w, "token exchange failed: "+err.Error(), http.StatusInternalServerError)
+        return
+    }
 
-	if err := json.NewEncoder(w).Encode(map[string]string{
-		"id_token": rawIDToken,
-		"email_validation": emailVal,
-	}); err != nil {
-		http.Error(w, "failed to encode response", http.StatusInternalServerError)
-		return
-	}
+    clearCookie(w, "pkce_verifier")
+    clearCookie(w, "oauth_state")
+
+    rawIDToken, ok := token.Extra("id_token").(string)
+    if !ok {
+        http.Error(w, "no id_token in response", http.StatusInternalServerError)
+        return
+    }
+
+    payload, err := idtoken.Validate(ctx, rawIDToken, googleClientID)
+    if err != nil {
+        http.Error(w, "invalid ID token: "+err.Error(), http.StatusUnauthorized)
+        return
+    }
+
+    emailVal, _ := payload.Claims["email"].(string)
+
+    redirectCookie, err := r.Cookie("oauth_redirect")
+    redirectURL := "http://localhost:5173/dashboard" 
+    if err == nil && redirectCookie.Value != "" {
+        redirectURL = redirectCookie.Value
+    }
+
+    redirectWithToken := fmt.Sprintf("%s?token=%s&email=%s", redirectURL, rawIDToken, emailVal)
+    http.Redirect(w, r, redirectWithToken, http.StatusSeeOther)
 }
 
 func VerifyGoogleIDToken(ctx context.Context, rawIDToken string, clientID string) (*idtoken.Payload, error) {
@@ -83,4 +166,17 @@ func VerifyGoogleIDToken(ctx context.Context, rawIDToken string, clientID string
 		return nil, fmt.Errorf("invalid google id_token: %w", err)
 	}
 	return payload, nil
+}
+
+// helper funtion to clear cookies
+func clearCookie(w http.ResponseWriter, name string) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     name,
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+		Secure:   true,
+		SameSite: http.SameSiteLaxMode,
+	})
 }
