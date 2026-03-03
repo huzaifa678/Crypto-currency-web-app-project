@@ -1,4 +1,4 @@
-resource "kubernetes_namespace" "cert_manager" {
+resource "kubernetes_namespace_v1" "cert_manager" {
   provider = kubernetes.eks
   metadata {
     name = "cert-manager"
@@ -11,7 +11,7 @@ resource "helm_release" "cert_manager_post_test" {
   chart      = "cert-manager"
   repository = "oci://quay.io/jetstack/charts"
   version    = "v1.18.2"
-  namespace  = kubernetes_namespace.cert_manager.metadata[0].name
+  namespace  = kubernetes_namespace_v1.cert_manager.metadata[0].name
   
   wait          = true
   wait_for_jobs = true 
@@ -38,7 +38,7 @@ resource "helm_release" "cert_manager_test" {
 
   name             = "cert-manager"
   chart            = "cert-manager"
-  namespace        = kubernetes_namespace.cert_manager.metadata[0].name
+  namespace        = kubernetes_namespace_v1.cert_manager.metadata[0].name
   create_namespace = false
   repository       = "oci://quay.io/jetstack/charts"
   version          = "v1.18.2"
@@ -63,7 +63,7 @@ resource "helm_release" "cert_manager_test" {
 
 resource "kubectl_manifest" "label_cert_manager_ns" {
   depends_on = [
-    kubernetes_namespace.cert_manager
+    kubernetes_namespace_v1.cert_manager
   ]
 
   yaml_body = <<YAML

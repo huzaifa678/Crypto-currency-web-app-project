@@ -38,12 +38,12 @@ resource "helm_release" "aws_lb_controller" {
   ]
 
   depends_on = [
-    kubernetes_service_account.aws_lb_controller,
+    kubernetes_service_account_v1.aws_lb_controller,
     var.vpc
   ]
 }
 
-resource "kubernetes_service_account" "aws_lb_controller" {
+resource "kubernetes_service_account_v1" "aws_lb_controller" {
   count    = var.environment == "post-test" ? 1 : 0
   provider = kubernetes.eks
   metadata {
