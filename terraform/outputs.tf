@@ -1,49 +1,39 @@
-output "rds_db" {
-  description = "RDS DB"
-  value       = aws_db_instance.postgres.db_name
-}
-
-output "rds_username" {
-  description = "Username"
-  sensitive = true
-  value = local.db_creds
-}
-
-output "vpc_id" {
-  description = "The VPC ID"
-  value       = module.vpc.vpc_id
-}
-
 output "eks_cluster_name" {
-  description = "EKS Cluster name"
-  value       = aws_eks_cluster.eks_cluster.name
-
+  value = module.eks.eks_cluster_name
 }
 
-# output "ecr_repository_url" {
-#   description = "ECR repository URL"
-#   value       = aws_ecr_repository.ecr_repo.repository_url
-# }
-
-output "redis_endpoint" {
-  description = "Redis Endpoint"
-  value       = aws_elasticache_replication_group.redis_cluster.primary_endpoint_address
+output "eks_cluster_endpoint" {
+  value = module.eks.eks_cluster_endpoint
 }
 
-output "launch_template_user_data" {
-  description = "user data"
-  value       = aws_launch_template.eks_nodes.user_data 
-}
-
-output "cert_manager_irsa_role_arn" {
-  value = aws_iam_role.cert_manager_irsa_role.arn
-}
-
-output "external_dns_irsa_role_arn" {
-  value = aws_iam_role.external_dns_irsa_role.arn
+output "eks_cluster_ca" {
+  value = module.eks.eks_cluster_ca
 }
 
 output "eks_service_ipv4_cidr" {
-  description = "EKS default Service CIDR"
-  value       = aws_eks_cluster.eks_cluster.kubernetes_network_config[0].service_ipv4_cidr
+  value = module.eks.eks_service_ipv4_cidr
+}
+
+output "launch_template_user_data" {
+  value = module.eks.launch_template_user_data
+}
+
+output "cert_manager_irsa_role_arn" {
+  value = module.eks.cert_manager_irsa_role_arn
+}
+
+output "external_dns_irsa_role_arn" {
+  value = module.eks.external_dns_irsa_role_arn
+}
+
+output "aws_lb_controller_irsa_role_arn" {
+  value = module.eks.aws_lb_controller_irsa_role_arn
+}
+
+output "rds_sg_id" {
+  value = module.eks.rds_sg_id
+}
+
+output "redis_sg_id" {
+  value = module.eks.redis_sg_id
 }

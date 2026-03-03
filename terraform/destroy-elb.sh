@@ -47,7 +47,7 @@ VPC_NAME="crypto-based-web-system-vpc-network"
 
 VPC_ID=$(aws ec2 describe-vpcs \
     --filters "Name=tag:Name,Values=$VPC_NAME" \
-    --query "Vpcs[1].VpcId" --output text)
+    --query "Vpcs[0].VpcId" --output text)
 
 if [ -z "$VPC_ID" ] || [ "$VPC_ID" == "None" ]; then
   echo "No VPC found with Name=$VPC_NAME"
