@@ -1,5 +1,10 @@
 # Cryptocurrency Web App
 
+![Integration Tests](https://img.shields.io/badge/Integration%20Tests-Passing-brightgreen)
+![Component Tests](https://img.shields.io/badge/Component%20Tests-Passing-brightgreen)
+![Frontend E2E Tests](https://img.shields.io/badge/Frontend%20E2E-Passing-brightgreen)
+
+
 A full-stack cryptocurrency trading platform with real-time market data, order management, and secure user authentication.
 
 ## Overview
