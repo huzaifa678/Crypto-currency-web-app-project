@@ -5,6 +5,8 @@
 ![Frontend E2E Tests](https://img.shields.io/badge/Frontend%20E2E-Passing-brightgreen)
 ![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
 ![CI](https://github.com/huzaifa678/Crypto-currency-web-app-project/actions/workflows/ci.yml/badge.svg)
+![CD](https://github.com/huzaifa678/Crypto-currency-web-app-project/actions/workflows/cd.yml/badge.svg)
+![FRONTEND-CI](https://github.com/huzaifa678/Crypto-currency-web-app-project/actions/workflows/frontend-ci.yml/badge.svg)
 ![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-Workflow-blue)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue)
 ![Kubernetes](https://img.shields.io/badge/Kubernetes-EKS-blue)
