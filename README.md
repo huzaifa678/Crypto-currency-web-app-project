@@ -17,6 +17,7 @@
 ![ArgoCD](https://img.shields.io/badge/ArgoCD-GitOps-red)
 ![CloudFront](https://img.shields.io/badge/AWS-CloudFront-orange)
 ![Cert Manager](https://img.shields.io/badge/Kubernetes-Cert--Manager-blue)
+![Lint](https://img.shields.io/badge/Lint-Passing-brightyellow)
 
 
 A full-stack cryptocurrency trading platform with real-time market data, order management, and secure user authentication.
