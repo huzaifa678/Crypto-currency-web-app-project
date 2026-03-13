@@ -12,6 +12,11 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
 ![Redis](https://img.shields.io/badge/Redis-Queue-red)
 ![License](https://img.shields.io/badge/License-MIT-green)
+![AWS](https://img.shields.io/badge/AWS-EKS-orange)
+![Helm](https://img.shields.io/badge/Helm-Charts-blue)
+![ArgoCD](https://img.shields.io/badge/ArgoCD-GitOps-red)
+![CloudFront](https://img.shields.io/badge/AWS-CloudFront-orange)
+![Cert Manager](https://img.shields.io/badge/Kubernetes-Cert--Manager-blue)
 
 
 A full-stack cryptocurrency trading platform with real-time market data, order management, and secure user authentication.
