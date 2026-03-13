@@ -468,11 +468,3 @@ This project is licensed under the LICENSE file included in the repository.
 ## Support
 
 For issues and questions, please open an issue on GitHub.
-
-## CI/CD Status
-
-- ✅ **Unit Tests**: Backend and frontend tests passing
-- ✅ **Integration Tests**: Database and API integration tests passing
-- ✅ **E2E Tests**: User flow tests passing via Playwright
-- ✅ **Lint**: Code quality checks passing
-- ✅ **Build**: Docker image building successfully
