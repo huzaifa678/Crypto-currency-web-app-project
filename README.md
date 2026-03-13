@@ -281,13 +281,10 @@ Main endpoints include:
 
 Connect via:
 
-<<<<<<< HEAD
 ```bash
 make evans
 ```
 
-=======
->>>>>>> 2def249 (added gateway nginx in terraform)
 ## Database Schema
 
 The project uses PostgreSQL with the following key tables:
