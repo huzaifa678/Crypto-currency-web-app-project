@@ -3,6 +3,15 @@
 ![Integration Tests](https://img.shields.io/badge/Integration%20Tests-Passing-brightgreen)
 ![Component Tests](https://img.shields.io/badge/Component%20Tests-Passing-brightgreen)
 ![Frontend E2E Tests](https://img.shields.io/badge/Frontend%20E2E-Passing-brightgreen)
+![Build](https://img.shields.io/badge/Build-Passing-brightgreen)
+![Docker](https://img.shields.io/badge/Docker-Ready-blue)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-EKS-blue)
+![Terraform](https://img.shields.io/badge/Terraform-IaC-purple)
+![Go](https://img.shields.io/badge/Go-1.24-blue)
+![React](https://img.shields.io/badge/React-19-blue)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
+![Redis](https://img.shields.io/badge/Redis-Queue-red)
+![License](https://img.shields.io/badge/License-MIT-green)
 
 
 A full-stack cryptocurrency trading platform with real-time market data, order management, and secure user authentication.
