@@ -74,6 +74,10 @@ This is a comprehensive cryptocurrency web application that provides:
 - **Service Mesh**: Cert-Manager for SSL/TLS
 - **Migrations**: golang-migrate
 
+### Architecture Diagram
+
+![Alt text](crypto_architecture.png)
+
 ## Project Structure
 
 ```
