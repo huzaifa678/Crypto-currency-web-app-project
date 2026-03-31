@@ -26,6 +26,10 @@
 
 A full-stack cryptocurrency trading platform with real-time market data, order management, and secure user authentication.
 
+## Architecture Diagram
+
+![Alt text](crypto_architecture.png)
+
 ## Overview
 
 This is a comprehensive cryptocurrency web application that provides:
@@ -73,10 +77,6 @@ This is a comprehensive cryptocurrency web application that provides:
 - **Frontend Deployment**: AWS CloudFront
 - **Service Mesh**: Cert-Manager for SSL/TLS
 - **Migrations**: golang-migrate
-
-## Architecture Diagram
-
-![Alt text](crypto_architecture.png)
 
 ## Project Structure
 
