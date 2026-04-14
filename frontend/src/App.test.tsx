@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { vi } from 'vitest';
-import Login from './pages/Login';
 import { MemoryRouter } from 'react-router-dom';
 import App from './App';
 
