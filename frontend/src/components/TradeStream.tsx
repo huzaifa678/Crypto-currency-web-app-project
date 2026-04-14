@@ -1,11 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Market } from "../pages/WebSocket";
 
-interface Trade {
-  symbol: string;
-  price: number;
-}
-
 export function useTradeStream() {
   const [markets, setMarkets] = useState<Market[]>([]);
   const lastPricesRef = useRef<Record<string, number>>({});
