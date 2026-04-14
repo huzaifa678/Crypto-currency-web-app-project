@@ -15,7 +15,7 @@ export interface Market {
 }
 
 const Markets: React.FC = () => {
-  const { market, setMarket } = useMarkets();
+  const { setMarket } = useMarkets();
   const [markets, setMarkets] = useState<Market[]>([]);
   const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
