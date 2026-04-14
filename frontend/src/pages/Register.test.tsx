@@ -10,7 +10,7 @@ import { setupMockAuth, mockRegister } from '../mock/mockAuth';
 
 
 const mockNavigate = vi.fn();
-vi.mock('react-router-dom', async (importOriginal) => {
+vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual<any>('react-router-dom');
   return {
     ...actual,
