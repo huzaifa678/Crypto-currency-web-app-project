@@ -3,7 +3,6 @@ import { Market } from "../pages/WebSocket";
 
 export function useTradeStream() {
   const [markets, setMarkets] = useState<Market[]>([]);
-  const lastPricesRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
     const controller = new AbortController();
