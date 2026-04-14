@@ -12,7 +12,6 @@ import {
   Menu,
   X
 } from 'lucide-react';
-import { error } from 'console';
 
 const Layout: React.FC = () => {
   const { user, logout } = useAuth();
