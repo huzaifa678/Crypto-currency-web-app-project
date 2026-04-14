@@ -21,8 +21,6 @@ const Trades: React.FC = () => {
   const { orders, setOrders } = useOrder();
   const [trades, setTrades] = useState<Trade[]>([]);
   const [loading, setLoading] = useState(false);
-  const [baseCurrency, setBaseCurrency] = useState("");
-  const [quoteCurrency, setQuoteCurrency] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [marketId, setMarketId] = useState("");
 
