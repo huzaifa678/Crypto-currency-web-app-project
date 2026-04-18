@@ -2,16 +2,6 @@ name: Terraform & AWS ECR Deployment
 
 on:
   workflow_dispatch:
-    inputs:
-      environment:
-        description: 'Environment to deploy'
-        required: true
-        default: 'main'
-        type: choice
-        options:
-          - main
-          - test
-          - post-test
   push:
     branches:
       - main
