@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package pb;
+
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+
+message DeleteTransactionRequest {
+  string transaction_id = 1;
+}
+
+message DeleteTransactionResponse {
+    string success = 1;
+}

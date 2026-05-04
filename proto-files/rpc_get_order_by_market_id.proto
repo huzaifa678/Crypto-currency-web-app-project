@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package pb;
+
+import "order.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message GetOrderByMarketIDRequest {
+  string market_id = 1;
+}
+
+message GetOrderByMarketIDResponse {
+    repeated Order orders = 1;
+}

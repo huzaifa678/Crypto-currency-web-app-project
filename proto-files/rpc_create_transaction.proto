@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package pb;
+
+import "transaction.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+
+message CreateTransactionRequest {
+  string username = 1;
+  string user_email = 2;
+  TransactionType type = 3;
+  string currency = 4;
+  string amount = 5;
+  string address = 6;
+  string tx_hash = 7;
+}
+
+message CreateTransactionResponse {
+  Transaction transaction = 1;
+}

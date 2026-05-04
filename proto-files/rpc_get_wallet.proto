@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package pb;
+
+import "wallet.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message GetWalletRequest {
+  string wallet_id = 1;
+}
+
+message GetWalletResponse {
+    Wallet wallet = 1;
+}
+

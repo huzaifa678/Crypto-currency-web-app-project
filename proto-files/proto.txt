@@ -1,0 +1,322 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message Market {
+  string market_id = 1;
+  string user_name = 2;
+  string base_currency = 3;
+  string quote_currency = 4;
+  string min_order_amount = 5;
+  int32 price_precision = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message DeleteOrderRequest {
+  string order_id = 1;
+}
+
+message DeleteOrderResponse {
+  string message = 1;
+}syntax = "proto3";
+
+package pb;
+
+import "market.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message MarketListResponse {
+  repeated Market markets = 1;
+}syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+enum OrderType {
+  BUY = 0;
+  SELL = 1;
+}
+
+message Order {
+  string id = 1;
+  string user_name = 2;
+  string user_email = 3;
+  string market_id = 4;
+  OrderType type = 5;
+  string status = 6;
+  string price = 7;
+  string amount = 8;
+  string filled_amount = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message DeleteUserRequest {
+  string user_id = 1;
+}
+
+message DeleteUserResponse {
+  string message = 1;
+}syntax = "proto3";
+
+package pb;
+
+import "user.proto";
+import "google/protobuf/timestamp.proto";
+
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+
+message LoginUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginResponse {
+  string session_id = 1;
+  string access_token = 2;
+  google.protobuf.Timestamp access_token_expiration = 3;
+  string refresh_token = 4;
+  google.protobuf.Timestamp refresh_token_expiration = 5;
+  User user = 6;
+}
+
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message CreateMarketRequest {
+  string base_currency = 1;
+  string quote_currency = 2;
+  string min_order_amount = 3;
+  int32 price_precision = 4;
+}
+
+
+message CreateMarketResponse {
+  string market_id = 1;
+}syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+
+message DeleteWalletRequest {
+  string wallet_id = 1;
+}
+
+message DeleteWalletResponse {
+  string message = 1;
+}
+
+syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message UpdateUser {
+  string user_id = 1;
+  string password = 2;
+}syntax = "proto3";
+
+package pb;
+
+import "order.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message CreateOrderRequest {
+  string user_email = 1;
+  string market_id = 2;
+  OrderType type = 3;
+  string price = 4;
+  string amount = 5;
+}
+
+message CreateOrderResponse {
+    string order_id = 1;
+}syntax = "proto3";
+
+package pb;
+
+import "market.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message GetMarketRequest {
+  string market_id = 1;
+}
+
+message GetMarketResponse {
+    Market market = 1;
+}syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+
+message UpdateWalletRequest {
+  string balance = 1;
+  string locked_balance = 2;
+  string wallet_id = 3;
+}syntax = "proto3";
+
+package pb;
+
+import "user.proto";
+
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+
+message CreateUserRequest {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+  User role = 4;
+}
+
+
+message CreateUserResponse {
+  string user_id = 1;
+}syntax = "proto3";
+
+package pb;
+
+import "order.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message GetOrderRequest {
+  string order_id = 1;
+}
+
+message GetOrderResponse {
+    Order order = 1;
+}syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+
+service cryptoWebApp {
+    rpc createUser
+}syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message CreateWalletRequest {
+  string user_email = 1;
+  string currency = 2;
+}
+
+message CreateWalletResponse {
+    string wallet_id = 1;
+}syntax = "proto3";
+
+package pb;
+
+import "user.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message GetUserRequest {
+  string user_id = 1;
+}
+
+message GetUserResponse {
+    User user = 1;
+}
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+enum UserRole {
+    USER_ROLE_ADMIN = 0;
+    USER_ROLE_USER = 1;
+}
+
+message User {
+    string id = 1;
+    string username = 2;
+    string email = 3;
+    google.protobuf.Timestamp created_at = 4;
+    google.protobuf.Timestamp updated_at = 5;
+    UserRole role = 6;
+    bool is_verified = 7;
+}syntax = "proto3";
+
+package pb;
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message DeleteMarketRequest {
+  string market_id = 1;
+}
+
+message DeleteMarketResponse {
+  string message = 1;
+}syntax = "proto3";
+
+package pb;
+
+import "wallet.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+message GetWalletRequest {
+  string wallet_id = 1;
+}
+
+message GetWalletResponse {
+    Wallet wallet = 1;
+}
+
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project";
+
+
+message Wallet {
+  string id = 1;
+  string user_email = 2;
+  string currency = 3;
+  string balance = 4;
+  string locked_balance = 5;
+  google.protobuf.Timestamp created_at = 6;
+}

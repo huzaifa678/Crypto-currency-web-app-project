@@ -1,0 +1,11 @@
+kind: Role
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  namespace: kube-system
+  name: myrole
+rules:
+  - apiGroups: [""]
+    resources: ["*"]
+    verbs: ["get", "list", "create", "update", "patch", "delete"]
+
+

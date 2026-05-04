@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.appName }}-ingress-http
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: "{{ .Values.domainName.http }}"
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  ingressClassName: {{ .Values.ingressClass }}
+  rules:
+  - host: {{ .Values.domainName.http }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.apiService }}
+            port:
+              number: 80
+  tls:
+  - hosts:
+    - {{ .Values.domainName.http }}
+    secretName: {{ .Values.tlsSecretName.http }}

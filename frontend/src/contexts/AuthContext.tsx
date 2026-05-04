@@ -1,0 +1,311 @@
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+
+interface User {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+  is_verified: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Client {
+  id : string;
+  email : string;
+  username : string;
+  role : string;
+  provider : string;
+  created_at : string;
+  is_verified : boolean;
+}
+
+interface LoginResponse {
+  session_id: string;
+  access_token: string;
+  access_token_expiration: string;
+  refresh_token: string;
+  refresh_token_expiration: string;
+  user: User;
+}
+
+interface GoogleLoginResponse {
+  access_token : string;
+  refresh_token : string;
+  client : Client
+  access_token_expires_at : string;
+  refresh_token_expires_at : string;
+}
+
+export interface AuthContextType {
+  user: User | null;
+  client: Client | null;
+  isAuthenticated: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  loginWithGoogle: (googleIdToken: string) => Promise<Client>;
+  loginWithGoogleServer: (redirectUrl?: string) => void;
+  register: (username: string, email: string, password: string, role: string) => Promise<void>;
+  logout: () => void;
+  loading: boolean;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+const API_BASE_URL = 'http://localhost:8081';
+
+const api = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+const normalizeRole = (role: string) => {
+  switch(role) {
+    case 'USER_ROLE_ADMIN':
+      return 'admin';
+    case 'USER_ROLE_USER':
+      return 'user';
+    default:
+      return 'user';
+  }
+};
+
+const roleMapping = (role: string) => {
+  switch(role) {
+    case 'admin':
+      return 0;
+    case 'user':
+      return 1;
+    default:
+      return 1;
+  }
+}
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+
+      const refreshToken = localStorage.getItem('refresh_token');
+
+      if (!refreshToken) {
+        localStorage.clear();
+        window.location.href = '/login';
+        return Promise.reject(error);
+      }
+
+      if (originalRequest.url.includes('/v1/renew_access_token')) {
+        return Promise.reject(error);
+      }
+
+      try {
+        const res = await api.post('/v1/renew_access_token', {
+          refresh_token: refreshToken,
+        });
+
+        const { access_token, access_token_expires_at } = res.data;
+
+        localStorage.setItem('access_token', access_token);
+        localStorage.setItem('access_token_expiration', access_token_expires_at);
+
+        originalRequest.headers.Authorization = `Bearer ${access_token}`;
+        return api(originalRequest);
+      } catch (refreshErr: any) {
+          if (refreshErr.response?.status === 401) {
+            localStorage.clear();
+            window.location.href = '/login';
+          }
+      }
+    }
+    return Promise.reject(error);
+  }
+);
+
+export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [client, setClient] = useState<Client | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const initializeAuth = () => {
+      const storedUser = localStorage.getItem('user');
+      const token = localStorage.getItem('access_token');
+
+      if (storedUser && token) {
+        const parsedUser = JSON.parse(storedUser);
+        parsedUser.role = normalizeRole(parsedUser.role); // normalize on load
+        setUser(parsedUser);
+      }
+      
+      if (storedUser && token) {
+        try {
+          setUser(JSON.parse(storedUser));
+        } catch (error) {
+          console.error('Error parsing stored user:', error);
+          localStorage.removeItem('user');
+          localStorage.removeItem('access_token');
+          localStorage.removeItem('refresh_token');
+        }
+      }
+      setLoading(false);
+    };
+
+    initializeAuth();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      const response = await api.post<LoginResponse>('/v1/login', {
+        email,
+        password,
+      });
+
+      const { access_token, refresh_token, user: userData } = response.data;
+
+      userData.role = normalizeRole(userData.role);
+
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+      localStorage.setItem('user', JSON.stringify(userData));
+
+      console.log("userDataRole", userData.role);
+
+      setUser(userData);
+
+      toast.success('Login successful!');
+    } catch (error: any) {
+      const message = error.response?.data?.error || 'Login failed';
+      console.error('Login error:', error);
+      toast.error(message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginWithGoogle = async (googleIdToken: string) => {
+    try {
+      setLoading(true);
+
+      const response = await api.post<GoogleLoginResponse>('/v1/google_login', {
+        id_token: googleIdToken,
+      });
+
+      const {
+        access_token,
+        refresh_token,
+        client,
+        access_token_expires_at,
+        refresh_token_expires_at,
+      } = response.data;
+
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('refresh_token', refresh_token);
+      localStorage.setItem('user', JSON.stringify(client));
+      localStorage.setItem('access_token_expiration', access_token_expires_at);
+      localStorage.setItem('refresh_token_expiration', refresh_token_expires_at);
+
+      setClient(client);
+      setUser({
+        id: client.id,
+        username: client.username,
+        email: client.email,
+        role: client.role,
+        is_verified: true,
+        created_at: client.created_at,
+        updated_at: client.created_at,
+      });
+
+      toast.success('login successful!');
+      return client;
+    } catch (error: any) {
+      const message = error.response?.data?.error || 'Google login failed';
+      toast.error(message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loginWithGoogleServer = async (redirectUrl?: string) => {
+    try {
+      setLoading(true);
+
+      const googleLoginUrl = `${API_BASE_URL}/oauth/google/login?redirect_to=${encodeURIComponent(redirectUrl || 'http://localhost:5173/dashboard')}`;
+      window.location.href = googleLoginUrl;
+
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (username: string, email: string, password: string, role: string) => {
+    try {
+      setLoading(true);
+
+      console.log('Registering user with:', { username, email, role });
+
+      await api.post('/v1/create_user', {
+        username,
+        email,
+        password,
+        role: roleMapping(role),
+      });
+
+      toast.success('Registration successful! Please login.');
+    } catch (error: any) {
+      const message = error.response?.data?.error || 'Registration failed';
+      toast.error(message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setClient(null);
+    toast.success('Logged out successfully');
+  };
+
+  const value: AuthContextType = {
+    user,
+    client,
+    isAuthenticated: !!user || !!client,
+    login,
+    loginWithGoogle,
+    loginWithGoogleServer,
+    register,
+    logout,
+    loading,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
+
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+export { api }; 

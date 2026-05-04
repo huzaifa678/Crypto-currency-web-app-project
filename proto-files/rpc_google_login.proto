@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message LoginClient {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+  string role = 4;
+  string provider = 5; 
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message GoogleLoginRequest {
+  string id_token = 1;
+}
+
+message GoogleLoginResponse {
+  string access_token = 1;
+  string refresh_token = 2;
+  LoginClient client = 3;
+  google.protobuf.Timestamp access_token_expires_at = 4;
+  google.protobuf.Timestamp refresh_token_expires_at = 5;
+}

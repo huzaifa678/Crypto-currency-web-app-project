@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package pb;
+
+import "wallet.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+
+message GetWalletsRequest {
+  string user_email = 1;
+}
+
+
+message GetWalletsResponse {
+  repeated Wallet wallets = 1;
+}

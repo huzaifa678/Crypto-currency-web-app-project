@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package pb;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+enum TransactionType {
+    DEPOSIT = 0;
+    WITHDRAWAL = 1;
+    NONE = 3;
+}
+
+enum TransactionStatus {
+    PENDING = 0;
+    COMPLETED = 1;
+    FAILED = 3;
+}
+
+message Transaction {
+  string transaction_id = 1;
+  string username = 2;
+  string user_email = 3;
+  TransactionType type = 4;       
+  string currency = 5;   
+  string amount = 6;
+  TransactionStatus status = 7;     
+  string address = 8;
+  string tx_hash = 9;
+  google.protobuf.Timestamp created_at = 10;
+}

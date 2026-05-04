@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package pb;
+
+import "trade.proto";
+
+option go_package = "github.com/huzaifa678/Crypto-currency-web-app-project/pb";
+
+message CreateTradeRequest {
+  string username = 1;
+  string buyer_user_email = 2;
+  string seller_user_email = 3;
+  string buy_order_id = 4;
+  string sell_order_id = 5;
+  string market_id = 6;
+  string price = 7;
+  string amount = 8;
+  string fee = 9;
+}
+
+message CreateTradeResponse {
+  Trades trade = 1;
+}
+
