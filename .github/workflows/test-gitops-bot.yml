@@ -1,0 +1,58 @@
+name: Test GitOps Bot Push
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-bot-push:
+    name: Verify App token + push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.GITOPS_APP_ID }}
+          private-key: ${{ secrets.GITOPS_APP_PRIVATE_KEY }}
+          owner: ${{ secrets.USER_NAME }}
+          repositories: Continious-Delivery
+
+      - name: Confirm token was minted
+        run: |
+          if [ -z "${{ steps.app-token.outputs.token }}" ]; then
+            echo "::error::App token is empty — check GITOPS_APP_ID / GITOPS_APP_PRIVATE_KEY"
+            exit 1
+          fi
+          echo "App token generated. Installation ID: ${{ steps.app-token.outputs.installation-id }}"
+
+      - name: Checkout GitOps Repository
+        uses: actions/checkout@v6
+        with:
+          repository: ${{ secrets.USER_NAME }}/Continious-Delivery
+          token: ${{ steps.app-token.outputs.token }}
+          path: Continious-Delivery
+
+      - name: Verify write access (commit + push a marker file)
+        run: |
+          cd Continious-Delivery
+
+          git config user.name "crypto-gitops-bot[bot]"
+          git config user.email "${{ steps.app-token.outputs.installation-id }}+crypto-gitops-bot[bot]@users.noreply.github.com"
+
+          git remote set-url origin \
+            https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ secrets.USER_NAME }}/Continious-Delivery.git
+
+          STAMP="$(date -u +%Y-%m-%dT%H:%M:%SZ) by run ${{ github.run_id }}"
+          echo "$STAMP" > .gitops-bot-test
+          git add .gitops-bot-test
+          git commit -m "test(bot): verify push access — $STAMP"
+          git push origin HEAD:main
+          echo "Push succeeded."
+
+      - name: Clean up marker file
+        run: |
+          cd Continious-Delivery
+          git rm .gitops-bot-test
+          git commit -m "test(bot): remove verification marker"
+          git push origin HEAD:main
+          echo "Cleanup pushed. Bot auth is fully working."
