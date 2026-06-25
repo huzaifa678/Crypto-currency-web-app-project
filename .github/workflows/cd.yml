@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ env.BRANCH_TO_DEPLOY || 'main' }}
 
@@ -67,7 +67,7 @@ jobs:
     needs: terraform
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
@@ -112,7 +112,7 @@ jobs:
           repositories: Continious-Delivery
           
       - name: Checkout GitOps Repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           repository: ${{ secrets.USER_NAME }}/Continious-Delivery
           token: ${{ steps.app-token.outputs.token }}
