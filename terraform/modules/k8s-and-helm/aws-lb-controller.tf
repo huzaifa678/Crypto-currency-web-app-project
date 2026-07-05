@@ -1,5 +1,5 @@
 resource "helm_release" "aws_lb_controller" {
-  count    = var.environment == "post-test" ? 1 : 0
+  count      = var.environment == "post-test" ? 1 : 0
   provider   = helm
   name       = "aws-load-balancer-controller"
   repository = "https://aws.github.io/eks-charts"
@@ -31,7 +31,7 @@ resource "helm_release" "aws_lb_controller" {
       name  = "subnetTags.kubernetes\\.io/role/elb"
       value = "1"
     },
-    { 
+    {
       name  = "subnetTags.kubernetes\\.io/cluster/${var.cluster_name}"
       value = "shared"
     }
@@ -54,7 +54,7 @@ resource "kubernetes_service_account_v1" "aws_lb_controller" {
     }
   }
 
-  depends_on = [ 
+  depends_on = [
     var.vpc
   ]
 }
