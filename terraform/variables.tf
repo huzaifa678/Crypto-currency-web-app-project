@@ -31,7 +31,7 @@ variable "private_subnets" {
 variable "cluster_endpoint_public_access_cidrs" {
   description = "Public CIDR blocks"
   type        = list(string)
-  default     = [ "0.0.0.0/0" ]
+  default     = ["0.0.0.0/0"]
 
 }
 
@@ -71,23 +71,23 @@ variable "min_size" {
 # }
 
 variable "rds_db_name" {
-    description = "RDS DB name"
-    type        = string
-    default     = "cryptodb"
+  description = "RDS DB name"
+  type        = string
+  default     = "cryptodb"
 }
 
 
 variable "rds_db_username" {
-    description = "username credential for RDS DB"
-    type        = string
-    default     = "root"
+  description = "username credential for RDS DB"
+  type        = string
+  default     = "root"
 }
 
 variable "rds_db_password" {
-    description = "password credential for RDS DB Optionally can be generated using random_password resource"
-    type        = string
-    default     = null
-    sensitive   = true
+  description = "password credential for RDS DB Optionally can be generated using random_password resource"
+  type        = string
+  default     = null
+  sensitive   = true
 }
 
 variable "google_client_id" {
@@ -118,7 +118,7 @@ variable "environment" {
   description = "Environment For Backend"
   type        = string
   default     = "post-test"
-} 
+}
 
 variable "origin" {
   description = "Origin for CORS"
