@@ -12,9 +12,9 @@ resource "helm_release" "cert_manager_post_test" {
   repository = "oci://quay.io/jetstack/charts"
   version    = "v1.18.2"
   namespace  = kubernetes_namespace_v1.cert_manager.metadata[0].name
-  
+
   wait          = true
-  wait_for_jobs = true 
+  wait_for_jobs = true
   timeout       = 600
 
   depends_on = [helm_release.nginx_gateway_fabric]
@@ -26,9 +26,9 @@ resource "helm_release" "cert_manager_post_test" {
     },
     { name = "serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn", value = var.cert_manager_irsa_role_arn },
     { name = "config.enableGatewayAPI", value = "true" },
-    { name = "config.apiVersion", value = "controller.config.cert-manager.io/v1alpha1"},
+    { name = "config.apiVersion", value = "controller.config.cert-manager.io/v1alpha1" },
     { name = "config.kind", value = "ControllerConfiguration" },
-    { name = "startupapicheck.enabled", value = "false" } 
+    { name = "startupapicheck.enabled", value = "false" }
   ]
 }
 
