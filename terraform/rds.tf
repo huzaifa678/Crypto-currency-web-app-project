@@ -32,6 +32,8 @@ resource "aws_db_instance" "postgres" {
 
   skip_final_snapshot = true
 
+  storage_encrypted = true
+
   tags = {
     Name = var.rds_db_name
   }
