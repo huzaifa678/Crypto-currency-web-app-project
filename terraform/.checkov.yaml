@@ -1,0 +1,19 @@
+# Checkov configuration for the Terraform codebase.
+# https://www.checkov.io/2.Basics/CLI%20Command%20Reference.html
+directory:
+  - .
+
+framework:
+  - terraform
+
+download-external-modules: false
+evaluate-variables: true
+compact: true
+quiet: true
+
+soft-fail: false
+
+skip-check:
+  - CKV_AWS_39
+  # ECR image tag immutability is handled by the CD pipeline tagging by sha.
+  - CKV_AWS_51
