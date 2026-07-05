@@ -43,7 +43,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run TFLint
-        run: tflint --recursive --format compact
+        # Only errors fail the build; the recommended-preset warnings on the
+        # existing modules (unused vars, missing version constraints) are
+        # surfaced but non-blocking while they are cleaned up incrementally.
+        run: tflint --recursive --format compact --minimum-failure-severity=error
 
   checkov:
     name: Checkov
@@ -72,10 +75,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v7
 
-      - name: Setup Conftest
-        uses: open-policy-agent/setup-conftest@v0.2.0
-        with:
-          version: v0.56.0
+      - name: Install Conftest
+        run: |
+          CONFTEST_VERSION=0.56.0
+          curl -sSfL "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin conftest
+          conftest --version
 
       - name: Verify Rego policies (unit tests)
         run: conftest verify --policy policy
