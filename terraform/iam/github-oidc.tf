@@ -70,7 +70,12 @@ variable "tf_state_key_prefix" {
 
 
 data "aws_iam_policy_document" "github_actions_ci" {
-  # --- Terraform remote state (tightly scoped to the one bucket + prefix) ---
+  # checkov:skip=CKV_AWS_107: CI role must read secrets it provisions.
+  # checkov:skip=CKV_AWS_108: Provisioning role manages data stores it creates.
+  # checkov:skip=CKV_AWS_109: Manages IAM for cluster/IRSA; guarded by DenySelfMutation.
+  # checkov:skip=CKV_AWS_110: Terraform creates IAM roles; privilege-escalation guarded by DenySelfMutation.
+  # checkov:skip=CKV_AWS_111: Broad write access is inherent to a full-stack Terraform runner.
+  # checkov:skip=CKV_AWS_356: ec2/eks/etc. management actions cannot be resource-scoped.
   statement {
     sid       = "TerraformStateBucketList"
     effect    = "Allow"
