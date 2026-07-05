@@ -20,6 +20,8 @@ POLICY
 }
 
 resource "aws_iam_policy" "eks_admin" {
+  # checkov:skip=CKV_AWS_290: eks:* admin actions cannot be resource-scoped.
+  # checkov:skip=CKV_AWS_355: eks:ListClusters and similar require "*" resource.
   name = "AmazonEKSAdminPolicy"
 
   policy = <<POLICY
@@ -54,6 +56,7 @@ resource "aws_iam_role_policy_attachment" "eks_admin" {
 }
 
 resource "aws_iam_user" "admin" {
+  # checkov:skip=CKV_AWS_273: Break-glass IAM user retained for bootstrapping;
   name = "terraform2"
 }
 
@@ -76,9 +79,18 @@ resource "aws_iam_policy" "eks_assume_admin" {
 POLICY
 }
 
-resource "aws_iam_user_policy_attachment" "admin" {
-  user       = aws_iam_user.admin.name
+resource "aws_iam_group" "eks_admins" {
+  name = "eks-admins"
+}
+
+resource "aws_iam_group_policy_attachment" "eks_admins" {
+  group      = aws_iam_group.eks_admins.name
   policy_arn = aws_iam_policy.eks_assume_admin.arn
+}
+
+resource "aws_iam_user_group_membership" "admin" {
+  user   = aws_iam_user.admin.name
+  groups = [aws_iam_group.eks_admins.name]
 }
 
 resource "aws_eks_access_entry" "admin" {
