@@ -79,13 +79,13 @@ data "aws_iam_policy_document" "github_actions_ci" {
   }
 
   statement {
-    sid    = "TerraformStateObjects"
-    effect = "Allow"
+    sid       = "TerraformStateObjects"
+    effect    = "Allow"
     actions   = ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"]
     resources = ["arn:aws:s3:::${var.tf_state_bucket}/${var.tf_state_key_prefix}/*"]
   }
 
-\  statement {
+  statement {
     sid    = "ComputeNetworking"
     effect = "Allow"
     actions = [
