@@ -12,7 +12,7 @@
 #   repository = "oci://quay.io/jetstack/charts"
 #   version    = "v1.18.2"
 #   namespace  = kubernetes_namespace.cert_manager.metadata[0].name
-  
+
 #   wait          = true
 #   wait_for_jobs = true 
 #   timeout       = 600
