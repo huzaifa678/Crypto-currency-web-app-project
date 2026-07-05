@@ -1,0 +1,62 @@
+name: Image Security
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Dockerfile
+      - "**.go"
+      - go.mod
+      - go.sum
+      - .github/workflows/image-security.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - Dockerfile
+      - "**.go"
+      - go.mod
+      - go.sum
+      - .github/workflows/image-security.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  checkov-dockerfile:
+    name: Checkov Dockerfile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Run Checkov against the Dockerfile
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          file: Dockerfile
+          framework: dockerfile
+          output_format: cli,sarif
+          output_file_path: console,checkov-dockerfile.sarif
+          soft_fail: false
+
+  trivy:
+    name: Trivy Image Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Build image
+        run: docker build -t crypto-system:${{ github.sha }} .
+
+      - name: Trivy vulnerability scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: crypto-system:${{ github.sha }}
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          vuln-type: os,library
+          exit-code: "1"
