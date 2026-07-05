@@ -59,10 +59,12 @@ jobs:
             -out=tfplan
         working-directory: ./terraform
 
-      - name: Setup Conftest
-        uses: open-policy-agent/setup-opa@v2
-        with:
-          version: latest
+      - name: Install Conftest
+        run: |
+          CONFTEST_VERSION=0.56.0
+          curl -sSfL "https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}/conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz" \
+            | sudo tar -xz -C /usr/local/bin conftest
+          conftest --version
 
       - name: Policy as Code (OPA / Conftest)
         run: |
