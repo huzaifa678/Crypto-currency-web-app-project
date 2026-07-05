@@ -1,9 +1,12 @@
-FROM golang:1.25.8-alpine3.21 AS builder
+FROM golang:1.25.8-alpine3.23 AS builder
 WORKDIR /app
 COPY . .
-RUN go build -o main main.go
 
-FROM alpine:3.19
+# static build for minimal final image
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o main main.go
+
+# Match the builder's Alpine version and stay on a supported release.
+FROM alpine:3.23
 WORKDIR /app
 COPY --from=builder /app/main .
 COPY app.env .
@@ -11,8 +14,9 @@ COPY start.sh .
 COPY wait-for.sh .
 COPY db/migrations ./db/migrations
 
-# Create an unprivileged user and run the container as it.
-RUN addgroup -S app && adduser -S app -G app \
+# Pull the latest security patches, then create an unprivileged user.
+RUN apk --no-cache upgrade \
+  && addgroup -S app && adduser -S app -G app \
   && chmod +x start.sh wait-for.sh \
   && chown -R app:app /app
 
