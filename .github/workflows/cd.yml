@@ -13,6 +13,10 @@ env:
   ENVIRONMENT: ${{ github.event.inputs.environment || github.ref_name }}
   BRANCH_TO_DEPLOY: ${{ github.event.inputs.environment || github.ref_name }}
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   terraform:
     name: Terraform Apply
@@ -31,8 +35,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1 
       
       - name: Initialize Terraform
@@ -56,6 +59,17 @@ jobs:
             -out=tfplan
         working-directory: ./terraform
 
+      - name: Setup Conftest
+        uses: open-policy-agent/setup-opa@v2
+        with:
+          version: latest
+
+      - name: Policy as Code (OPA / Conftest)
+        run: |
+          terraform show -json tfplan > tfplan.json
+          conftest test tfplan.json --policy policy --all-namespaces
+        working-directory: ./terraform
+
       - name: Terraform Apply
         run: |
           terraform apply -auto-approve tfplan
@@ -72,8 +86,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
 
       - name: Login to Amazon ECR
@@ -121,8 +134,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v6
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: us-east-1
          
       - name: Add Image Tag And Gateway NLB target
