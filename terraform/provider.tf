@@ -18,11 +18,11 @@ terraform {
   }
 
   backend "s3" {
-    bucket         = "my-terraform-state-bucket-1742982420"
-    key            = "crypto-system/terraform.tfstate"
-    region         = "us-west-2"
+    bucket       = "my-terraform-state-bucket-1742982420"
+    key          = "crypto-system/terraform.tfstate"
+    region       = "us-west-2"
     use_lockfile = true
-    encrypt        = true
+    encrypt      = true
   }
 }
 
