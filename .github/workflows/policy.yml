@@ -1,0 +1,99 @@
+name: Policy as Code
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - policy/**
+      - Dockerfile
+      - eks-chart/**
+      - .github/workflows/**
+  pull_request:
+    branches: [main]
+    paths:
+      - policy/**
+      - Dockerfile
+      - eks-chart/**
+      - .github/workflows/**
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  CONFTEST_VERSION: "0.56.0"
+
+jobs:
+  verify:
+    name: Rego unit tests + fmt
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Conftest
+        run: |
+          set -euo pipefail
+          base="https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}"
+          tarball="conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz"
+          curl -fsSL "${base}/${tarball}"    -o "${tarball}"
+          curl -fsSL "${base}/checksums.txt" -o checksums.txt
+          grep " ${tarball}\$" checksums.txt | sha256sum -c -
+          tar -xzf "${tarball}" conftest && sudo install -m 0755 conftest /usr/local/bin/conftest
+      - name: Verify Rego policies (unit tests)
+        run: conftest verify --policy policy
+      - name: Lint Rego policies
+        run: conftest fmt --check policy
+
+  docker:
+    name: Dockerfile policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Conftest
+        run: |
+          set -euo pipefail
+          base="https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}"
+          tarball="conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz"
+          curl -fsSL "${base}/${tarball}"    -o "${tarball}"
+          curl -fsSL "${base}/checksums.txt" -o checksums.txt
+          grep " ${tarball}\$" checksums.txt | sha256sum -c -
+          tar -xzf "${tarball}" conftest && sudo install -m 0755 conftest /usr/local/bin/conftest
+      - name: conftest test (Dockerfile)
+        run: conftest test Dockerfile --parser dockerfile --policy policy --namespace docker
+
+  actions:
+    name: Workflows policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install Conftest
+        run: |
+          set -euo pipefail
+          base="https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}"
+          tarball="conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz"
+          curl -fsSL "${base}/${tarball}"    -o "${tarball}"
+          curl -fsSL "${base}/checksums.txt" -o checksums.txt
+          grep " ${tarball}\$" checksums.txt | sha256sum -c -
+          tar -xzf "${tarball}" conftest && sudo install -m 0755 conftest /usr/local/bin/conftest
+      - name: conftest test (workflows)
+        run: conftest test .github/workflows/*.yml --parser yaml --policy policy --namespace actions
+
+  helm:
+    name: Helm manifests policy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: azure/setup-helm@v4
+      - name: Install Conftest
+        run: |
+          set -euo pipefail
+          base="https://github.com/open-policy-agent/conftest/releases/download/v${CONFTEST_VERSION}"
+          tarball="conftest_${CONFTEST_VERSION}_Linux_x86_64.tar.gz"
+          curl -fsSL "${base}/${tarball}"    -o "${tarball}"
+          curl -fsSL "${base}/checksums.txt" -o checksums.txt
+          grep " ${tarball}\$" checksums.txt | sha256sum -c -
+          tar -xzf "${tarball}" conftest && sudo install -m 0755 conftest /usr/local/bin/conftest
+      - name: Render + test eks-chart
+        run: |
+          set -euo pipefail
+          helm template crypto eks-chart > rendered.yaml
+          conftest test rendered.yaml --policy policy --namespace kubernetes
