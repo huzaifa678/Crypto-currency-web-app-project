@@ -14,7 +14,7 @@ require (
 
 require (
 	github.com/gorilla/websocket v1.5.3
-	google.golang.org/grpc v1.82.0
+	google.golang.org/grpc v1.82.1
 )
 
 require (
