@@ -25,9 +25,9 @@ require (
 	github.com/shopspring/decimal v1.4.0
 	golang.org/x/oauth2 v0.36.0
 	golang.org/x/sync v0.22.0
-	google.golang.org/api v0.291.0
+	google.golang.org/api v0.292.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260630182238-925bb5da69e7
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20260724162435-b2f20204f0df
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260803160001-6ac0973c030d
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
