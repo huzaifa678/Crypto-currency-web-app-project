@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import Trades from "./Trading";
 import { MemoryRouter } from "react-router-dom";
+import { withQueryClient } from "../test-utils";
 
 const localStorageMock: Record<string, string> = {};
 vi.stubGlobal("localStorage", {
@@ -84,9 +85,11 @@ describe("Trades Component", () => {
     });
 
     render(
-      <MemoryRouter>
-        <Trades />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Trades />
+        </MemoryRouter>
+      )
     );
 
     expect(await screen.findByText("T1")).toBeInTheDocument();
@@ -121,9 +124,11 @@ describe("Trades Component", () => {
     });
 
     render(
-      <MemoryRouter>
-        <Trades />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Trades />
+        </MemoryRouter>
+      )
     );
 
     fireEvent.change(screen.getByPlaceholderText("Price"), {
@@ -173,9 +178,11 @@ describe("Trades Component", () => {
     });
 
     render(
-      <MemoryRouter>
-        <Trades />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Trades />
+        </MemoryRouter>
+      )
     );
 
     expect(await screen.findByText("DEL1")).toBeInTheDocument();
