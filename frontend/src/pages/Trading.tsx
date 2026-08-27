@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowDownRight, ArrowUpRight } from "lucide-react";
 import { useAuth, api } from "../contexts/AuthContext";
 import { useOrder } from '../contexts/OrderContext';
@@ -19,10 +20,9 @@ interface Trade {
 const Trades: React.FC = () => {
   const { user } = useAuth();
   const { orders, setOrders } = useOrder();
-  const [trades, setTrades] = useState<Trade[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [marketId, setMarketId] = useState("");
+  const queryClient = useQueryClient();
+  const [mutating, setMutating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -45,36 +45,32 @@ const Trades: React.FC = () => {
     setFormData((f) => ({ ...f, username: defaultUsername }));
   }, [user?.email]);
 
-  useEffect(() => {
-    const fetchTrades = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const storedMarketId = localStorage.getItem("marketId");
-        if (storedMarketId === "") return;
-        const res = await api.get(`/v1/trades/all/${storedMarketId}`);
-        const trades = res.data.trades.map((t: any) => ({
-          tradeId: t.trade_id,
-          username: t.username,
-          buyOrderId: t.buy_order_id,
-          sellOrderId: t.sell_order_id,
-          marketId: t.market_id,
-          price: parseFloat(t.price),
-          amount: parseFloat(t.amount),
-          fee: parseFloat(t.fee),
-          createdAt: t.created_at,
-        }));
-        setTrades(trades);
-      } catch (err) {
-        console.error("Error fetching trades:", err);
-        setError("Failed to fetch trades");
-      } finally {
-        setLoading(false);
-      }
-    };
+  const {
+    data: trades = [],
+    isLoading,
+    isError,
+  } = useQuery<Trade[]>({
+    queryKey: ["trades"],
+    queryFn: async () => {
+      const storedMarketId = localStorage.getItem("marketId");
+      if (!storedMarketId) return [];
+      const res = await api.get(`/v1/trades/all/${storedMarketId}`);
+      return res.data.trades.map((t: any) => ({
+        tradeId: t.trade_id,
+        username: t.username,
+        buyOrderId: t.buy_order_id,
+        sellOrderId: t.sell_order_id,
+        marketId: t.market_id,
+        price: parseFloat(t.price),
+        amount: parseFloat(t.amount),
+        fee: parseFloat(t.fee),
+        createdAt: t.created_at,
+      }));
+    },
+  });
 
-    fetchTrades();
-  }, [marketId]);
+  const loading = isLoading || mutating;
+  const error = createError || (isError ? "Failed to fetch trades" : null);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -112,8 +108,8 @@ const Trades: React.FC = () => {
 
   const createTrade = async () => {
     try {
-      setLoading(true);
-      setError(null);
+      setMutating(true);
+      setCreateError(null);
 
       console.log("Creating trade with formData:", formData, "and order:", orders);
 
@@ -138,7 +134,7 @@ const Trades: React.FC = () => {
 
         const orders = res.data.orders;
         if (!orders || orders.length === 0) {
-          setError("No order available to create trade");
+          setCreateError("No order available to create trade");
           return;
         }
 
@@ -170,7 +166,7 @@ const Trades: React.FC = () => {
       console.log("seller order", sellOrder)
 
       if (!buyOrder || !sellOrder) {
-        setError("No matching BUY/SELL orders found for this market");
+        setCreateError("No matching BUY/SELL orders found for this market");
         return;
       }
 
@@ -210,7 +206,6 @@ const Trades: React.FC = () => {
 
       console.log("Setting marketId to", getTrade.data.trade.market_id);
 
-      setMarketId(getTrade.data.trade.market_id);
       localStorage.setItem("marketId", getTrade.data.trade.market_id);
 
       const mapped: Trade = {
@@ -225,14 +220,15 @@ const Trades: React.FC = () => {
         createdAt: t.created_at,
       };
 
-      setTrades((prev) => [mapped, ...prev]);
+      await queryClient.cancelQueries({ queryKey: ["trades"] });
+      queryClient.setQueryData<Trade[]>(["trades"], (prev = []) => [mapped, ...prev]);
 
       setFormData((f) => ({ ...f, price: "", amount: "" }));
     } catch (err) {
       console.error("Error creating trade:", err);
-      setError("Failed to create trade");
+      setCreateError("Failed to create trade");
     } finally {
-      setLoading(false);
+      setMutating(false);
     }
   };
 
@@ -240,7 +236,7 @@ const Trades: React.FC = () => {
     if (!id) return;
     try {
       await api.delete(`/v1/trades/${id}`);
-      setTrades((prev) => prev.filter((t) => t.tradeId !== id));
+      queryClient.setQueryData<Trade[]>(["trades"], (prev = []) => prev.filter((t) => t.tradeId !== id));
     } catch (err) {
       console.error("Error deleting trade:", err);
     }
