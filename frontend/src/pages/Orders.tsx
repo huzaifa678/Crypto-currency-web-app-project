@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../contexts/AuthContext';
 import { Clock, CheckCircle, XCircle, Trash2, PlusCircle } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -19,8 +20,7 @@ export interface Order {
 const Orders: React.FC = () => {
   const { setOrder } = useOrder();
   const { market } = useMarkets();
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   const [creating, setCreating] = useState(false);
   const [type, setType] = useState<'BUY' | 'SELL'>('BUY');
@@ -31,28 +31,18 @@ const Orders: React.FC = () => {
 
   const [fetchedOrder, setFetchedOrder] = useState<Order | null>(null);
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        const user = localStorage.getItem('user')
-        const username = user ? JSON.parse(user).username : '';
-        const response = await api.get('/v1/orders' , {
-          params: { username: username }
-        });
-        
-        setOrders(response.data.orders ?? []);
-        console.log('Fetched orders:', response.data.orders);
-        console.log('data', response.data);
-        console.log("Orders API response (stringified):", JSON.stringify(response.data, null, 2));
+  const { data: orders = [], isLoading: loading } = useQuery<Order[]>({
+    queryKey: ['orders'],
+    queryFn: async () => {
+      const user = localStorage.getItem('user')
+      const username = user ? JSON.parse(user).username : '';
+      const response = await api.get('/v1/orders', {
+        params: { username: username }
+      });
 
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchOrders();
-  }, []);
+      return response.data.orders ?? [];
+    },
+  });
 
   const handleCreateOrder = async () => {
     console.log("markets", market);
@@ -96,7 +86,8 @@ const Orders: React.FC = () => {
       setOrder(createdOrder);
 
       setFetchedOrder(createdOrder);
-      setOrders((prev) => [...prev, createdOrder]);
+      await queryClient.cancelQueries({ queryKey: ['orders'] });
+      queryClient.setQueryData<Order[]>(['orders'], (prev = []) => [...prev, createdOrder]);
 
       toast.success('Order created & fetched successfully!');
       setPrice('');
@@ -113,7 +104,7 @@ const Orders: React.FC = () => {
   const handleCancelOrder = async (orderId: string) => {
     try {
       await api.delete(`/v1/orders/${orderId}`);
-      setOrders(orders.filter(order => order.id !== orderId));
+      queryClient.setQueryData<Order[]>(['orders'], (prev = []) => prev.filter(order => order.id !== orderId));
       if (fetchedOrder?.id === orderId) setFetchedOrder(null);
       toast.success('Order cancelled successfully!');
     } catch (error: any) {
