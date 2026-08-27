@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { api } from '../contexts/AuthContext';
 import { Wallet as WalletIcon, Plus, Minus, Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -18,36 +19,26 @@ interface Wallet {
 }
 
 const WalletPage: React.FC = () => {
-  const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [creating, setCreating] = useState(false);
   const [newCurrency, setNewCurrency] = useState('');
 
   const [searchedWallet, setSearchedWallet] = useState<Wallet | null>(null);
 
-  useEffect(() => {
-    const fetchWallets = async () => {
-      try {
-        const res = await api.get<{ wallets: WalletResponse[] }>('/v1/wallets', {
-          params: { user_email: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).email : '' }
-        });
-        const normalized = (res.data.wallets || []).filter(Boolean).map((w: WalletResponse) => ({
-            id: w.id,
-            currency: w.currency,
-            balance: parseFloat(w.balance?.toString() ?? "0"),
-            locked_balance: parseFloat(w.locked_balance?.toString() ?? "0")
-        }));
-        setWallets(normalized);
-        console.log(res.data.wallets);
-      } catch (err) {
-        console.error(err);
-      } finally {
-      setLoading(false);
-      }
-    };
-
-    fetchWallets();
-  }, []);
+  const { data: wallets = [], isLoading: loading } = useQuery<Wallet[]>({
+    queryKey: ['wallets'],
+    queryFn: async () => {
+      const res = await api.get<{ wallets: WalletResponse[] }>('/v1/wallets', {
+        params: { user_email: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')!).email : '' }
+      });
+      return (res.data.wallets || []).filter(Boolean).map((w: WalletResponse) => ({
+        id: w.id,
+        currency: w.currency,
+        balance: parseFloat(w.balance?.toString() ?? "0"),
+        locked_balance: parseFloat(w.locked_balance?.toString() ?? "0")
+      }));
+    },
+  });
 
   const handleCreateWallet = async () => {
     if (!newCurrency) {
@@ -76,7 +67,8 @@ const WalletPage: React.FC = () => {
         locked_balance: Number(raw.locked_balance),
       };
       setSearchedWallet(createdWallet);
-      setWallets((prev) => [...prev, createdWallet]);
+      await queryClient.cancelQueries({ queryKey: ['wallets'] });
+      queryClient.setQueryData<Wallet[]>(['wallets'], (prev = []) => [...prev, createdWallet]);
 
       toast.success('Wallet created & fetched successfully!');
       setNewCurrency('');
@@ -92,7 +84,7 @@ const WalletPage: React.FC = () => {
     try {
       await api.delete(`/v1/wallets/${walletId}`);
       toast.success('Wallet deleted successfully!');
-      setWallets(wallets.filter((w) => w.id !== walletId));
+      queryClient.setQueryData<Wallet[]>(['wallets'], (prev = []) => prev.filter((w) => w.id !== walletId));
       if (searchedWallet?.id === walletId) setSearchedWallet(null);
     } catch (error: any) {
       toast.error('Failed to delete wallet');
