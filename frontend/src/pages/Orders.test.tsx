@@ -2,6 +2,7 @@ import { render, screen, waitFor, fireEvent, within } from '@testing-library/rea
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import Orders from './Orders';
+import { withQueryClient } from '../test-utils';
 
 const mockUseMarkets = {
   market: [{ market_id: 'btc-usdt' }],
@@ -71,9 +72,11 @@ describe('Orders Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <Orders />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Orders />
+        </MemoryRouter>
+      )
     );
 
     expect(
@@ -86,9 +89,9 @@ describe('Orders Component', () => {
       })
     );
 
-    const table = screen.getByRole('table', { name: /orders-table/i });
+    const table = await screen.findByRole('table', { name: /orders-table/i });
 
-    expect(within(table).getByText('#1')).toBeInTheDocument();
+    expect(await within(table).findByText('#1')).toBeInTheDocument();
     expect(within(table).getByText('BTC-USDT')).toBeInTheDocument();
     expect(within(table).getByText('BUY')).toBeInTheDocument();
   });
@@ -119,9 +122,11 @@ describe('Orders Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <Orders />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Orders />
+        </MemoryRouter>
+      )
     );
 
     await waitFor(() => screen.getByText('Create Order'));
@@ -166,9 +171,11 @@ describe('Orders Component', () => {
     mockApiDelete.mockResolvedValueOnce({});
 
     render(
-      <MemoryRouter>
-        <Orders />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Orders />
+        </MemoryRouter>
+      )
     );
 
     await waitFor(() => screen.getByText('#1'));
