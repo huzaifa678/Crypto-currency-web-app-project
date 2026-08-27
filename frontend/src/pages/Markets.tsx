@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { api } from '../contexts/AuthContext';
 import { useMarkets } from '../contexts/MarketContext';
@@ -16,10 +17,8 @@ export interface Market {
 
 const Markets: React.FC = () => {
   const { setMarket } = useMarkets();
-  const [markets, setMarkets] = useState<Market[]>([]);
-  const [filteredMarkets, setFilteredMarkets] = useState<Market[]>([]);
+  const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
   const [sortBy, setSortBy] = useState<'name' | 'base_currency' | 'quote_currency' | 'created_at'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [marketId, setMarketId] = useState('');
@@ -29,38 +28,29 @@ const Markets: React.FC = () => {
   const [minOrderAmount, setMinOrderAmount] = useState('');
   const [pricePrecision, setPricePrecision] = useState(2);
 
-  useEffect(() => {
-    const fetchMarkets = async () => {
-      try {
-        setLoading(true);
-        const user = localStorage.getItem('user');
-        const username = user ? JSON.parse(user).username : '';
-        const response = await api.get('/v1/markets', {
-          params: { username: username }
-        });
+  const { data: markets = [], isLoading: loading } = useQuery<Market[]>({
+    queryKey: ['markets'],
+    queryFn: async () => {
+      const user = localStorage.getItem('user');
+      const username = user ? JSON.parse(user).username : '';
+      const response = await api.get('/v1/markets', {
+        params: { username: username }
+      });
 
-        const normalizedMarkets = (response.data.markets || []).filter(Boolean).map((m: any) => ({
-          market_id: m.market_id,
-          name: m.name,
-          base_currency: m.base_currency,
-          quote_currency: m.quote_currency,
-          min_order_amount: parseFloat(m.min_order_amount ?? '0'),
-          price_precision: parseFloat(m.price_precision ?? '2'),
-          created_at: m.created_at,
-        }));
+      const normalizedMarkets = (response.data.markets || []).filter(Boolean).map((m: any) => ({
+        market_id: m.market_id,
+        name: m.name,
+        base_currency: m.base_currency,
+        quote_currency: m.quote_currency,
+        min_order_amount: parseFloat(m.min_order_amount ?? '0'),
+        price_precision: parseFloat(m.price_precision ?? '2'),
+        created_at: m.created_at,
+      }));
 
-        setMarket(normalizedMarkets);
-        setMarkets(normalizedMarkets);
-        setFilteredMarkets(normalizedMarkets);
-      } catch (error) {
-        console.error('Error fetching markets:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMarkets();
-  }, []);
+      setMarket(normalizedMarkets);
+      return normalizedMarkets;
+    },
+  });
 
   const fetchMarketById = async (marketId: string) => {
     try {
@@ -75,8 +65,7 @@ const Markets: React.FC = () => {
   const deleteMarket = async (marketId: string) => {
     try {
       await api.delete(`/v1/markets/${marketId}`);
-      setMarkets((prev) => prev.filter((m) => m.market_id !== marketId));
-      setFilteredMarkets((prev) => prev.filter((m) => m.market_id !== marketId));
+      queryClient.setQueryData<Market[]>(['markets'], (prev = []) => prev.filter((m) => m.market_id !== marketId));
     } catch (error) {
       console.error('Error deleting market:', error);
     }
@@ -97,8 +86,8 @@ const Markets: React.FC = () => {
 
       const newMarket = await fetchMarketById(newMarketId);
       if (newMarket) {
-        setMarkets((prev) => [...prev, newMarket]);
-        setFilteredMarkets((prev) => [...prev, newMarket]);
+        await queryClient.cancelQueries({ queryKey: ['markets'] });
+        queryClient.setQueryData<Market[]>(['markets'], (prev = []) => [...prev, newMarket]);
       }
 
       setBaseCurrency('');
@@ -110,16 +99,14 @@ const Markets: React.FC = () => {
     }
   };
 
-  useEffect(() => {
+  const filteredMarkets = useMemo(() => {
     const query = (searchTerm ?? '').toLowerCase();
 
-    const filtered = markets.filter((market) =>
+    return markets.filter((market) =>
       (market.name ?? '').toLowerCase().includes(query) ||
       (market.base_currency ?? '').toLowerCase().includes(query) ||
       (market.quote_currency ?? '').toLowerCase().includes(query)
     );
-
-    setFilteredMarkets(filtered);
   }, [searchTerm, markets]);
 
   const sortMarkets = (markets: Market[]) => {
