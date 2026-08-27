@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { useAuth, api } from "../contexts/AuthContext";
 
@@ -13,9 +14,9 @@ interface Transaction {
 
 const Transactions: React.FC = () => {
   const { user } = useAuth();
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
+  const [mutating, setMutating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     type: "deposit",
@@ -36,13 +37,17 @@ const Transactions: React.FC = () => {
     });
   };
 
-  const fetchTransactions = async (email?: string) => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const res = await api.get(`/v1/transactions/list/${email}`); 
-      const mapped = (res.data.transactions || []).map((t: any) => ({
+  const {
+    data: transactions = [],
+    isLoading,
+    isError,
+  } = useQuery<Transaction[]>({
+    queryKey: ["transactions", user?.email],
+    enabled: !!user?.email,
+    refetchInterval: 5000,
+    queryFn: async () => {
+      const res = await api.get(`/v1/transactions/list/${user!.email}`);
+      return (res.data.transactions || []).map((t: any) => ({
         transactionId: t.transaction_id,
         type: t.type.toLowerCase(),
         currency: t.currency,
@@ -50,32 +55,16 @@ const Transactions: React.FC = () => {
         status: t.status.toLowerCase() || "pending",
         createdAt: t.created_at,
       }));
+    },
+  });
 
-      setTransactions(mapped);
-    } catch (err: any) {
-      console.error("Error fetching transactions:", err);
-      setError("Failed to fetch transactions");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!user?.email) return;
-
-    fetchTransactions(user.email);
-
-    const interval = setInterval(() => {
-      fetchTransactions(user.email);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [user?.email]);
+  const loading = isLoading || mutating;
+  const error = createError || (isError ? "Failed to fetch transactions" : null);
 
   const createTransaction = async () => {
     try {
-      setLoading(true);
-      setError(null);
+      setMutating(true);
+      setCreateError(null);
 
       const res = await api.post("/v1/transactions", {
         username: user?.username,
@@ -96,23 +85,27 @@ const Transactions: React.FC = () => {
         status: "COMPLETED",
       });
 
-      setTransactions((prev) => [
-        ...prev,
-        {
-          transactionId: createdTx.transaction_id,
-          type: createdTx.type,
-          currency: createdTx.currency,
-          amount: createdTx.amount,
-          status: "completed", 
-          createdAt: createdTx.created_at,
-        },
-      ]);
+      await queryClient.cancelQueries({ queryKey: ["transactions", user?.email] });
+      queryClient.setQueryData<Transaction[]>(
+        ["transactions", user?.email],
+        (prev = []) => [
+          ...prev,
+          {
+            transactionId: createdTx.transaction_id,
+            type: createdTx.type,
+            currency: createdTx.currency,
+            amount: createdTx.amount,
+            status: "completed",
+            createdAt: createdTx.created_at,
+          },
+        ]
+      );
 
     } catch (err) {
       console.error("Error creating transaction:", err);
-      setError("Failed to create transaction");
+      setCreateError("Failed to create transaction");
     } finally {
-      setLoading(false);
+      setMutating(false);
     }
   };
 
@@ -124,7 +117,10 @@ const Transactions: React.FC = () => {
 
     try {
       await api.delete(`/v1/transactions/${id}`);
-      setTransactions((t) => t.filter((tx) => tx.transactionId !== id));
+      queryClient.setQueryData<Transaction[]>(
+        ["transactions", user?.email],
+        (prev = []) => prev.filter((tx) => tx.transactionId !== id)
+      );
     } catch (err) {
       console.error("Error deleting transaction:", err);
     }
