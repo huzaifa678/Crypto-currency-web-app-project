@@ -2,6 +2,7 @@ import { render, screen, waitFor, fireEvent, within } from "@testing-library/rea
 import { MemoryRouter } from "react-router-dom";
 import { vi } from "vitest";
 import Transactions from "./Transactions";
+import { withQueryClient } from "../test-utils";
 
 vi.mock("../contexts/AuthContext", () => {
   return {
@@ -51,9 +52,11 @@ describe("Transactions Component", () => {
     });
 
     render(
-      <MemoryRouter>
-        <Transactions />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Transactions />
+        </MemoryRouter>
+      )
     );
 
     expect(
@@ -68,7 +71,7 @@ describe("Transactions Component", () => {
 
     const table = screen.getByRole("table");
 
-    expect(within(table).getByText("deposit")).toBeInTheDocument();
+    expect(await within(table).findByText("deposit")).toBeInTheDocument();
     expect(within(table).getByText("USD")).toBeInTheDocument();
   });
 
@@ -91,9 +94,11 @@ describe("Transactions Component", () => {
     mockApiPatch.mockResolvedValueOnce({});
 
     render(
-      <MemoryRouter>
-        <Transactions />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Transactions />
+        </MemoryRouter>
+      )
     );
 
     fireEvent.change(screen.getByPlaceholderText("Amount"), {
@@ -123,7 +128,7 @@ describe("Transactions Component", () => {
     });
 
     const table = screen.getByRole("table");
-    expect(within(table).getByText("deposit")).toBeInTheDocument();
+    expect(await within(table).findByText("deposit")).toBeInTheDocument();
   });
 
   it("deletes a transaction", async () => {
@@ -131,9 +136,11 @@ describe("Transactions Component", () => {
     mockApiDelete.mockResolvedValueOnce({});
 
     render(
-      <MemoryRouter>
-        <Transactions />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Transactions />
+        </MemoryRouter>
+      )
     );
 
     await waitFor(() => screen.getByText("deposit"));
@@ -151,9 +158,11 @@ describe("Transactions Component", () => {
     mockApiGet.mockRejectedValueOnce(new Error("API error"));
 
     render(
-      <MemoryRouter>
-        <Transactions />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Transactions />
+        </MemoryRouter>
+      )
     );
 
     await waitFor(() =>
