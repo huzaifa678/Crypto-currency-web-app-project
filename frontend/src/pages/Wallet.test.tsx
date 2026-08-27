@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor, cleanup, within } from "@testing-li
 import { MemoryRouter } from "react-router-dom";
 import { vi } from "vitest";
 import WalletPage from "./Wallet";
+import { withQueryClient } from "../test-utils";
 
 afterEach(() => {
   cleanup();
@@ -39,9 +40,11 @@ beforeEach(() => {
 
 const renderWalletPage = () =>
   render(
-    <MemoryRouter>
-      <WalletPage />
-    </MemoryRouter>
+    withQueryClient(
+      <MemoryRouter>
+        <WalletPage />
+      </MemoryRouter>
+    )
   );
 
 
