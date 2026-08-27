@@ -2,6 +2,7 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { vi } from 'vitest';
 import Markets from './Markets';
+import { withQueryClient } from '../test-utils';
 
 const mockSetMarket = vi.fn();
 const mockUseMarkets = {
@@ -65,9 +66,11 @@ describe('Markets Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <Markets />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Markets />
+        </MemoryRouter>
+      )
     );
 
     expect(screen.getByRole('status')).toBeInTheDocument();
@@ -76,7 +79,7 @@ describe('Markets Component', () => {
       expect(mockApiGet).toHaveBeenCalledWith('/v1/markets', expect.any(Object));
     });
 
-    expect(screen.getByText('BTC')).toBeInTheDocument();
+    expect(await screen.findByText('BTC')).toBeInTheDocument();
     expect(screen.getByText('ETH')).toBeInTheDocument();
   });
 
@@ -87,9 +90,11 @@ describe('Markets Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <Markets />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Markets />
+        </MemoryRouter>
+      )
     );
 
     await waitFor(() => screen.getByText('BTC'));
@@ -108,9 +113,11 @@ describe('Markets Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <Markets />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Markets />
+        </MemoryRouter>
+      )
     );
 
     await waitFor(() => screen.getByText('BTC'));
@@ -137,9 +144,11 @@ describe('Markets Component', () => {
     mockApiDelete.mockResolvedValueOnce({});
 
     render(
-      <MemoryRouter>
-        <Markets />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Markets />
+        </MemoryRouter>
+      )
     );
 
     await waitFor(() => screen.getByText('BTC'));
@@ -179,9 +188,11 @@ describe('Markets Component', () => {
     });
 
     render(
-      <MemoryRouter>
-        <Markets />
-      </MemoryRouter>
+      withQueryClient(
+        <MemoryRouter>
+          <Markets />
+        </MemoryRouter>
+      )
     );
 
     await waitFor(() => screen.getByText('Create Market'));
