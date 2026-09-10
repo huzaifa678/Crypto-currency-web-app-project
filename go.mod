@@ -1,6 +1,6 @@
 module github.com/huzaifa678/Crypto-currency-web-app-project
 
-go 1.25.8
+go 1.26.0
 
 require github.com/google/uuid v1.6.0
 
@@ -9,7 +9,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/lib/pq v1.12.3
 	github.com/spf13/viper v1.21.0
-	golang.org/x/crypto v0.55.0
+	golang.org/x/crypto v0.56.0
 )
 
 require (
