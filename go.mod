@@ -1,6 +1,6 @@
 module github.com/huzaifa678/Crypto-currency-web-app-project
 
-go 1.25.8
+go 1.26.0
 
 require github.com/google/uuid v1.6.0
 
@@ -23,7 +23,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.30.0
 	github.com/jackc/pgx/v5 v5.10.0
 	github.com/shopspring/decimal v1.4.0
-	golang.org/x/oauth2 v0.36.0
+	golang.org/x/oauth2 v0.37.0
 	golang.org/x/sync v0.22.0
 	google.golang.org/api v0.296.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20260803160001-6ac0973c030d
