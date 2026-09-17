@@ -108,15 +108,12 @@ require (
 )
 
 require (
-	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/hibiken/asynq v0.26.0
 	github.com/jackc/pgconn v1.14.3
-	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/rs/cors v1.11.1
 	github.com/rs/zerolog v1.35.1
-	github.com/stretchr/testify v1.11.1
-	gopkg.in/yaml.v3 v3.0.1 // indirect
+	github.com/stretchr/testify v1.12.1
 )
 
 tool (
