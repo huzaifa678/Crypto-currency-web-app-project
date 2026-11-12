@@ -25,15 +25,15 @@ require (
 	github.com/shopspring/decimal v1.6.0
 	golang.org/x/oauth2 v0.38.0
 	golang.org/x/sync v0.25.0
-	google.golang.org/api v0.309.0
+	google.golang.org/api v0.311.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20261026165753-2ffab32bce7e
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261026165753-2ffab32bce7e
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
 
 require (
 	cloud.google.com/go/auth v0.24.1-0.20261001053825-dbc26066f70a // indirect
-	cloud.google.com/go/auth/oauth2adapt v0.3.0 // indirect
+	cloud.google.com/go/auth/oauth2adapt v0.3.1 // indirect
 	cloud.google.com/go/compute/metadata v0.10.0 // indirect
 	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -44,8 +44,8 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0 // indirect
 	github.com/goccy/go-yaml v1.19.2 // indirect
 	github.com/google/s2a-go v0.1.11 // indirect
-	github.com/googleapis/enterprise-certificate-proxy v0.3.23 // indirect
-	github.com/googleapis/gax-go/v2 v2.26.2 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.3.24 // indirect
+	github.com/googleapis/gax-go/v2 v2.27.0 // indirect
 	github.com/jackc/puddle/v2 v2.2.3 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
@@ -102,7 +102,7 @@ require (
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.1 // indirect
 	golang.org/x/arch v0.22.0 // indirect
-	golang.org/x/net v0.61.0 // indirect
+	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 	google.golang.org/protobuf v1.36.12
