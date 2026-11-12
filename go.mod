@@ -20,13 +20,13 @@ require (
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/golang-migrate/migrate/v4 v4.20.1
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.32.0
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.33.0
 	github.com/jackc/pgx/v5 v5.12.0
 	github.com/shopspring/decimal v1.6.0
 	golang.org/x/oauth2 v0.38.0
 	golang.org/x/sync v0.25.0
 	google.golang.org/api v0.309.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20261012220534-4341edf3f941
+	google.golang.org/genproto/googleapis/api v0.0.0-20261026165753-2ffab32bce7e
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
