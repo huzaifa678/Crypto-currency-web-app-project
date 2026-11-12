@@ -24,7 +24,7 @@ require (
 	github.com/jackc/pgx/v5 v5.12.0
 	github.com/shopspring/decimal v1.6.0
 	golang.org/x/oauth2 v0.38.0
-	golang.org/x/sync v0.24.0
+	golang.org/x/sync v0.25.0
 	google.golang.org/api v0.309.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20261012220534-4341edf3f941
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20261019180522-ce908d29299b
